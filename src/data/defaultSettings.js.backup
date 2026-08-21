@@ -1,0 +1,108 @@
+export const DEFAULT_SETTINGS = {
+  // Geometry & Logo
+  archWidth: 280,
+  logoImage: 'logo.jpg',
+  logoSize: 36,
+  page13LogoSize: 54, // Separate & independent logo size for Page 13 (Info & Legend)
+
+  // Custom Page Background Image & Watermark
+  customBgImage: '',
+  bgOpacity: 20,              // 0% to 100%
+  bgBlur: 0,                  // 0px to 20px
+  bgDarkness: 30,             // 0% to 90%
+  bgFit: 'cover',             // 'cover' | 'contain' | 'center'
+
+  // QR Codes Configuration (Page 13 & Contact)
+  showQrCodes: true,
+  qrCodeSize: 68,
+  qrCodes: [
+    {
+      id: 'website',
+      title: 'WEBSITE & SPEISEKARTE',
+      url: 'https://alsafi-restaurant.de',
+      customImage: '',
+      subtitle: 'Online Speisekarte',
+    },
+    {
+      id: 'google',
+      title: 'GOOGLE BEWERTUNG',
+      url: 'https://g.page/r/alsafi-restaurant/review',
+      customImage: '',
+      subtitle: 'Bewerten Sie uns',
+    },
+    {
+      id: 'whatsapp',
+      title: 'WHATSAPP BESTELLUNG',
+      url: 'https://wa.me/4917634567890',
+      customImage: '',
+      subtitle: 'Reservierung & Chat',
+    },
+  ],
+
+  // Content Block Positioning (Nudge / Offset & Edge Margins)
+  contentOffsetX: 0,
+  contentOffsetY: 0,
+  contentScale: 100,            // 50% to 120% — scale entire content block as one unit
+  contentPaddingRight: 14,
+  contentPaddingLeft: 8,
+  printBleedScale: 100,       // 100% to 108% for full overscan bleed
+
+  // Page 13 Legend & Allergens Section Positioning & Typography
+  legendOffsetX: 0,
+  legendOffsetY: 0,
+  legendScale: 100,
+  legendPaddingBottom: 4,
+  legendTextSize: 8,          // Font size for Allergen & Additives list items (6px to 14px)
+  legendTitleSize: 10,        // Font size for Legend box titles (8px to 18px)
+  showHinweiseCard: true,     // Toggle for Hinweise & Symbole card
+  showAllergenLegend: true,   // Toggle for Allergen & Additives tables
+
+  // Dish Allergens Display
+  showDishAllergens: true,    // Toggle for dish-level allergen tags
+  allergenSize: 8,            // 6px to 16px
+
+  // Decorative Page Frame & Borders
+  showBorder: true,
+  borderTop: true,
+  borderBottom: true,
+  borderLeft: true,
+  borderRight: true,
+  borderCornerStyle: 'royal', // 'royal' | 'geometric' | 'none'
+  borderInset: 4,             // 0px to 24px (4px gives edge-to-edge luxury look)
+  borderWidth: 1.5,           // 0.5px to 4px
+  borderOpacity: 85,          // 20% to 100%
+
+  // Photo Blend & Transition
+  photoBlend: 'smooth',       // 'smooth' | 'vignette' | 'sharp'
+  photoFeather: 60,
+
+  // Whitespace Optimization & Luxury Ornaments
+  autoFitPageSpacing: true,   // Dynamically distributes item gaps based on page density
+  bottomOrnamentStyle: 'royal', // 'royal' | 'geometric' | 'stars' | 'classic' | 'none'
+  showCalloutCards: true,     // Shows Chef Recommendation callout cards on spare-space pages
+
+  // Spacing
+  itemGap: 8,
+  categoryGap: 18,
+
+  // Header Typography
+  titleSize: 28,
+  subtitleSize: 11.5,
+  taglineSize: 13.5,
+  dietaryBarSize: 8.5,
+
+  // Category Typography
+  catTitleSize: 16,
+  catSubtitleSize: 11,
+
+  // Dish / Item Typography
+  itemTitleSize: 14,
+  priceSize: 13.5,
+  descSize: 10,
+  allergenSize: 8,
+  itemNumSize: 12,
+
+  // Footer Typography
+  pageNumberSize: 15,
+  footerTextSize: 10,
+};
