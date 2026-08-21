@@ -43,9 +43,9 @@ export const PageDecorativeBorder = ({
             <stop offset="100%" stopColor="#9a7b2c" />
           </linearGradient>
           <linearGradient id="emeraldFrameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#0f3d23" />
-            <stop offset="50%" stopColor="#185d37" />
-            <stop offset="100%" stopColor="#082414" />
+            <stop offset="0%" stopColor="#e6cd85" />
+            <stop offset="50%" stopColor="#c9aa58" />
+            <stop offset="100%" stopColor="#a38942" />
           </linearGradient>
         </defs>
 

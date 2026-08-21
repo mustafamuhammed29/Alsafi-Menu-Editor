@@ -87,8 +87,8 @@ export const MenuItemRow = ({
             <EditableText
               value={item.name.replace(/ 🌱| 🥬| 🌶️🌶️| 🌶️/g, '')}
               onChange={handleNameChange}
-              className="font-bold text-white tracking-wide block"
-              style={{ fontSize: `${effectiveTitleSize}px`, lineHeight: 1.1 }}
+              className="font-bold text-white tracking-wide block drop-shadow-md"
+              style={{ fontSize: `${effectiveTitleSize}px`, lineHeight: 1.1, fontFamily: 'Outfit, sans-serif' }}
             />
 
             {/* Inline Allergen / Additive badge for compact rows without descriptions (e.g. Drinks) */}
@@ -163,8 +163,8 @@ export const MenuItemRow = ({
             )}
           </div>
 
-          {/* Dotted Leader Line */}
-          {item.price && <div className="flex-1 border-b-[2px] border-dotted border-brand-gold/30 mx-3 translate-y-[4px]"></div>}
+          {/* Elegant Leader Line */}
+          {item.price && <div className="flex-1 border-b border-dashed border-brand-gold/40 mx-4 translate-y-[4px]"></div>}
 
           {/* Price */}
           {item.price && (
@@ -172,7 +172,7 @@ export const MenuItemRow = ({
               <EditableText
                 value={item.price}
                 onChange={(v) => onUpdateItem(catIdx, itemIdx, 'price', v)}
-                className="price-badge-pill block origin-right"
+                className="price-badge-pill block origin-right font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F3E5AB] to-[#D4AF37]"
                 style={{ fontSize: `${effectivePriceSize}px` }}
               />
             </div>
@@ -193,8 +193,8 @@ export const MenuItemRow = ({
             <EditableText
               value={item.desc}
               onChange={(v) => onUpdateItem(catIdx, itemIdx, 'desc', v)}
-              className="text-gray-200 font-medium block pr-0.5 leading-[1.3]"
-              style={{ fontSize: `${effectiveDescSize}px` }}
+              className="text-[#a8b5b0] font-light block pr-0.5 leading-[1.4] tracking-wide"
+              style={{ fontSize: `${effectiveDescSize}px`, fontFamily: 'Inter, sans-serif' }}
             />
           </div>
         )}

@@ -126,19 +126,18 @@ export const MenuPageLayout = ({
     smartCatGap        = parseFloat((smartCatGap * userScale).toFixed(1));
   }
 
-  // Determine background style
-  let bgColor = '#000000'; // Default to true-black
+  // Premium Background Styling
+  let bgColor = '#050a07'; 
   let bgImage = '';
 
-  if (p.bgStyle === 'gradient') {
-    bgColor = '#050a07';
-    bgImage = 'linear-gradient(180deg, #0a1f13 0%, #07150d 40%, #050a07 100%)';
-  } else if (p.bgStyle === 'solid-green' || !p.bgStyle) {
-    bgColor = '#050a07';
+  if (p.bgStyle === 'gradient' || !p.bgStyle || p.bgStyle === 'solid-green') {
+    // Elegant radial/linear mix for a luxurious deep green feel
+    bgColor = '#060d09';
+    bgImage = 'radial-gradient(ellipse at top center, #0a1710 0%, #050a07 70%, #020503 100%)';
   } else if (p.bgStyle === 'true-black') {
     bgColor = '#000000';
+    bgImage = 'radial-gradient(ellipse at top center, #0a0a0a 0%, #000000 80%)';
   }
-
   const patternOpacity = p.bgPatternOpacity !== undefined ? (p.bgPatternOpacity / 100).toFixed(3) : 0.02;
   const patternScale = p.bgPatternScale !== undefined ? p.bgPatternScale / 100 : 1;
   const patternColor = p.bgPatternColor || '#c9aa58';
