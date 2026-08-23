@@ -84,57 +84,61 @@ export const ContentTab = () => {
         )}
       </div>
 
-      {/* Page Food Photos Quick Control Card */}
-      <PageImageControls editPageIdx={editPageIdx} pageImages={pageImages} />
-
-      {/* Page Mode Toggle */}
-      <div className="bg-black/40 border border-white/5 rounded-xl p-2.5">
-        <label className="text-[11px] text-gray-300 font-bold mb-2 block">نموذج الصفحة (Page Mode):</label>
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            onClick={() => updatePage(editPageIdx, { ...currentPage, pageMode: 'menu' })}
-            className={`py-1.5 px-2 rounded-lg text-[10px] font-bold transition ${(!currentPage.pageMode || currentPage.pageMode === 'menu') ? 'bg-brand-gold text-black' : 'bg-black/60 text-gray-400 border border-white/10 hover:text-white'}`}
-          >
-            قائمة عمود واحد
-          </button>
-          <button
-            type="button"
-            onClick={() => updatePage(editPageIdx, { ...currentPage, pageMode: 'two-columns' })}
-            className={`py-1.5 px-2 rounded-lg text-[10px] font-bold transition ${currentPage.pageMode === 'two-columns' ? 'bg-brand-gold text-black' : 'bg-black/60 text-gray-400 border border-white/10 hover:text-white'}`}
-          >
-            قائمة عمودين + صورة بالأسفل
-          </button>
-          <button
-            type="button"
-            onClick={() => updatePage(editPageIdx, { ...currentPage, pageMode: 'free-text' })}
-            className={`py-1.5 px-2 rounded-lg text-[10px] font-bold transition ${currentPage.pageMode === 'free-text' ? 'bg-brand-gold text-black' : 'bg-black/60 text-gray-400 border border-white/10 hover:text-white'}`}
-          >
-            محرر نصوص حر
-          </button>
-        </div>
-      </div>
-
-      {/* Content Editor */}
-      {console.log('[ContentTab] editPageIdx=', editPageIdx, 'page.id=', currentPage.id, 'page.layout=', currentPage.layout, 'categories.length=', categories.length)}
+      {/* If Page 13 (Info & Legend Page) */}
       {(currentPage.layout === 'info' || currentPage.id === 'page13' || (editPageIdx === 12 && (!categories || categories.length === 0))) ? (
         <Page13Editor pageIdx={editPageIdx} page={currentPage} />
-      ) : currentPage.pageMode === 'free-text' ? (
-        <FreeTextEditor pageIdx={editPageIdx} page={currentPage} />
-      ) : (!categories || categories.length === 0) ? (
-        <div className="text-center text-slate-400 text-xs py-6 px-4 border border-white/10 rounded-lg bg-black/30">
-          ℹ️ هذه صفحة معلومات وعناصر ثابتة. يمكنك تعديل نصوصها مباشرة بالنقر عليها في الصفحة نفسها.
-        </div>
       ) : (
-        <CategoryItemEditor 
-          editPageIdx={editPageIdx} 
-          editCatIdx={editCatIdx} 
-          currentCat={currentCat} 
-        />
-      )}
+        <>
+          {/* Page Food Photos Quick Control Card */}
+          <PageImageControls editPageIdx={editPageIdx} pageImages={pageImages} />
 
-      {/* Callout Card Editor */}
-      <CalloutCardEditor pageIdx={editPageIdx} page={currentPage} />
+          {/* Page Mode Toggle */}
+          <div className="bg-black/40 border border-white/5 rounded-xl p-2.5">
+            <label className="text-[11px] text-gray-300 font-bold mb-2 block">نموذج الصفحة (Page Mode):</label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => updatePage(editPageIdx, { ...currentPage, pageMode: 'menu' })}
+                className={`py-1.5 px-2 rounded-lg text-[10px] font-bold transition ${(!currentPage.pageMode || currentPage.pageMode === 'menu') ? 'bg-brand-gold text-black' : 'bg-black/60 text-gray-400 border border-white/10 hover:text-white'}`}
+              >
+                قائمة عمود واحد
+              </button>
+              <button
+                type="button"
+                onClick={() => updatePage(editPageIdx, { ...currentPage, pageMode: 'two-columns' })}
+                className={`py-1.5 px-2 rounded-lg text-[10px] font-bold transition ${currentPage.pageMode === 'two-columns' ? 'bg-brand-gold text-black' : 'bg-black/60 text-gray-400 border border-white/10 hover:text-white'}`}
+              >
+                قائمة عمودين + صورة بالأسفل
+              </button>
+              <button
+                type="button"
+                onClick={() => updatePage(editPageIdx, { ...currentPage, pageMode: 'free-text' })}
+                className={`py-1.5 px-2 rounded-lg text-[10px] font-bold transition ${currentPage.pageMode === 'free-text' ? 'bg-brand-gold text-black' : 'bg-black/60 text-gray-400 border border-white/10 hover:text-white'}`}
+              >
+                محرر نصوص حر
+              </button>
+            </div>
+          </div>
+
+          {/* Content Editor */}
+          {currentPage.pageMode === 'free-text' ? (
+            <FreeTextEditor pageIdx={editPageIdx} page={currentPage} />
+          ) : (!categories || categories.length === 0) ? (
+            <div className="text-center text-slate-400 text-xs py-6 px-4 border border-white/10 rounded-lg bg-black/30">
+              ℹ️ هذه صفحة معلومات وعناصر ثابتة. يمكنك تعديل نصوصها مباشرة بالنقر عليها في الصفحة نفسها.
+            </div>
+          ) : (
+            <CategoryItemEditor 
+              editPageIdx={editPageIdx} 
+              editCatIdx={editCatIdx} 
+              currentCat={currentCat} 
+            />
+          )}
+
+          {/* Callout Card Editor */}
+          <CalloutCardEditor pageIdx={editPageIdx} page={currentPage} />
+        </>
+      )}
     </div>
   );
 };

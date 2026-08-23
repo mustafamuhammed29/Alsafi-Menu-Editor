@@ -204,62 +204,216 @@ const TypographySettings = ({
           </div>
         </div>
 
-        {/* 1. Dish Title Size */}
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[11px] text-gray-300 font-semibold">حجم اسم الطبق:</span>
-            <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-              {currentSettings.itemTitleSize !== undefined ? currentSettings.itemTitleSize : 14}px
-            </span>
-          </div>
-          <input
-            type="range"
-            min="10"
-            max="26"
-            step="0.5"
-            className="control-slider"
-            value={currentSettings.itemTitleSize !== undefined ? currentSettings.itemTitleSize : 14}
-            onChange={(e) => updateSetting(targetScope, 'itemTitleSize', parseFloat(e.target.value))}
-          />
-        </div>
+        {/* Dedicated Controls for Page 13 (Catering & Legenden) */}
+        {targetScope === 'page13' ? (
+          <div className="space-y-3 pt-2">
+            <div className="bg-gradient-to-r from-[#0c2417] to-[#06140d] p-2.5 rounded-xl border border-brand-gold/50 shadow-md">
+              <span className="text-[11px] font-bold text-brand-gold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+                <span>إعدادات مخصصة لصفحة 13 (Catering &amp; Legenden)</span>
+              </span>
+              <p className="text-[9.5px] text-gray-300 mt-0.5">
+                تحكم مباشر في حجم الشعار، رموز QR، خطوط جداول الحساسية والملاحظات
+              </p>
+            </div>
 
-        {/* 2. Price Size */}
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[11px] text-gray-300 font-semibold">حجم شارة السعر:</span>
-            <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-              {currentSettings.priceSize !== undefined ? currentSettings.priceSize : 13.5}px
-            </span>
-          </div>
-          <input
-            type="range"
-            min="10"
-            max="26"
-            step="0.5"
-            className="control-slider"
-            value={currentSettings.priceSize !== undefined ? currentSettings.priceSize : 13.5}
-            onChange={(e) => updateSetting(targetScope, 'priceSize', parseFloat(e.target.value))}
-          />
-        </div>
+            {/* Page 13 Logo Size */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] text-gray-300 font-semibold">حجم شعار المطعم (صفحة 13):</span>
+                <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
+                  {currentSettings.page13LogoSize !== undefined ? currentSettings.page13LogoSize : 54}px
+                </span>
+              </div>
+              <input
+                type="range" min="30" max="100" step="1" className="control-slider"
+                value={currentSettings.page13LogoSize !== undefined ? currentSettings.page13LogoSize : 54}
+                onChange={(e) => updateSetting('page13', 'page13LogoSize', parseFloat(e.target.value))}
+              />
+            </div>
 
-        {/* 3. Description Size */}
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[11px] text-gray-300 font-semibold">حجم الوصف والمكونات:</span>
-            <span className="text-[11px] text-brand-accent font-mono font-bold bg-brand-green/30 px-1.5 py-0.5 rounded border border-brand-accent/30">
-              {currentSettings.descSize !== undefined ? currentSettings.descSize : 10}px
-            </span>
+            {/* Page 13 QR Size */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] text-gray-300 font-semibold">حجم رموز QR (صفحة 13):</span>
+                <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
+                  {currentSettings.qrCodeSize !== undefined ? currentSettings.qrCodeSize : 60}px
+                </span>
+              </div>
+              <input
+                type="range" min="40" max="110" step="2" className="control-slider"
+                value={currentSettings.qrCodeSize !== undefined ? currentSettings.qrCodeSize : 60}
+                onChange={(e) => {
+                  updateSetting('page13', 'qrCodeSize', parseFloat(e.target.value));
+                  updateSetting('global', 'qrCodeSize', parseFloat(e.target.value));
+                }}
+              />
+            </div>
+
+            {/* Page 13 Legend Title Size */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] text-gray-300 font-semibold">حجم عناوين جداول الدليل (Legend Titles):</span>
+                <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
+                  {currentSettings.legendTitleSize !== undefined ? currentSettings.legendTitleSize : 10}px
+                </span>
+              </div>
+              <input
+                type="range" min="8" max="18" step="0.5" className="control-slider"
+                value={currentSettings.legendTitleSize !== undefined ? currentSettings.legendTitleSize : 10}
+                onChange={(e) => {
+                  updateSetting('page13', 'legendTitleSize', parseFloat(e.target.value));
+                  updateSetting('global', 'legendTitleSize', parseFloat(e.target.value));
+                }}
+              />
+            </div>
+
+            {/* Page 13 Legend Text Size */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] text-gray-300 font-semibold">حجم خط قائمة الحساسية والملاحظات:</span>
+                <span className="text-[11px] text-brand-accent font-mono font-bold bg-brand-green/30 px-1.5 py-0.5 rounded border border-brand-accent/30">
+                  {currentSettings.legendTextSize !== undefined ? currentSettings.legendTextSize : 8}px
+                </span>
+              </div>
+              <input
+                type="range" min="6.5" max="14" step="0.5" className="control-slider"
+                value={currentSettings.legendTextSize !== undefined ? currentSettings.legendTextSize : 8}
+                onChange={(e) => {
+                  updateSetting('page13', 'legendTextSize', parseFloat(e.target.value));
+                  updateSetting('global', 'legendTextSize', parseFloat(e.target.value));
+                }}
+              />
+            </div>
+
+            {/* Page 13 Legend Offsets */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-300">إزاحة أفقية (X):</span>
+                  <span className="text-[10px] text-brand-gold font-mono">{currentSettings.legendOffsetX || 0}px</span>
+                </div>
+                <input
+                  type="range" min="-30" max="30" step="1" className="control-slider"
+                  value={currentSettings.legendOffsetX || 0}
+                  onChange={(e) => updateSetting('page13', 'legendOffsetX', parseFloat(e.target.value))}
+                />
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-300">إزاحة عمودية (Y):</span>
+                  <span className="text-[10px] text-brand-gold font-mono">{currentSettings.legendOffsetY || 0}px</span>
+                </div>
+                <input
+                  type="range" min="-30" max="30" step="1" className="control-slider"
+                  value={currentSettings.legendOffsetY || 0}
+                  onChange={(e) => updateSetting('page13', 'legendOffsetY', parseFloat(e.target.value))}
+                />
+              </div>
+            </div>
+
+            {/* Toggles */}
+            <div className="space-y-1.5 pt-2 border-t border-white/10">
+              <label className="flex items-center gap-2 text-xs text-gray-200 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={currentSettings.showHinweiseCard !== false}
+                  onChange={(e) => {
+                    updateSetting('page13', 'showHinweiseCard', e.target.checked);
+                    updateSetting('global', 'showHinweiseCard', e.target.checked);
+                  }}
+                  className="rounded"
+                />
+                <span>إظهار بطاقة الملاحظات (Hinweise &amp; Symbole)</span>
+              </label>
+
+              <label className="flex items-center gap-2 text-xs text-gray-200 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={currentSettings.showAllergenLegend !== false}
+                  onChange={(e) => {
+                    updateSetting('page13', 'showAllergenLegend', e.target.checked);
+                    updateSetting('global', 'showAllergenLegend', e.target.checked);
+                  }}
+                  className="rounded"
+                />
+                <span>إظهار جدول الحساسية (Allergenlegende)</span>
+              </label>
+
+              <label className="flex items-center gap-2 text-xs text-gray-200 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={currentSettings.showQrCodes !== false}
+                  onChange={(e) => {
+                    updateSetting('page13', 'showQrCodes', e.target.checked);
+                    updateSetting('global', 'showQrCodes', e.target.checked);
+                  }}
+                  className="rounded"
+                />
+                <span>إظهار رموز الباركود (QR Codes)</span>
+              </label>
+            </div>
           </div>
-          <input
-            type="range"
-            min="8"
-            max="18"
-            step="0.5"
-            className="control-slider"
-            value={currentSettings.descSize !== undefined ? currentSettings.descSize : 10}
-            onChange={(e) => updateSetting(targetScope, 'descSize', parseFloat(e.target.value))}
-          />
-        </div>
+        ) : (
+          <>
+            {/* 1. Dish Title Size */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] text-gray-300 font-semibold">حجم اسم الطبق:</span>
+                <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
+                  {currentSettings.itemTitleSize !== undefined ? currentSettings.itemTitleSize : 14}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min="10"
+                max="26"
+                step="0.5"
+                className="control-slider"
+                value={currentSettings.itemTitleSize !== undefined ? currentSettings.itemTitleSize : 14}
+                onChange={(e) => updateSetting(targetScope, 'itemTitleSize', parseFloat(e.target.value))}
+              />
+            </div>
+
+            {/* 2. Price Size */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] text-gray-300 font-semibold">حجم شارة السعر:</span>
+                <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
+                  {currentSettings.priceSize !== undefined ? currentSettings.priceSize : 13.5}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min="10"
+                max="26"
+                step="0.5"
+                className="control-slider"
+                value={currentSettings.priceSize !== undefined ? currentSettings.priceSize : 13.5}
+                onChange={(e) => updateSetting(targetScope, 'priceSize', parseFloat(e.target.value))}
+              />
+            </div>
+
+            {/* 3. Description Size */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] text-gray-300 font-semibold">حجم الوصف والمكونات:</span>
+                <span className="text-[11px] text-brand-accent font-mono font-bold bg-brand-green/30 px-1.5 py-0.5 rounded border border-brand-accent/30">
+                  {currentSettings.descSize !== undefined ? currentSettings.descSize : 10}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min="8"
+                max="20"
+                step="0.5"
+                className="control-slider"
+                value={currentSettings.descSize !== undefined ? currentSettings.descSize : 10}
+                onChange={(e) => updateSetting(targetScope, 'descSize', parseFloat(e.target.value))}
+              />
+            </div>
+          </>
+        )}
 
         {/* 4. Category Title Size */}
         <div>
