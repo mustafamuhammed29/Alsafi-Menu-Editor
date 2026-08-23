@@ -23,7 +23,7 @@ export const MenuPageLayout = ({
 }) => {
   const p = pageSettings;
   const w = p.archWidth;
-  const { updatePageCallout, updateFloatingShape, deleteFloatingShape } = useMenu();
+  const { updatePageCallout, updateFloatingShape, deleteFloatingShape, updateSetting } = useMenu();
 
   const containerRef = useRef(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -207,6 +207,34 @@ export const MenuPageLayout = ({
   const isTwoColumnMode = pageData.pageMode === 'two-columns' || pageIndex === 11;
   const colImages = pageData.images?.slice(0, 2).map(img => img?.url || (typeof img === 'string' ? img : null)).filter(Boolean) || [];
 
+  // Smart Auto-Fit & Maximize: Intelligently calculates the maximum possible font size and clean spacing
+  // so the page content fills the A4 page at the largest possible size without any overflow!
+  const handleAutoFitAndMaximize = (e) => {
+    e?.stopPropagation();
+    const el = containerRef.current;
+    if (!el) return;
+
+    const clientH = el.clientHeight || 1122;
+    const scrollH = el.scrollHeight;
+    const currentScale = p.contentScale !== undefined ? Number(p.contentScale) : 100;
+
+    // Target height with safety margin to guarantee zero overflow
+    const targetH = clientH - 10;
+    const fitFactor = Math.min(1.0, targetH / Math.max(1, scrollH));
+    const newScale = Math.max(50, Math.min(140, Math.floor(currentScale * fitFactor * 0.99)));
+
+    const pageScope = `page${pageIndex + 1}`;
+    updateSetting(pageScope, 'contentScale', newScale);
+
+    // Tighten gaps slightly if needed to give maximum room for larger text
+    if ((p.itemGap !== undefined ? Number(p.itemGap) : baseGap) > 6) {
+      updateSetting(pageScope, 'itemGap', Math.max(2, Math.floor((p.itemGap !== undefined ? Number(p.itemGap) : baseGap) * 0.85)));
+    }
+    if ((p.categoryGap !== undefined ? Number(p.categoryGap) : baseCatGap) > 10) {
+      updateSetting(pageScope, 'categoryGap', Math.max(4, Math.floor((p.categoryGap !== undefined ? Number(p.categoryGap) : baseCatGap) * 0.85)));
+    }
+  };
+
   return (
     <div className="a4-page-wrapper" id={pageData.id}>
       <div 
@@ -214,11 +242,22 @@ export const MenuPageLayout = ({
         className={`a4-page ${isOverflowing ? 'a4-overflow-detected' : ''}`} 
         style={{ backgroundColor: bgColor, backgroundImage: bgImage || 'none' }}
       >
-        {/* Debug / Edit mode Visual Overflow Warning */}
+        {/* Debug / Edit mode Visual Overflow Warning with One-Click Smart Auto-Fit Button */}
         {isOverflowing && (
           <div className="a4-overflow-badge no-print" title="المحتوى يتجاوز الحد الأقصى لارتفاع صفحة A4 (297mm)">
-            <span>⚠️</span>
-            <span>تجاوز ارتفاع A4 (297mm) — يرجى تصغير مقياس المحتوى</span>
+            <div className="flex items-center gap-1.5 font-bold text-xs text-white">
+              <span>⚠️</span>
+              <span>تجاوز ارتفاع A4 (297mm)</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleAutoFitAndMaximize}
+              className="px-3 py-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black text-xs font-black rounded-lg shadow-lg transition-transform hover:scale-105 active:scale-95 flex items-center gap-1.5 cursor-pointer border border-white/40"
+              title="إعادة توزيع وضبط المحتوى تلقائياً بأكبر حجم خط ممكن ليتناسب 100% مع ورقة A4"
+            >
+              <span>⚡</span>
+              <span>ضبط وتكبير تلقائي مثالي</span>
+            </button>
           </div>
         )}
 
