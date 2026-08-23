@@ -268,6 +268,86 @@ export const Page13Editor = ({ pageIdx = 12, page }) => {
           />
         </div>
       </div>
+
+      {/* 5. Footer & Page Number Controls for Page 13 */}
+      <div className="bg-black/60 border border-white/10 rounded-xl p-3 space-y-2.5 shadow-sm">
+        <span className="text-[11px] font-bold text-brand-goldLight flex items-center gap-1">
+          <Type className="w-3 h-3 text-brand-gold" />
+          <span>تذييل الصفحة ورقم الصفحة (Footer &amp; Page Number):</span>
+        </span>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <div className="flex justify-between text-[10px] text-gray-300 mb-1">
+              <span>حجم نص التذييل:</span>
+              <span className="text-brand-gold font-mono">{p.footerTextSize !== undefined ? p.footerTextSize : 10}px</span>
+            </div>
+            <input
+              type="range" min="6" max="20" step="0.5" className="control-slider"
+              value={p.footerTextSize !== undefined ? p.footerTextSize : 10}
+              onChange={(e) => updateSetting(pageScope, 'footerTextSize', parseFloat(e.target.value))}
+            />
+          </div>
+          <div>
+            <div className="flex justify-between text-[10px] text-gray-300 mb-1">
+              <span>إزاحة عمودية (نص):</span>
+              <span className="text-brand-accent font-mono">{p.footerTextOffsetY || 0}px</span>
+            </div>
+            <input
+              type="range" min="-200" max="200" step="1" className="control-slider"
+              value={p.footerTextOffsetY || 0}
+              onChange={(e) => updateSetting(pageScope, 'footerTextOffsetY', parseFloat(e.target.value))}
+            />
+          </div>
+          <div className="col-span-2">
+            <div className="flex justify-between text-[10px] text-gray-300 mb-1">
+              <span>إزاحة أفقية (نص التذييل):</span>
+              <span className="text-brand-accent font-mono">{p.footerTextOffsetX || 0}px</span>
+            </div>
+            <input
+              type="range" min="-200" max="200" step="1" className="control-slider"
+              value={p.footerTextOffsetX || 0}
+              onChange={(e) => updateSetting(pageScope, 'footerTextOffsetX', parseFloat(e.target.value))}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
+          <div>
+            <div className="flex justify-between text-[10px] text-gray-300 mb-1">
+              <span>حجم رقم الصفحة:</span>
+              <span className="text-brand-gold font-mono">{p.pageNumberSize !== undefined ? p.pageNumberSize : 14}px</span>
+            </div>
+            <input
+              type="range" min="8" max="28" step="0.5" className="control-slider"
+              value={p.pageNumberSize !== undefined ? p.pageNumberSize : 14}
+              onChange={(e) => updateSetting(pageScope, 'pageNumberSize', parseFloat(e.target.value))}
+            />
+          </div>
+          <div>
+            <div className="flex justify-between text-[10px] text-gray-300 mb-1">
+              <span>إزاحة عمودية (رقم):</span>
+              <span className="text-brand-accent font-mono">{p.pageNumberOffsetY || 0}px</span>
+            </div>
+            <input
+              type="range" min="-200" max="200" step="1" className="control-slider"
+              value={p.pageNumberOffsetY || 0}
+              onChange={(e) => updateSetting(pageScope, 'pageNumberOffsetY', parseFloat(e.target.value))}
+            />
+          </div>
+          <div className="col-span-2">
+            <div className="flex justify-between text-[10px] text-gray-300 mb-1">
+              <span>إزاحة أفقية (رقم الصفحة):</span>
+              <span className="text-brand-accent font-mono">{p.pageNumberOffsetX || 0}px</span>
+            </div>
+            <input
+              type="range" min="-200" max="200" step="1" className="control-slider"
+              value={p.pageNumberOffsetX || 0}
+              onChange={(e) => updateSetting(pageScope, 'pageNumberOffsetX', parseFloat(e.target.value))}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

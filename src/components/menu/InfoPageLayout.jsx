@@ -371,18 +371,30 @@ export const InfoPageLayout = ({
 
         {/* Footer */}
         <footer 
-          className="absolute bottom-4 pt-0.5 border-t border-brand-gold/30 flex items-center justify-between text-[9.5px] text-brand-textMuted tracking-widest font-cinzel z-30"
+          className="absolute bottom-4 pt-0.5 border-t border-brand-gold/30 flex items-center justify-between text-brand-textMuted tracking-widest font-cinzel z-30"
           style={{
+            fontSize: `${p.footerTextSize || 9.5}px`,
             left: `${p.contentPaddingLeft !== undefined ? p.contentPaddingLeft : 36}px`,
             right: `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 36}px`
           }}
         >
-          <span>ALSAFI RESTAURANT · HEIDELBERG</span>
-          <EditableText
-            value={pageData.pageNumber}
-            onChange={(v) => onUpdateHeader(pageIndex, 'pageNumber', v)}
-            className="text-brand-gold font-bold text-[13px] block"
-          />
+          <span 
+            className="transition-transform duration-75" 
+            style={{ transform: `translate(${p.footerTextOffsetX || 0}px, ${p.footerTextOffsetY || 0}px)`, display: 'inline-block' }}
+          >
+            ALSAFI RESTAURANT · HEIDELBERG
+          </span>
+          <div 
+            className="transition-transform duration-75" 
+            style={{ transform: `translate(${p.pageNumberOffsetX || 0}px, ${p.pageNumberOffsetY || 0}px)` }}
+          >
+            <EditableText
+              value={pageData.pageNumber}
+              onChange={(v) => onUpdateHeader(pageIndex, 'pageNumber', v)}
+              className="text-brand-gold font-bold block"
+              style={{ fontSize: `${p.pageNumberSize || 14}px` }}
+            />
+          </div>
         </footer>
         </div>
       </div>
