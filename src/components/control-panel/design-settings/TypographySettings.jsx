@@ -24,7 +24,17 @@ const TypographySettings = ({
   selectedImageSlot,
   setSelectedImageSlot
 }) => {
-  const { pages, globalSettings, pageOverrides, updateSetting, updateImageTransform, resetImageTransform, updatePageImage } = useMenu();
+  const {
+    pages,
+    globalSettings,
+    pageOverrides,
+    updateSetting,
+    updateImageTransform,
+    resetImageTransform,
+    updatePageImage,
+    maximizePageTypography,
+    maximizeAllPagesTypography,
+  } = useMenu();
 
   const [customPct, setCustomPct] = useState(100);
 
@@ -171,6 +181,26 @@ const TypographySettings = ({
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-1 pt-1.5 border-t border-white/10 mt-1">
+            <span className="text-[10px] text-gray-300 font-semibold">استغلال المساحة الشاغرة:</span>
+            <button
+              type="button"
+              onClick={() => {
+                if (targetScope === 'global') {
+                  maximizeAllPagesTypography();
+                } else {
+                  const pIdx = parseInt(targetScope.replace('page', ''), 10) - 1;
+                  maximizePageTypography(pIdx);
+                }
+              }}
+              className="px-2.5 py-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:brightness-110 text-black text-[10.5px] font-black rounded-lg shadow transition flex items-center gap-1 cursor-pointer"
+              title="تكبير الخطوط واستغلال المساحة المتاحة بالصفحة لأقصى حد لتكون واضحة جداً للزبون"
+            >
+              <Sparkles className="w-3 h-3 text-black" />
+              <span>⚡ تكبير الخط وملء المساحة تلقائياً</span>
+            </button>
           </div>
         </div>
 

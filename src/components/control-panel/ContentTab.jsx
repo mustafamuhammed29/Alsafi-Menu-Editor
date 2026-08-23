@@ -7,6 +7,7 @@ import PageImageControls from './content-settings/PageImageControls';
 import CategoryItemEditor from './content-settings/CategoryItemEditor';
 import CalloutCardEditor from './content-settings/CalloutCardEditor';
 import FreeTextEditor from './content-settings/FreeTextEditor';
+import Page13Editor from './content-settings/Page13Editor';
 
 export const ContentTab = () => {
   const { pages, resetToOfficialPdfData, updatePage } = useMenu();
@@ -115,11 +116,13 @@ export const ContentTab = () => {
       </div>
 
       {/* Content Editor */}
-      {currentPage.pageMode === 'free-text' ? (
+      {currentPage.layout === 'info' ? (
+        <Page13Editor pageIdx={editPageIdx} page={currentPage} />
+      ) : currentPage.pageMode === 'free-text' ? (
         <FreeTextEditor pageIdx={editPageIdx} page={currentPage} />
       ) : (!categories || categories.length === 0) ? (
         <div className="text-center text-slate-400 text-xs py-6 px-4 border border-white/10 rounded-lg bg-black/30">
-          ℹ️ هذه صفحة معلومات وعناصر ثابتة (Catering & Legenden). يمكنك تعديل نصوصها مباشرة بالنقر عليها في الصفحة نفسها.
+          ℹ️ هذه صفحة معلومات وعناصر ثابتة. يمكنك تعديل نصوصها مباشرة بالنقر عليها في الصفحة نفسها.
         </div>
       ) : (
         <CategoryItemEditor 

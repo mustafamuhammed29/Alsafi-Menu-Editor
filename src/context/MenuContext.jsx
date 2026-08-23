@@ -394,6 +394,37 @@ export const MenuProvider = ({ children }) => {
     return { ...globalSettings, ...(pageOverrides[pageKey] || {}) };
   };
 
+  // Smart Typography Maximizer: Expands fonts & fills unused page height to the maximum possible readable size!
+  const maximizePageTypography = (pageIndex) => {
+    const page = pages[pageIndex];
+    if (!page) return;
+    const pageKey = `page${pageIndex + 1}`;
+    const pageWrapper = document.getElementById(page.id);
+    if (!pageWrapper) return;
+    const el = pageWrapper.querySelector('.a4-page') || pageWrapper;
+    const clientH = el.clientHeight || 1122;
+    const scrollH = el.scrollHeight;
+
+    const currentOverride = pageOverrides[pageKey] || {};
+    const currentScale = currentOverride.contentScale !== undefined ? currentOverride.contentScale : (globalSettings.contentScale || 100);
+
+    // Target height with safety padding to prevent overflow
+    const targetH = clientH - 16;
+    const ratio = targetH / Math.max(1, scrollH);
+    const newScale = Math.max(60, Math.min(145, Math.floor(currentScale * ratio)));
+
+    updateSetting(pageKey, 'contentScale', newScale);
+    return newScale;
+  };
+
+  const maximizeAllPagesTypography = () => {
+    pages.forEach((_, idx) => {
+      setTimeout(() => {
+        maximizePageTypography(idx);
+      }, idx * 45);
+    });
+  };
+
   // Export / Import
   const exportBackup = () => {
     const dataStr = JSON.stringify({ pages, globalSettings, pageOverrides }, null, 2);
@@ -451,6 +482,8 @@ export const MenuProvider = ({ children }) => {
         zoomInPreview,
         zoomOutPreview,
         resetPreviewZoom,
+        maximizePageTypography,
+        maximizeAllPagesTypography,
         updateSetting,
         resetScope,
         resetToOfficialPdfData,

@@ -25,6 +25,7 @@ export const TopControlBar = () => {
     zoomOutPreview,
     resetPreviewZoom,
     setPreviewZoom,
+    maximizeAllPagesTypography,
   } = useMenu();
 
   const [isWorking, setIsWorking]               = useState(false);
@@ -139,6 +140,17 @@ export const TopControlBar = () => {
               </button>
             )}
           </div>
+
+          {/* Maximize All Pages Typography & Exploit Space */}
+          <button
+            type="button"
+            onClick={maximizeAllPagesTypography}
+            className="px-3.5 py-2 bg-gradient-to-r from-amber-500/20 via-yellow-500/30 to-amber-500/20 hover:from-amber-500/40 hover:to-yellow-500/40 border border-brand-gold/60 text-brand-goldLight text-xs font-bold rounded-lg transition flex items-center gap-1.5 shadow-sm hover:border-brand-gold cursor-pointer"
+            title="فحص كافة الصفحات وتكبير الخطوط واستغلال المساحات الشاغرة لأقصى حد لضمان وضوح كامل للزبون"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+            <span>👑 تكبير واستغلال كل الصفحات</span>
+          </button>
 
           {/* Backup */}
           <button
