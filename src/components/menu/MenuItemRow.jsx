@@ -19,9 +19,9 @@ export const MenuItemRow = ({
   const hasDesc = item.desc && item.desc.trim() !== '';
   const [showBadgeMenu, setShowBadgeMenu] = useState(false);
 
-  const effectiveTitleSize = smartItemTitleSize || p.itemTitleSize || 14;
-  const effectivePriceSize = smartPriceSize || p.priceSize || 13.5;
-  const effectiveDescSize = smartDescSize || p.descSize || 10;
+  const effectiveTitleSize = Math.max(12, smartItemTitleSize || p.itemTitleSize || 14);
+  const effectivePriceSize = Math.max(12, smartPriceSize || p.priceSize || 13.5);
+  const effectiveDescSize = Math.max(8.5, smartDescSize || p.descSize || 10);
   const effectiveAllergenSize = smartAllergenSize || p.allergenSize || Math.max(7, effectiveDescSize - 1.5);
   const effectiveNumSize = p.itemNumSize || 15;
 

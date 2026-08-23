@@ -71,6 +71,26 @@ export const MenuProvider = ({ children }) => {
     }
   });
 
+  // Pure UI Screen Preview Zoom (50% - 150%, does NOT affect print/PDF export)
+  const [previewZoom, setPreviewZoom] = useState(() => {
+    try {
+      const saved = localStorage.getItem('alsafi_preview_zoom');
+      return saved ? Number(saved) : 100;
+    } catch {
+      return 100;
+    }
+  });
+
+  const zoomInPreview = () => setPreviewZoom((prev) => Math.min(150, prev + 10));
+  const zoomOutPreview = () => setPreviewZoom((prev) => Math.max(50, prev - 10));
+  const resetPreviewZoom = () => setPreviewZoom(100);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('alsafi_preview_zoom', previewZoom.toString());
+    } catch (_) {}
+  }, [previewZoom]);
+
   // Autosave to localStorage
   useEffect(() => {
     try {
@@ -426,6 +446,11 @@ export const MenuProvider = ({ children }) => {
         addFloatingShape,
         updateFloatingShape,
         deleteFloatingShape,
+        previewZoom,
+        setPreviewZoom,
+        zoomInPreview,
+        zoomOutPreview,
+        resetPreviewZoom,
         updateSetting,
         resetScope,
         resetToOfficialPdfData,

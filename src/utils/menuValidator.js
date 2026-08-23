@@ -1,7 +1,11 @@
 /**
  * Menu Pre-Export Validation Utility
  * Validates all pages and dishes to ensure print and export readiness.
- * Blocks export if placeholder dishes (e.g. 'طبق جديد') or 0,00 € prices exist.
+ * Checks for:
+ * 1. Placeholder / empty dish names
+ * 2. Missing / zero prices
+ * 3. A4 height overflow (> 297mm in DOM)
+ * 4. German character support readiness
  */
 
 export const validateMenuForExport = (pages) => {
@@ -18,6 +22,26 @@ export const validateMenuForExport = (pages) => {
     const pageNum = page.pageNumber || `0${pIdx + 1}`.slice(-2);
     const pageTitle = (page.header?.title || `Page ${pageNum}`).split('\n')[0];
 
+    // Check 1: DOM Physical Overflow Check (> 297mm)
+    if (typeof document !== 'undefined') {
+      const pageWrapper = document.getElementById(page.id);
+      if (pageWrapper) {
+        const pageElement = pageWrapper.querySelector('.a4-page') || pageWrapper;
+        const clientH = pageElement.clientHeight || 1122;
+        const scrollH = pageElement.scrollHeight;
+        if (scrollH > clientH + 8) {
+          errors.push({
+            pageNumber: pageNum,
+            pageTitle,
+            categoryTitle: 'تنسيق الصفحة والأبعاد',
+            itemNum: 'A4 Layout',
+            dishName: 'تجاوز حدود الورقة A4 (297mm)',
+            reason: `محتوى هذه الصفحة يتجاوز الارتفاع الفعلي لورقة A4 بمقدار ${scrollH - clientH}px. يرجى تقليص "مقياس محتوى الصفحة" أو تقليل التباعد لتفادي قص النصوص عند الطباعة.`,
+          });
+        }
+      }
+    }
+
     if (page.categories && Array.isArray(page.categories)) {
       page.categories.forEach((cat) => {
         const catTitle = cat.title || 'Unbenannte Kategorie';
@@ -29,7 +53,7 @@ export const validateMenuForExport = (pages) => {
             const lowerName = cleanName.toLowerCase();
             const price = (item.price || '').trim();
 
-            // Check 1: Empty or placeholder dish name
+            // Check 2: Empty or placeholder dish name
             if (!cleanName) {
               errors.push({
                 pageNumber: pageNum,
@@ -50,7 +74,7 @@ export const validateMenuForExport = (pages) => {
               });
             }
 
-            // Check 2: Zero or empty price
+            // Check 3: Zero or empty price
             if (!price || price === '0,00 €' || price === '0 €' || price === '0,00' || price === '0.00' || price === '0') {
               errors.push({
                 pageNumber: pageNum,

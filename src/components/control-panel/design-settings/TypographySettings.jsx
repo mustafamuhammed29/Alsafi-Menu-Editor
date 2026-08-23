@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Type, Globe, Move, Shield, Frame, LayoutTemplate, Utensils, Footprints, QrCode, Upload, Trash2, Camera, Sparkles, Sliders } from 'lucide-react';
+import { Type, Globe, Move, Shield, Frame, LayoutTemplate, Utensils, Footprints, QrCode, Upload, Trash2, Camera, Sparkles, Sliders, RotateCcw } from 'lucide-react';
 import { useMenu } from '../../../context/MenuContext';
 import { optimizeImageFile } from '../../../utils/imageOptimizer';
 
@@ -113,54 +113,64 @@ const TypographySettings = ({
           )}
         </div>
 
-        {/* Quick Text Sizing Presets for Selected Scope */}
-        <div className="bg-black/60 p-2 rounded-lg border border-white/10 space-y-1.5">
-          <span className="text-[10px] text-gray-300 font-semibold block">نسب سريعة لتكبير النصوص ({targetScope === 'global' ? 'لكل الصفحات' : `لصفحة ${targetScope.replace('page', '')}`}):</span>
-          <div className="flex flex-wrap gap-1.5 mt-1">
-            {[50, 75, 100, 125, 150, 175, 200, 250, 300].map((pct) => (
-              <button
-                key={pct}
-                type="button"
-                onClick={() => {
-                  const scale = pct / 100;
-                  updateSetting(targetScope, 'itemTitleSize', 13.5 * scale);
-                  updateSetting(targetScope, 'priceSize', 13 * scale);
-                  updateSetting(targetScope, 'descSize', 9.5 * scale);
-                  updateSetting(targetScope, 'catTitleSize', 15 * scale);
-                }}
-                className="py-1 px-2 bg-black hover:bg-brand-gold hover:text-black border border-brand-gold/30 rounded text-[10px] font-bold text-gray-300 transition"
-              >
-                {pct}%
-              </button>
-            ))}
+        {/* ★ PROMINENT CONTENT SCALE (تكبير وتصغير محتوى الصفحة للطباعة) ★ */}
+        <div className="bg-gradient-to-r from-[#0c2417] to-[#06140d] p-3 rounded-xl border-2 border-brand-gold/60 space-y-2 shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-xs font-bold text-brand-gold flex items-center gap-1.5">
+                <Sliders className="w-3.5 h-3.5 text-yellow-400" />
+                <span>تكبير / تصغير محتوى الصفحة (Content Scale)</span>
+              </span>
+              <p className="text-[10px] text-gray-300 mt-0.5">
+                يتحكم بحجم الخطوط والتباعد المطبوع فعلياً داخل ({targetScope === 'global' ? 'كل الصفحات' : `صفحة ${targetScope.replace('page', '')}`})
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-yellow-400 font-mono font-bold bg-black/80 px-2 py-0.5 rounded border border-yellow-500/40">
+                {currentSettings.contentScale !== undefined ? currentSettings.contentScale : 100}%
+              </span>
+              {(currentSettings.contentScale !== undefined && currentSettings.contentScale !== 100) && (
+                <button
+                  type="button"
+                  onClick={() => updateSetting(targetScope, 'contentScale', 100)}
+                  className="px-2 py-0.5 bg-red-950/60 hover:bg-red-800 text-red-200 border border-red-500/40 rounded text-[10px] font-bold transition flex items-center gap-1"
+                  title="إعادة الضبط الافتراضي للتحجيم التلقائي الذكي (100%)"
+                >
+                  <RotateCcw className="w-2.5 h-2.5" />
+                  <span>إعادة ضبط (100%)</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/5">
-            <span className="text-[10px] text-gray-300">أو اكتب نسبة مخصصة:</span>
-            <input
-              type="number"
-              min="10"
-              max="500"
-              value={customPct}
-              onChange={(e) => setCustomPct(e.target.value)}
-              className="w-16 bg-black text-brand-goldLight border border-brand-gold/60 rounded px-2 py-0.5 text-[11px] font-bold focus:outline-none focus:border-brand-gold"
-            />
-            <span className="text-[10px] text-gray-400">%</span>
-            <button
-              type="button"
-              onClick={() => {
-                const pct = parseInt(customPct);
-                if (isNaN(pct) || pct <= 0) return;
-                const scale = pct / 100;
-                updateSetting(targetScope, 'itemTitleSize', 13.5 * scale);
-                updateSetting(targetScope, 'priceSize', 13 * scale);
-                updateSetting(targetScope, 'descSize', 9.5 * scale);
-                updateSetting(targetScope, 'catTitleSize', 15 * scale);
-              }}
-              className="py-0.5 px-3 bg-brand-green/80 hover:bg-brand-green text-brand-accent border border-brand-accent/40 rounded text-[10px] font-bold transition ml-auto"
-            >
-              تطبيق النسبة
-            </button>
+          <input
+            type="range"
+            min="60"
+            max="140"
+            step="1"
+            className="control-slider"
+            value={currentSettings.contentScale !== undefined ? currentSettings.contentScale : 100}
+            onChange={(e) => updateSetting(targetScope, 'contentScale', parseFloat(e.target.value))}
+          />
+
+          <div className="flex items-center justify-between gap-1 pt-1">
+            <span className="text-[9.5px] text-gray-400">نسب سريعة:</span>
+            <div className="flex gap-1">
+              {[75, 90, 100, 110, 125].map((pct) => (
+                <button
+                  key={pct}
+                  type="button"
+                  onClick={() => updateSetting(targetScope, 'contentScale', pct)}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition ${
+                    (currentSettings.contentScale || 100) === pct
+                      ? 'bg-brand-gold text-black'
+                      : 'bg-black/60 text-gray-300 hover:text-white border border-white/10'
+                  }`}
+                >
+                  {pct}%
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -305,22 +315,8 @@ const TypographySettings = ({
           </div>
         </div>
 
-        {/* 7. Hidden Typography & Global Scale */}
+        {/* Subtitle & Tagline Details */}
         <div className="pt-2 mt-2 border-t border-white/10 space-y-3">
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-[11px] text-gray-300 font-bold">تكبير وتصغير المحتوى (Global Zoom):</span>
-              <span className="text-[11px] text-yellow-400 font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-yellow-500/30">
-                {currentSettings.contentScale !== undefined ? currentSettings.contentScale : 100}%
-              </span>
-            </div>
-            <input
-              type="range" min="50" max="150" step="1" className="control-slider"
-              value={currentSettings.contentScale !== undefined ? currentSettings.contentScale : 100}
-              onChange={(e) => updateSetting(targetScope, 'contentScale', parseFloat(e.target.value))}
-            />
-          </div>
-
           <div>
             <div className="flex justify-between items-center mb-1">
               <span className="text-[11px] text-gray-300 font-semibold">حجم العنوان الفرعي (Subtitle):</span>

@@ -6,6 +6,9 @@ import {
   Loader2,
   Check,
   AlertTriangle,
+  ZoomIn,
+  ZoomOut,
+  X,
 } from 'lucide-react';
 import { useMenu } from '../../context/MenuContext';
 import { exportMenuAsPDF } from '../../utils/pdfExporter';
@@ -14,7 +17,15 @@ import { validateMenuForExport } from '../../utils/menuValidator';
 
 // ─── Main TopControlBar ────────────────────────────────────────────────────────
 export const TopControlBar = () => {
-  const { exportBackup, pages } = useMenu();
+  const {
+    exportBackup,
+    pages,
+    previewZoom,
+    zoomInPreview,
+    zoomOutPreview,
+    resetPreviewZoom,
+    setPreviewZoom,
+  } = useMenu();
 
   const [isWorking, setIsWorking]               = useState(false);
   const [workProgress, setWorkProgress]         = useState({ current: 0, total: 0, text: '' });
@@ -88,7 +99,46 @@ export const TopControlBar = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
+
+          {/* Screen Preview Zoom Control (UX feature) */}
+          <div className="flex items-center gap-1.5 bg-black/60 border border-brand-gold/40 rounded-xl px-2.5 py-1 shadow-inner mr-2" title="تكبير وتصغير المعاينة على الشاشة فقط (لا يؤثر على الطباعة)">
+            <span className="text-[10px] text-gray-400 font-bold ml-1">معاينة:</span>
+            <button
+              type="button"
+              onClick={zoomOutPreview}
+              disabled={previewZoom <= 50}
+              className="p-1 text-brand-goldLight hover:bg-white/10 rounded transition disabled:opacity-30"
+              title="تصغير المعاينة (Zoom Out)"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+
+            <span className="text-xs font-mono font-bold text-brand-gold w-10 text-center select-none">
+              {previewZoom}%
+            </span>
+
+            <button
+              type="button"
+              onClick={zoomInPreview}
+              disabled={previewZoom >= 150}
+              className="p-1 text-brand-goldLight hover:bg-white/10 rounded transition disabled:opacity-30"
+              title="تكبير المعاينة (Zoom In)"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+
+            {previewZoom !== 100 && (
+              <button
+                type="button"
+                onClick={resetPreviewZoom}
+                className="text-[10px] bg-brand-gold/20 hover:bg-brand-gold hover:text-black text-brand-goldLight px-1.5 py-0.5 rounded font-bold transition mr-1"
+                title="إعادة ضبط المعاينة إلى 100%"
+              >
+                100%
+              </button>
+            )}
+          </div>
 
           {/* Backup */}
           <button

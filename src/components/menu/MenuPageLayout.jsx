@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import EditableText from '../common/EditableText';
 import RestaurantLogo from '../common/RestaurantLogo';
 import PageDecorativeBorder from '../common/PageDecorativeBorder';
@@ -24,6 +24,9 @@ export const MenuPageLayout = ({
   const p = pageSettings;
   const w = p.archWidth;
   const { updatePageCallout, updateFloatingShape, deleteFloatingShape } = useMenu();
+
+  const containerRef = useRef(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
 
   const totalItems = pageData.categories
     ? pageData.categories.reduce((acc, cat) => acc + (cat.items?.length || 0), 0)
@@ -126,13 +129,33 @@ export const MenuPageLayout = ({
     smartCatGap        = parseFloat((smartCatGap * userScale).toFixed(1));
   }
 
-  // FORCE BOOST: The user explicitly requested the menu text to be significantly larger 
-  // without altering the layout gaps. This ensures the text is always large even with saved settings.
-  smartItemTitleSize += 3;
-  smartDescSize += 2.5;
-  smartPriceSize += 3;
-  smartCatTitleSize += 3;
-  smartAllergenSize += 2;
+  // Proportional Balanced Boost (+3% relative scaling instead of fixed hardcoded +3px boost)
+  const relativeBoost = 1.03;
+  smartItemTitleSize = parseFloat((smartItemTitleSize * relativeBoost).toFixed(1));
+  smartDescSize      = parseFloat((smartDescSize * relativeBoost).toFixed(1));
+  smartPriceSize     = parseFloat((smartPriceSize * relativeBoost).toFixed(1));
+  smartCatTitleSize  = parseFloat((smartCatTitleSize * relativeBoost).toFixed(1));
+  smartAllergenSize  = parseFloat((smartAllergenSize * relativeBoost).toFixed(1));
+
+  // Best-Practice minimum font sizes (at least 12px for title/price to guarantee legibility on table)
+  smartItemTitleSize = Math.max(12, smartItemTitleSize);
+  smartPriceSize     = Math.max(12, smartPriceSize);
+  smartDescSize      = Math.max(8.5, smartDescSize);
+
+  // Real-time A4 height overflow detection
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const checkOverflow = () => {
+      // 297mm height is ~1122.5px in 96dpi screen CSS
+      const clientH = el.clientHeight || 1122;
+      const scrollH = el.scrollHeight;
+      setIsOverflowing(scrollH > clientH + 5);
+    };
+    checkOverflow();
+    const timer = setTimeout(checkOverflow, 150);
+    return () => clearTimeout(timer);
+  }, [pageData, pageSettings, smartItemTitleSize, smartDescSize, smartGap, smartCatGap]);
 
   // Premium Background Styling
   let bgColor = '#050a07'; 
@@ -186,7 +209,19 @@ export const MenuPageLayout = ({
 
   return (
     <div className="a4-page-wrapper" id={pageData.id}>
-      <div className="a4-page" style={{ backgroundColor: bgColor, backgroundImage: bgImage || 'none' }}>
+      <div 
+        ref={containerRef}
+        className={`a4-page ${isOverflowing ? 'a4-overflow-detected' : ''}`} 
+        style={{ backgroundColor: bgColor, backgroundImage: bgImage || 'none' }}
+      >
+        {/* Debug / Edit mode Visual Overflow Warning */}
+        {isOverflowing && (
+          <div className="a4-overflow-badge no-print" title="المحتوى يتجاوز الحد الأقصى لارتفاع صفحة A4 (297mm)">
+            <span>⚠️</span>
+            <span>تجاوز ارتفاع A4 (297mm) — يرجى تصغير مقياس المحتوى</span>
+          </div>
+        )}
+
         {/* Custom Page Background Image & Watermark Layer (100% Full-Bleed) */}
         <PageBackgroundLayer
           customBgImage={p.customBgImage}

@@ -1,5 +1,6 @@
 import { toPng } from 'html-to-image';
 import JSZip from 'jszip';
+import { ensureAllFontsLoaded } from './pdfExporter';
 
 // ─── Filter: remove UI-only elements ──────────────────────────────────────────
 const exportFilter = (node) => {
@@ -286,7 +287,7 @@ const capturePageAsSVG = async (element) => {
      version="1.1">
   <defs>
     <style type="text/css">
-      @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Cairo:wght@400;600;700;800&amp;family=Cinzel:wght@400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600;1,700&amp;family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&amp;family=Tajawal:wght@400;500;700;800&amp;display=swap');
     </style>
   </defs>
 
@@ -313,6 +314,11 @@ ${svgTextContent}
 export const exportMenuAsSVG = async (pages, onProgress) => {
   const total = pages.length;
   if (total === 0) throw new Error('لا توجد صفحات للتصدير.');
+
+  if (onProgress) {
+    onProgress(0, total, 'جاري تحميل الخطوط وضمان جاهزية النصوص...');
+  }
+  await ensureAllFontsLoaded();
 
   const zip = new JSZip();
   let addedCount = 0;

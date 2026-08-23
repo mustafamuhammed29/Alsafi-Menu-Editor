@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Edit3, Palette, Download, Upload, SlidersHorizontal, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Edit3, Palette, Download, Upload, SlidersHorizontal, ChevronRight, ChevronLeft, ZoomIn, ZoomOut } from 'lucide-react';
 import ContentTab from './ContentTab';
 import DesignTab from './DesignTab';
 import { useMenu } from '../../context/MenuContext';
@@ -7,7 +7,14 @@ import { useMenu } from '../../context/MenuContext';
 export const ControlPanel = () => {
   const [activeTab, setActiveTab] = useState('content');
   const [collapsed, setCollapsed] = useState(false);
-  const { exportBackup, importBackup } = useMenu();
+  const {
+    exportBackup,
+    importBackup,
+    previewZoom,
+    zoomInPreview,
+    zoomOutPreview,
+    resetPreviewZoom,
+  } = useMenu();
 
   const handleImportFile = (e) => {
     const file = e.target.files[0];
@@ -47,13 +54,38 @@ export const ControlPanel = () => {
             </h2>
           </div>
 
-          <button
-            onClick={() => setCollapsed(true)}
-            className="p-1 text-slate-400 hover:text-white rounded hover:bg-white/10 transition"
-            title="إخفاء اللوحة"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Quick Preview Zoom in Sidebar Header */}
+            <div className="flex items-center gap-1 bg-black/60 border border-brand-gold/30 rounded-lg px-2 py-0.5" title="تكبير/تصغير شاشة المعاينة فقط">
+              <button
+                type="button"
+                onClick={zoomOutPreview}
+                disabled={previewZoom <= 50}
+                className="text-gray-300 hover:text-white p-0.5 disabled:opacity-30"
+              >
+                <ZoomOut className="w-3 h-3" />
+              </button>
+              <span className="text-[11px] font-mono font-bold text-brand-goldLight w-8 text-center">
+                {previewZoom}%
+              </span>
+              <button
+                type="button"
+                onClick={zoomInPreview}
+                disabled={previewZoom >= 150}
+                className="text-gray-300 hover:text-white p-0.5 disabled:opacity-30"
+              >
+                <ZoomIn className="w-3 h-3" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => setCollapsed(true)}
+              className="p-1 text-slate-400 hover:text-white rounded hover:bg-white/10 transition"
+              title="إخفاء اللوحة"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Tab Buttons */}
