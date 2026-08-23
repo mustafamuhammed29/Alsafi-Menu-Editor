@@ -455,6 +455,12 @@ export const MenuProvider = ({ children }) => {
     reader.readAsText(file);
   };
 
+  const restoreFromCode = (payload) => {
+    if (payload.gs) setGlobalSettings(payload.gs);
+    if (payload.po) setPageOverrides(payload.po);
+    if (payload.pg) setPages(payload.pg);
+  };
+
   return (
     <MenuContext.Provider
       value={{
@@ -492,6 +498,7 @@ export const MenuProvider = ({ children }) => {
         getEffectiveSettingsForPage,
         exportBackup,
         importBackup,
+        restoreFromCode,
       }}
     >
       {children}
