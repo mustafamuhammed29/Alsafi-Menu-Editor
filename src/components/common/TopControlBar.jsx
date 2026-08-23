@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useMenu } from '../../context/MenuContext';
 import { exportMenuAsPDF } from '../../utils/pdfExporter';
+import { exportMenuAsSVG } from '../../utils/svgExporter';
 import { validateMenuForExport } from '../../utils/menuValidator';
 
 // ─── Main TopControlBar ────────────────────────────────────────────────────────
@@ -18,6 +19,7 @@ export const TopControlBar = () => {
   const [isWorking, setIsWorking]               = useState(false);
   const [workProgress, setWorkProgress]         = useState({ current: 0, total: 0, text: '' });
   const [isPdfSuccess, setIsPdfSuccess]         = useState(false);
+  const [isSvgSuccess, setIsSvgSuccess]         = useState(false);
   const [validationErrors, setValidationErrors] = useState([]);
 
   // ── validate helper ──────────────────────────────────────────────────────────
@@ -38,6 +40,22 @@ export const TopControlBar = () => {
     } catch (e) {
       console.error(e);
       alert('حدث خطأ أثناء تصدير ملف الـ PDF.');
+    } finally {
+      setIsWorking(false);
+    }
+  };
+
+  // ── SVG Export ───────────────────────────────────────────────────────────────
+  const handleExportSVG = async () => {
+    if (!validate()) return;
+    setIsWorking(true); setIsSvgSuccess(false);
+    try {
+      await exportMenuAsSVG(pages, (c, t, txt) => setWorkProgress({ current: c, total: t, text: txt }));
+      setIsSvgSuccess(true);
+      setTimeout(() => setIsSvgSuccess(false), 3000);
+    } catch (e) {
+      console.error(e);
+      alert('حدث خطأ أثناء تصدير ملفات الـ SVG.');
     } finally {
       setIsWorking(false);
     }
@@ -81,6 +99,23 @@ export const TopControlBar = () => {
           >
             <Download className="w-3.5 h-3.5" />
             <span>حفظ العمل</span>
+          </button>
+
+          {/* ★ SVG EXPORT BUTTON ★ */}
+          <button
+            type="button"
+            onClick={handleExportSVG}
+            disabled={isWorking}
+            className="relative px-6 py-2 bg-[#133221] border border-brand-gold/50 text-brand-goldLight font-bold text-sm rounded-lg hover:bg-[#1a422b] transition flex items-center gap-2 disabled:opacity-60 mr-2"
+            title="تصدير جميع الصفحات كملفات SVG مفتوحة للإليستريتور"
+          >
+            {isWorking ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /><span>جاري التصدير...</span></>
+            ) : isSvgSuccess ? (
+              <><Check className="w-4 h-4 text-green-400" /><span>تم التصدير!</span></>
+            ) : (
+              <><Download className="w-4 h-4" /><span>تصدير للإليستريتور (SVG)</span></>
+            )}
           </button>
 
           {/* ★ HIGH-RES PRINT EXPORT BUTTON ★ */}

@@ -23,7 +23,7 @@ export const MenuItemRow = ({
   const effectivePriceSize = smartPriceSize || p.priceSize || 13.5;
   const effectiveDescSize = smartDescSize || p.descSize || 10;
   const effectiveAllergenSize = smartAllergenSize || p.allergenSize || Math.max(7, effectiveDescSize - 1.5);
-  const effectiveNumSize = p.itemNumSize || 12;
+  const effectiveNumSize = p.itemNumSize || 15;
 
   const handleNameChange = (newName) => {
     // Preserve existing dietary emoji suffixes

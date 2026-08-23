@@ -44,64 +44,64 @@ export const MenuPageLayout = ({
     // 20+ items (Page 12 drinks)
     baseGap = 0;
     baseCatGap = 4;
-    baseItemTitleSize = 11.5;
-    baseDescSize = 8.5;
-    basePriceSize = 11.5;
-    baseCatTitleSize = 13;
-    baseAllergenSize = 7.5;
+    baseItemTitleSize = 13;
+    baseDescSize = 9.5;
+    basePriceSize = 13;
+    baseCatTitleSize = 14;
+    baseAllergenSize = 8.5;
   } else if (totalItems >= 11) {
     baseGap = 1;
     baseCatGap = 4;
-    baseItemTitleSize = 12.5;
-    baseDescSize = 9.2;
-    basePriceSize = 12.5;
-    baseCatTitleSize = 14;
-    baseAllergenSize = 8;
+    baseItemTitleSize = 14;
+    baseDescSize = 10.5;
+    basePriceSize = 14;
+    baseCatTitleSize = 15.5;
+    baseAllergenSize = 9.5;
   } else if (totalItems === 10) {
     // e.g. Page 02 (Mezze + Vorspeisen mit Fleisch) and Page 08 (Burger + Veggie)
     baseGap = 1.5;
     baseCatGap = 5;
-    baseItemTitleSize = 13;
-    baseDescSize = 9.5;
-    basePriceSize = 13;
-    baseCatTitleSize = 14.5;
-    baseAllergenSize = 8.5;
+    baseItemTitleSize = 14.5;
+    baseDescSize = 11;
+    basePriceSize = 14.5;
+    baseCatTitleSize = 16;
+    baseAllergenSize = 10;
   } else if (totalItems === 9) {
     // e.g. Page 06 (Wraps)
     baseGap = 3;
     baseCatGap = 6;
-    baseItemTitleSize = 13.5;
-    baseDescSize = 9.8;
-    basePriceSize = 13.5;
-    baseCatTitleSize = 15;
-    baseAllergenSize = 8.5;
+    baseItemTitleSize = 15;
+    baseDescSize = 11.5;
+    basePriceSize = 15;
+    baseCatTitleSize = 16.5;
+    baseAllergenSize = 10.5;
   } else if (totalItems === 8) {
     // e.g. Page 03, Page 07, Page 09
     baseGap = hasCallout ? 3 : 4.5;
     baseCatGap = 8;
-    baseItemTitleSize = 14;
-    baseDescSize = 10.2;
-    basePriceSize = 14;
-    baseCatTitleSize = 15.5;
-    baseAllergenSize = 8.5;
+    baseItemTitleSize = 16;
+    baseDescSize = 12;
+    basePriceSize = 16;
+    baseCatTitleSize = 17.5;
+    baseAllergenSize = 10.5;
   } else if (totalItems === 7) {
     // e.g. Page 04 (Salate), Page 10 (Grillgerichte)
     baseGap = hasCallout ? 14 : 20;
     baseCatGap = 24;
-    baseItemTitleSize = 16.5;
-    baseDescSize = 11.5;
-    basePriceSize = 16.5;
-    baseCatTitleSize = 19;
-    baseAllergenSize = 10;
+    baseItemTitleSize = 18;
+    baseDescSize = 13;
+    basePriceSize = 18;
+    baseCatTitleSize = 20;
+    baseAllergenSize = 11.5;
   } else {
     // 6 or fewer items (Page 01 Frühstück)
     baseGap = hasCallout ? 18 : 28;
     baseCatGap = 32;
-    baseItemTitleSize = 18;
-    baseDescSize = 12.5;
-    basePriceSize = 18;
-    baseCatTitleSize = 22;
-    baseAllergenSize = 11;
+    baseItemTitleSize = 19.5;
+    baseDescSize = 14;
+    basePriceSize = 19.5;
+    baseCatTitleSize = 23;
+    baseAllergenSize = 12.5;
   }
 
   // Active Effective Typography (Controlled by User Sliders with 100% precision per page/global)
@@ -125,6 +125,14 @@ export const MenuPageLayout = ({
     smartGap           = parseFloat((smartGap * userScale).toFixed(1));
     smartCatGap        = parseFloat((smartCatGap * userScale).toFixed(1));
   }
+
+  // FORCE BOOST: The user explicitly requested the menu text to be significantly larger 
+  // without altering the layout gaps. This ensures the text is always large even with saved settings.
+  smartItemTitleSize += 3;
+  smartDescSize += 2.5;
+  smartPriceSize += 3;
+  smartCatTitleSize += 3;
+  smartAllergenSize += 2;
 
   // Premium Background Styling
   let bgColor = '#050a07'; 
@@ -172,7 +180,8 @@ export const MenuPageLayout = ({
     }
   }
 
-  const isTwoColumnMode = pageData.pageMode === 'two-columns';
+  // Force two-column layout for Page 12 (Drinks) to place Cold right, Hot left, and images below Hot
+  const isTwoColumnMode = pageData.pageMode === 'two-columns' || pageIndex === 11;
   const colImages = pageData.images?.slice(0, 2).map(img => img?.url || (typeof img === 'string' ? img : null)).filter(Boolean) || [];
 
   return (
