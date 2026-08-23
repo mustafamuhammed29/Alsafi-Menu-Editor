@@ -79,14 +79,14 @@ export const MenuPageLayout = ({
     baseCatTitleSize = 16.5;
     baseAllergenSize = 10.5;
   } else if (totalItems === 8) {
-    // e.g. Page 03, Page 07, Page 09
-    baseGap = hasCallout ? 3 : 4.5;
-    baseCatGap = 8;
-    baseItemTitleSize = 16;
-    baseDescSize = 12;
-    basePriceSize = 16;
-    baseCatTitleSize = 17.5;
-    baseAllergenSize = 10.5;
+    // e.g. Page 03, Page 05 (Boxen + Kindergerichte), Page 07, Page 09
+    baseGap = hasCallout ? 1.5 : 4;
+    baseCatGap = hasCallout ? 5 : 8;
+    baseItemTitleSize = hasCallout ? 14 : 16;
+    baseDescSize = hasCallout ? 10.5 : 12;
+    basePriceSize = hasCallout ? 14 : 16;
+    baseCatTitleSize = hasCallout ? 15.5 : 17.5;
+    baseAllergenSize = hasCallout ? 9 : 10.5;
   } else if (totalItems === 7) {
     // e.g. Page 04 (Salate), Page 10 (Grillgerichte)
     baseGap = hasCallout ? 14 : 20;
@@ -98,13 +98,13 @@ export const MenuPageLayout = ({
     baseAllergenSize = 11.5;
   } else {
     // 6 or fewer items (Page 01 Frühstück)
-    baseGap = hasCallout ? 18 : 28;
-    baseCatGap = 32;
-    baseItemTitleSize = 19.5;
-    baseDescSize = 14;
-    basePriceSize = 19.5;
-    baseCatTitleSize = 23;
-    baseAllergenSize = 12.5;
+    baseGap = hasCallout ? 5 : 14;
+    baseCatGap = hasCallout ? 10 : 20;
+    baseItemTitleSize = hasCallout ? 17 : 19.5;
+    baseDescSize = hasCallout ? 12 : 14;
+    basePriceSize = hasCallout ? 17 : 19.5;
+    baseCatTitleSize = hasCallout ? 19.5 : 23;
+    baseAllergenSize = hasCallout ? 11 : 12.5;
   }
 
   // Active Effective Typography (Controlled by User Sliders with 100% precision per page/global)
@@ -502,19 +502,10 @@ export const MenuPageLayout = ({
                   />
                 ))
               )}
-            </div>
 
-            {/* Bottom Section: Callout Card + Royal Bottom Ornament */}
-            <div 
-              className={`absolute bottom-11 flex flex-col items-center pointer-events-none z-20 ${isTwoColumnMode ? 'flex-1 justify-end' : ''}`}
-              style={{
-                left: isTwoColumnMode ? `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 28}px` : `${p.contentPaddingLeft !== undefined ? p.contentPaddingLeft : 12}px`,
-                right: `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 28}px`
-              }}
-            >
-              {/* Chef Recommendation / Note Callout Card */}
+              {/* Chef Recommendation / Special Note Callout Card in natural flow - NEVER overlaps dishes */}
               {p.showCalloutCards !== false && pageData.bottomCallout && (
-                <div className="pointer-events-auto w-full flex justify-center mb-1">
+                <div className="w-full flex justify-center mt-2 mb-1 shrink-0 z-30">
                   <PageCalloutCard
                     callout={pageData.bottomCallout}
                     pageIndex={pageIndex}
@@ -524,7 +515,7 @@ export const MenuPageLayout = ({
               )}
 
               {/* Selectable Royal Bottom Ornament / Divider */}
-              <div className="pointer-events-auto flex justify-center w-full">
+              <div className="flex justify-center w-full mt-auto pt-1 pb-1 shrink-0 z-20">
                 <PageBottomOrnament
                   style={p.bottomOrnamentStyle || 'royal'}
                   color="#c9aa58"
