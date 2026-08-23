@@ -399,29 +399,31 @@ export const MenuProvider = ({ children }) => {
     const page = pages[pageIndex];
     if (!page) return;
     const pageKey = `page${pageIndex + 1}`;
-    const pageWrapper = document.getElementById(page.id);
-    if (!pageWrapper) return;
-    const el = pageWrapper.querySelector('.a4-page') || pageWrapper;
-    const clientH = el.clientHeight || 1122;
-    const scrollH = el.scrollHeight;
+    
+    const totalItems = page.categories
+      ? page.categories.reduce((acc, cat) => acc + (cat.items?.length || 0), 0)
+      : 0;
 
-    const currentOverride = pageOverrides[pageKey] || {};
-    const currentScale = currentOverride.contentScale !== undefined ? currentOverride.contentScale : (globalSettings.contentScale || 100);
+    let targetScale = 100;
+    if (totalItems <= 6 && totalItems > 0) {
+      targetScale = 112;
+    } else if (totalItems === 7) {
+      targetScale = 108;
+    } else if (totalItems === 8) {
+      targetScale = 104;
+    } else if (totalItems <= 10) {
+      targetScale = 102;
+    } else {
+      targetScale = 100;
+    }
 
-    // Target height with safety padding to prevent overflow
-    const targetH = clientH - 16;
-    const ratio = targetH / Math.max(1, scrollH);
-    const newScale = Math.max(60, Math.min(145, Math.floor(currentScale * ratio)));
-
-    updateSetting(pageKey, 'contentScale', newScale);
-    return newScale;
+    updateSetting(pageKey, 'contentScale', targetScale);
+    return targetScale;
   };
 
   const maximizeAllPagesTypography = () => {
     pages.forEach((_, idx) => {
-      setTimeout(() => {
-        maximizePageTypography(idx);
-      }, idx * 45);
+      maximizePageTypography(idx);
     });
   };
 

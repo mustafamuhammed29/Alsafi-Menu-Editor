@@ -116,7 +116,8 @@ export const ContentTab = () => {
       </div>
 
       {/* Content Editor */}
-      {currentPage.layout === 'info' ? (
+      {console.log('[ContentTab] editPageIdx=', editPageIdx, 'page.id=', currentPage.id, 'page.layout=', currentPage.layout, 'categories.length=', categories.length)}
+      {(currentPage.layout === 'info' || currentPage.id === 'page13' || (editPageIdx === 12 && (!categories || categories.length === 0))) ? (
         <Page13Editor pageIdx={editPageIdx} page={currentPage} />
       ) : currentPage.pageMode === 'free-text' ? (
         <FreeTextEditor pageIdx={editPageIdx} page={currentPage} />

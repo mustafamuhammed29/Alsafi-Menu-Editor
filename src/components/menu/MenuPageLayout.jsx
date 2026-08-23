@@ -32,16 +32,16 @@ export const MenuPageLayout = ({
     ? pageData.categories.reduce((acc, cat) => acc + (cat.items?.length || 0), 0)
     : 0;
 
-  // Smart Dynamic Auto-Fit Spacing & Typography baseline calculation
+  // Smart Dynamic Auto-Fit Spacing & Typography baseline calculation based on item count
   const hasCallout = Boolean(p.showCalloutCards !== false && pageData.bottomCallout);
 
-  let baseGap = 6;
-  let baseCatGap = 14;
-  let baseItemTitleSize = 14.5;
-  let baseDescSize = 10.5;
-  let basePriceSize = 14;
-  let baseCatTitleSize = 16;
-  let baseAllergenSize = 8;
+  let baseGap = 16;
+  let baseCatGap = 22;
+  let baseItemTitleSize = 19.5;
+  let baseDescSize = 13.5;
+  let basePriceSize = 19.5;
+  let baseCatTitleSize = 22;
+  let baseAllergenSize = 11;
 
   if (totalItems >= 20) {
     // 20+ items (Page 12 drinks)
@@ -53,8 +53,8 @@ export const MenuPageLayout = ({
     baseCatTitleSize = 14;
     baseAllergenSize = 8.5;
   } else if (totalItems >= 11) {
-    baseGap = 1;
-    baseCatGap = 4;
+    baseGap = 2;
+    baseCatGap = 6;
     baseItemTitleSize = 14;
     baseDescSize = 10.5;
     basePriceSize = 14;
@@ -62,61 +62,72 @@ export const MenuPageLayout = ({
     baseAllergenSize = 9.5;
   } else if (totalItems === 10) {
     // e.g. Page 02 (Mezze + Vorspeisen mit Fleisch) and Page 08 (Burger + Veggie)
-    baseGap = 1.5;
-    baseCatGap = 5;
-    baseItemTitleSize = 14.5;
+    baseGap = 3.5;
+    baseCatGap = 7;
+    baseItemTitleSize = 15;
     baseDescSize = 11;
-    basePriceSize = 14.5;
-    baseCatTitleSize = 16;
+    basePriceSize = 15;
+    baseCatTitleSize = 16.5;
     baseAllergenSize = 10;
   } else if (totalItems === 9) {
     // e.g. Page 06 (Wraps)
-    baseGap = 3;
-    baseCatGap = 6;
-    baseItemTitleSize = 15;
+    baseGap = 6.5;
+    baseCatGap = 10;
+    baseItemTitleSize = 16;
     baseDescSize = 11.5;
-    basePriceSize = 15;
-    baseCatTitleSize = 16.5;
+    basePriceSize = 16;
+    baseCatTitleSize = 17.5;
     baseAllergenSize = 10.5;
   } else if (totalItems === 8) {
-    // e.g. Page 03, Page 05 (Boxen + Kindergerichte), Page 07, Page 09
-    baseGap = hasCallout ? 1.5 : 4;
-    baseCatGap = hasCallout ? 5 : 8;
-    baseItemTitleSize = hasCallout ? 14 : 16;
-    baseDescSize = hasCallout ? 10.5 : 12;
-    basePriceSize = hasCallout ? 14 : 16;
-    baseCatTitleSize = hasCallout ? 15.5 : 17.5;
-    baseAllergenSize = hasCallout ? 9 : 10.5;
+    // e.g. Page 03 (Veggi), Page 05 (Boxen), Page 07 (XXL), Page 09 (Spezialitäten)
+    baseGap = hasCallout ? 3 : 9;
+    baseCatGap = hasCallout ? 6 : 13;
+    baseItemTitleSize = hasCallout ? 14.5 : 17;
+    baseDescSize = hasCallout ? 11 : 12;
+    basePriceSize = hasCallout ? 14.5 : 17;
+    baseCatTitleSize = hasCallout ? 16 : 19;
+    baseAllergenSize = hasCallout ? 9.5 : 11;
   } else if (totalItems === 7) {
-    // e.g. Page 04 (Salate), Page 10 (Grillgerichte)
-    baseGap = hasCallout ? 14 : 20;
-    baseCatGap = 24;
-    baseItemTitleSize = 18;
-    baseDescSize = 13;
-    basePriceSize = 18;
-    baseCatTitleSize = 20;
-    baseAllergenSize = 11.5;
+    // e.g. Page 04 (Salate), Page 10 (Grillgerichte), Page 11 (Beilagen & Desserts)
+    baseGap = hasCallout ? 8 : 16;
+    baseCatGap = hasCallout ? 12 : 20;
+    baseItemTitleSize = hasCallout ? 16.5 : 18.5;
+    baseDescSize = hasCallout ? 12 : 13;
+    basePriceSize = hasCallout ? 16.5 : 18.5;
+    baseCatTitleSize = hasCallout ? 18.5 : 21;
+    baseAllergenSize = hasCallout ? 10.5 : 12;
   } else {
     // 6 or fewer items (Page 01 Frühstück)
-    baseGap = hasCallout ? 5 : 14;
-    baseCatGap = hasCallout ? 10 : 20;
-    baseItemTitleSize = hasCallout ? 17 : 19.5;
-    baseDescSize = hasCallout ? 12 : 14;
-    basePriceSize = hasCallout ? 17 : 19.5;
-    baseCatTitleSize = hasCallout ? 19.5 : 23;
-    baseAllergenSize = hasCallout ? 11 : 12.5;
+    baseGap = hasCallout ? 10 : 22;
+    baseCatGap = hasCallout ? 14 : 26;
+    baseItemTitleSize = hasCallout ? 17.5 : 20.5;
+    baseDescSize = hasCallout ? 13 : 14;
+    basePriceSize = hasCallout ? 17.5 : 20.5;
+    baseCatTitleSize = hasCallout ? 20 : 24;
+    baseAllergenSize = hasCallout ? 11 : 13;
   }
 
-  // Active Effective Typography (Controlled by User Sliders with 100% precision per page/global)
-  let smartItemTitleSize = p.itemTitleSize !== undefined ? Number(p.itemTitleSize) : baseItemTitleSize;
-  let smartPriceSize     = p.priceSize !== undefined ? Number(p.priceSize) : basePriceSize;
-  let smartDescSize      = p.descSize !== undefined ? Number(p.descSize) : baseDescSize;
-  let smartCatTitleSize  = p.catTitleSize !== undefined ? Number(p.catTitleSize) : baseCatTitleSize;
-  let smartAllergenSize  = p.allergenSize !== undefined ? Number(p.allergenSize) : baseAllergenSize;
-  let smartGap           = p.itemGap !== undefined ? Number(p.itemGap) : baseGap;
-  let smartCatGap        = p.categoryGap !== undefined ? Number(p.categoryGap) : baseCatGap;
+  // Check for explicit page-specific overrides in pageOverrides
+  const pageScope = `page${pageIndex + 1}`;
+  const isPageSpecific = p._isPageSpecificOverride || false;
 
-  // User Content Scale Slider multiplier (e.g. 108% -> 1.08, 90% -> 0.90)
+  // Global scale multipliers if user adjusted global typography sliders
+  const globalTitleMultiplier = (p.itemTitleSize && p.itemTitleSize !== 14) ? (p.itemTitleSize / 14) : 1;
+  const globalPriceMultiplier = (p.priceSize && p.priceSize !== 13.5) ? (p.priceSize / 13.5) : 1;
+  const globalDescMultiplier  = (p.descSize && p.descSize !== 10) ? (p.descSize / 10) : 1;
+  const globalCatMultiplier   = (p.catTitleSize && p.catTitleSize !== 16) ? (p.catTitleSize / 16) : 1;
+  const globalGapMultiplier   = (p.itemGap && p.itemGap !== 8) ? (p.itemGap / 8) : 1;
+  const globalCatGapMultiplier= (p.categoryGap && p.categoryGap !== 18) ? (p.categoryGap / 18) : 1;
+
+  let smartItemTitleSize = parseFloat((baseItemTitleSize * globalTitleMultiplier).toFixed(1));
+  let smartPriceSize     = parseFloat((basePriceSize * globalPriceMultiplier).toFixed(1));
+  let smartDescSize      = parseFloat((baseDescSize * globalDescMultiplier).toFixed(1));
+  let smartCatTitleSize  = parseFloat((baseCatTitleSize * globalCatMultiplier).toFixed(1));
+  let smartAllergenSize  = baseAllergenSize;
+  let smartGap           = parseFloat((baseGap * globalGapMultiplier).toFixed(1));
+  let smartCatGap        = parseFloat((baseCatGap * globalCatGapMultiplier).toFixed(1));
+
+  // User Content Scale Slider multiplier (e.g. 110% -> 1.10)
   const userScale = p.contentScale !== undefined && p.contentScale > 0 ? p.contentScale / 100 : 1;
 
   if (userScale !== 1) {
@@ -129,18 +140,10 @@ export const MenuPageLayout = ({
     smartCatGap        = parseFloat((smartCatGap * userScale).toFixed(1));
   }
 
-  // Proportional Balanced Boost (+3% relative scaling instead of fixed hardcoded +3px boost)
-  const relativeBoost = 1.03;
-  smartItemTitleSize = parseFloat((smartItemTitleSize * relativeBoost).toFixed(1));
-  smartDescSize      = parseFloat((smartDescSize * relativeBoost).toFixed(1));
-  smartPriceSize     = parseFloat((smartPriceSize * relativeBoost).toFixed(1));
-  smartCatTitleSize  = parseFloat((smartCatTitleSize * relativeBoost).toFixed(1));
-  smartAllergenSize  = parseFloat((smartAllergenSize * relativeBoost).toFixed(1));
-
-  // Best-Practice minimum font sizes (at least 12px for title/price to guarantee legibility on table)
+  // Minimum legible font size constraints
   smartItemTitleSize = Math.max(12, smartItemTitleSize);
   smartPriceSize     = Math.max(12, smartPriceSize);
-  smartDescSize      = Math.max(8.5, smartDescSize);
+  smartDescSize      = Math.max(9, smartDescSize);
 
   // Real-time A4 height overflow detection
   useEffect(() => {
