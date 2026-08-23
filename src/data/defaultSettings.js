@@ -97,7 +97,7 @@ export const DEFAULT_SETTINGS = {
 
   // Whitespace Optimization & Luxury Ornaments
   autoFitPageSpacing: true,   // Dynamically distributes item gaps based on page density
-  bottomOrnamentStyle: 'royal', // 'royal' | 'geometric' | 'stars' | 'classic' | 'none'
+  bottomOrnamentStyle: 'none', // Default is none to maximize food space
   showCalloutCards: true,     // Shows Chef Recommendation callout cards on spare-space pages
 
   // Spacing

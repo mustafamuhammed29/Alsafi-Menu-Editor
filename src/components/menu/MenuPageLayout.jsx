@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import EditableText from '../common/EditableText';
 import RestaurantLogo from '../common/RestaurantLogo';
 import PageDecorativeBorder from '../common/PageDecorativeBorder';
-import PageBottomOrnament from '../common/PageBottomOrnament';
 import PageCalloutCard from '../common/PageCalloutCard';
 import FloatingShapeOverlay from '../common/FloatingShapeOverlay';
 import PageBackgroundLayer from '../common/PageBackgroundLayer';
@@ -516,15 +515,6 @@ export const MenuPageLayout = ({
                   />
                 </div>
               )}
-
-              {/* Selectable Royal Bottom Ornament / Divider */}
-              <div className="flex justify-center w-full mt-auto pt-1 pb-1 shrink-0 z-20">
-                <PageBottomOrnament
-                  style={p.bottomOrnamentStyle || 'royal'}
-                  color="#c9aa58"
-                  opacity={0.65}
-                />
-              </div>
             </div>
 
             {/* Page Footer */}
