@@ -3,14 +3,56 @@ import { Plus, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 import { useMenu } from '../../../context/MenuContext';
 
 const CategoryItemEditor = ({ editPageIdx, editCatIdx, currentCat }) => {
-  const { addItem, moveItem, deleteItem, updateItem } = useMenu();
+  const { addItem, moveItem, deleteItem, updateItem, updateCategory } = useMenu();
 
   return (
-    <div>
+    <div className="space-y-3">
+      {/* Section Header Fields (Title, Code, Subtitle) */}
+      {currentCat && (
+        <div className="bg-black/30 border border-white/10 rounded-xl p-2.5 space-y-2">
+          <span className="text-[10.5px] font-bold text-brand-goldLight block">بيانات ونصوص عنوان القسم:</span>
+          <div className="grid grid-cols-12 gap-2">
+            <div className="col-span-9">
+              <label className="cms-label">عنوان القسم (Title)</label>
+              <input
+                type="text"
+                className="cms-input font-bold"
+                dir="ltr"
+                value={currentCat.title || ''}
+                onChange={(e) => updateCategory(editPageIdx, editCatIdx, 'title', e.target.value)}
+                placeholder="VEGETARISCHE & VEGANE VORSPEISEN"
+              />
+            </div>
+            <div className="col-span-3">
+              <label className="cms-label">رقم القسم (#)</label>
+              <input
+                type="text"
+                className="cms-input text-center font-bold text-brand-gold"
+                dir="ltr"
+                value={currentCat.code || ''}
+                onChange={(e) => updateCategory(editPageIdx, editCatIdx, 'code', e.target.value)}
+                placeholder="4"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="cms-label">النص الفرعي / الاقتباس (Subtitle)</label>
+            <input
+              type="text"
+              className="cms-input text-[11px] italic text-[#e6cd85]"
+              dir="ltr"
+              value={currentCat.subtitle || ''}
+              onChange={(e) => updateCategory(editPageIdx, editCatIdx, 'subtitle', e.target.value)}
+              placeholder="„Ganz ohne Fleisch. Voller Geschmack.“"
+            />
+          </div>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={() => addItem(editPageIdx, editCatIdx)}
-        className="w-full py-2.5 mb-3 bg-gradient-to-r from-brand-green to-brand-greenLight border border-brand-gold/60 rounded-lg text-brand-goldLight text-xs font-bold hover:brightness-110 transition flex items-center justify-center gap-1.5 shadow-md shadow-black/40"
+        className="w-full py-2.5 bg-gradient-to-r from-brand-green to-brand-greenLight border border-brand-gold/60 rounded-lg text-brand-goldLight text-xs font-bold hover:brightness-110 transition flex items-center justify-center gap-1.5 shadow-md shadow-black/40 cursor-pointer"
       >
         <Plus className="w-4 h-4" />
         إضافة طبق جديد في هذا القسم
@@ -21,7 +63,7 @@ const CategoryItemEditor = ({ editPageIdx, editCatIdx, currentCat }) => {
           <div key={iIdx} className="cms-item-card hover:border-brand-gold/30 transition">
             <div className="flex justify-between items-center mb-2.5 pb-2 border-b border-white/10">
               <span className="text-brand-goldLight font-bold text-xs" dir="ltr">
-                {item.num ? `#${item.num}` : ''} {item.name.replace(/ 🌱| 🥬| 🌶️🌶️| 🌶️/g, '').substring(0, 18)}
+                {item.num ? `#${item.num}` : ''} {item.name.replace(/\s*(🌱|🥬|🌶️|🌶)+/g, '').trim().substring(0, 18)}
                 {item.name.length > 18 ? '...' : ''}
               </span>
               

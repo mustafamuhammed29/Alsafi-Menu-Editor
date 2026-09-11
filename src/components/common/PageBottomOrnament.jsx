@@ -6,7 +6,7 @@ import React from 'react';
  */
 export const PageBottomOrnament = ({
   style = 'royal',
-  color = '#c9aa58',
+  color = '#8dc63f',
   opacity = 0.65,
   className = '',
 }) => {

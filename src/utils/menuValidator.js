@@ -49,7 +49,7 @@ export const validateMenuForExport = (pages) => {
         if (cat.items && Array.isArray(cat.items)) {
           cat.items.forEach((item, iIdx) => {
             const rawName = (item.name || '').trim();
-            const cleanName = rawName.replace(/ [🌱🥬🌶️⭐👑🔥✨🥩]+/g, '').trim();
+            const cleanName = rawName.replace(/\s*[🌱🥬🌶️⭐👑🔥✨🥩\uFE0F]+/g, '').trim();
             const lowerName = cleanName.toLowerCase();
             const price = (item.price || '').trim();
 

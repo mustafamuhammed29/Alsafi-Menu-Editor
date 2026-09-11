@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Move, Camera, RotateCcw, Globe } from 'lucide-react';
+import { Move, Camera, RotateCcw, Globe, FlipHorizontal, FlipVertical, Sun, Sparkles } from 'lucide-react';
 import { useMenu, normalizeImage } from '../../../context/MenuContext';
 import { optimizeImageFile } from '../../../utils/imageOptimizer';
 
@@ -180,7 +180,7 @@ const ArchSettings = ({ targetScope }) => {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <div className="flex justify-between text-[10px] text-gray-300 mb-1">
-                <span>الخط الذهبي الخارجي:</span>
+                <span>الخط الليموني الخارجي:</span>
                 <span className="font-mono text-brand-gold font-bold">
                   {currentSettings.archBorderWidth !== undefined ? currentSettings.archBorderWidth : 1.5}px
                 </span>
@@ -310,7 +310,7 @@ const ArchSettings = ({ targetScope }) => {
             const norm = normalizeImage(currentImg, selectedImageSlot);
             const curPosY = norm.posY !== undefined ? norm.posY : (selectedImageSlot === 0 ? 68 : 30);
             const curPosX = norm.posX !== undefined ? norm.posX : 50;
-            const curScale = norm.scale !== undefined ? norm.scale : 1.25;
+            const curScale = typeof norm.scale === 'number' ? Math.min(4.0, Math.max(0.2, norm.scale)) : 1.0;
 
             return (
               <div className="space-y-3 pt-2">
@@ -337,7 +337,7 @@ const ArchSettings = ({ targetScope }) => {
                             className="w-full h-full object-cover"
                             style={{
                               objectPosition: `${slotNorm.posX || 50}% ${slotNorm.posY || 50}%`,
-                              transform: `scale(${slotNorm.scale || 1})`,
+                              transform: `scale(${slotNorm.scale || 1}) ${slotNorm.flipX ? 'scaleX(-1)' : ''} ${slotNorm.flipY ? 'scaleY(-1)' : ''}`,
                             }}
                           />
                         </div>
@@ -351,12 +351,320 @@ const ArchSettings = ({ targetScope }) => {
                   })}
                 </div>
 
+                {/* Frame Size Controls (Height, Width & Presets for the 2 Arched Images) */}
+                {(() => {
+                  const selectedScope = `page${selectedImagePageIdx + 1}`;
+                  const activeScope = targetScope !== 'global' ? targetScope : selectedScope;
+                  const activeScopeSettings = { ...globalSettings, ...(pageOverrides[activeScope] || {}) };
+                  const currentHeight = activeScopeSettings.twoColumnImageHeight || 245;
+                  const currentWidth = activeScopeSettings.twoColumnImageWidth !== undefined ? activeScopeSettings.twoColumnImageWidth : 100;
+
+                  return (
+                    <div className="bg-gradient-to-r from-black/90 via-brand-gold/15 to-black/90 p-3 rounded-xl border border-brand-gold/50 shadow-md space-y-2.5">
+                      <div className="flex justify-between items-center text-[11.5px] text-brand-goldLight font-bold">
+                        <span className="flex items-center gap-1.5">
+                          <span>📐</span>
+                          <span>أبعاد وحجم إطاري الصورتين (Frame Size):</span>
+                        </span>
+                        <span className="text-[10px] text-brand-gold font-mono font-bold bg-black/80 px-2 py-0.5 rounded border border-brand-gold/40">
+                          صفحة {selectedImagePageIdx + 1}
+                        </span>
+                      </div>
+
+                      {/* Frame Height */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center text-[10.5px] text-gray-200 font-semibold">
+                          <span>طول الإطار (ارتفاع الصورتين):</span>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              min="80"
+                              max="450"
+                              step="5"
+                              className="w-16 bg-black border border-brand-gold/70 text-brand-gold text-center text-[11px] font-mono font-bold rounded py-0.5 outline-none focus:ring-1 focus:ring-brand-gold"
+                              value={currentHeight}
+                              onChange={(e) => {
+                                const val = Number(e.target.value);
+                                updateSetting(activeScope, 'twoColumnImageHeight', val);
+                                if (targetScope === 'global') updateSetting('global', 'twoColumnImageHeight', val);
+                              }}
+                            />
+                            <span className="text-[10px] text-gray-400 font-bold">px</span>
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="80"
+                          max="450"
+                          step="5"
+                          className="control-slider w-full"
+                          value={currentHeight}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateSetting(activeScope, 'twoColumnImageHeight', val);
+                            if (targetScope === 'global') updateSetting('global', 'twoColumnImageHeight', val);
+                          }}
+                        />
+                        {/* Quick Presets for Height */}
+                        <div className="grid grid-cols-4 gap-1 pt-0.5">
+                          {[
+                            { label: 'عادي (200px)', val: 200 },
+                            { label: 'متوسط (245px)', val: 245 },
+                            { label: 'كبير (300px)', val: 300 },
+                            { label: 'كبير جداً (360px)', val: 360 },
+                          ].map((preset) => (
+                            <button
+                              key={preset.val}
+                              type="button"
+                              onClick={() => {
+                                updateSetting(activeScope, 'twoColumnImageHeight', preset.val);
+                                if (targetScope === 'global') updateSetting('global', 'twoColumnImageHeight', preset.val);
+                              }}
+                              className={`py-1 text-[9.5px] font-bold rounded transition border ${
+                                currentHeight === preset.val
+                                  ? 'bg-brand-gold text-black border-brand-gold shadow'
+                                  : 'bg-black/70 text-gray-300 border-white/10 hover:bg-white/10'
+                              }`}
+                            >
+                              {preset.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Frame Width */}
+                      <div className="space-y-1 pt-1.5 border-t border-white/10">
+                        <div className="flex justify-between items-center text-[10.5px] text-gray-200 font-semibold">
+                          <span>عرض إطار الصورتين:</span>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              min="50"
+                              max="100"
+                              step="1"
+                              className="w-14 bg-black border border-brand-gold/70 text-brand-gold text-center text-[11px] font-mono font-bold rounded py-0.5 outline-none focus:ring-1 focus:ring-brand-gold"
+                              value={currentWidth}
+                              onChange={(e) => {
+                                const val = Number(e.target.value);
+                                updateSetting(activeScope, 'twoColumnImageWidth', val);
+                                if (targetScope === 'global') updateSetting('global', 'twoColumnImageWidth', val);
+                              }}
+                            />
+                            <span className="text-[10px] text-gray-400 font-bold">%</span>
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="50"
+                          max="100"
+                          step="1"
+                          className="control-slider w-full"
+                          value={currentWidth}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            updateSetting(activeScope, 'twoColumnImageWidth', val);
+                            if (targetScope === 'global') updateSetting('global', 'twoColumnImageWidth', val);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Adjustment Sliders for Selected Photo */}
                 <div className="bg-black/80 p-3 rounded-xl border border-brand-gold/30 space-y-3">
-                  <div>
-                    <div className="flex justify-between text-[11px] text-gray-200 font-semibold mb-1">
+                  {/* Zoom / Scale Section */}
+                  <div className="space-y-1.5 bg-black/60 p-2.5 rounded-lg border border-brand-gold/30">
+                    <div className="flex justify-between items-center text-[11px] text-gray-200 font-semibold">
+                      <span className="flex items-center gap-1">
+                        <span>🔍</span>
+                        <span>مستوى التكبير والتصغير (Zoom & Scale):</span>
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="20"
+                          max="400"
+                          step="5"
+                          className="w-14 bg-black border border-brand-gold/70 text-brand-gold text-center text-[11px] font-mono font-bold rounded py-0.5 outline-none focus:ring-1 focus:ring-brand-gold"
+                          value={Math.round(curScale * 100)}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (!isNaN(val)) {
+                              updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                                scale: Math.min(4.0, Math.max(0.2, val / 100)),
+                              });
+                            }
+                          }}
+                        />
+                        <span className="text-[10px] text-gray-400 font-bold">%</span>
+                      </div>
+                    </div>
+
+                    {/* Quick Presets */}
+                    <div className="grid grid-cols-6 gap-1 pt-0.5">
+                      {[
+                        { label: '50%', val: 0.5 },
+                        { label: '75%', val: 0.75 },
+                        { label: '100%', val: 1.0 },
+                        { label: '125%', val: 1.25 },
+                        { label: '150%', val: 1.5 },
+                        { label: '200%', val: 2.0 },
+                      ].map((chip) => (
+                        <button
+                          key={chip.label}
+                          type="button"
+                          onClick={() =>
+                            updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                              scale: chip.val,
+                            })
+                          }
+                          className={`py-0.5 text-[9.5px] font-mono font-bold rounded transition border ${
+                            Math.abs(curScale - chip.val) < 0.04
+                              ? 'bg-brand-gold text-black border-brand-gold shadow-sm'
+                              : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/15'
+                          }`}
+                        >
+                          {chip.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Slider with - / + buttons */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                            scale: Math.min(4.0, Math.max(0.2, parseFloat((curScale - 0.1).toFixed(2)))),
+                          })
+                        }
+                        className="w-6 h-6 rounded bg-black/80 hover:bg-brand-gold hover:text-black border border-brand-gold/40 flex items-center justify-center text-xs text-brand-goldLight transition shadow-sm font-bold shrink-0"
+                        title="تصغير (-10%)"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="range"
+                        min="0.2"
+                        max="4.0"
+                        step="0.02"
+                        className="control-slider flex-1"
+                        value={curScale}
+                        onChange={(e) => updateImageTransform(selectedImagePageIdx, selectedImageSlot, { scale: Number(e.target.value) })}
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                            scale: Math.min(4.0, Math.max(0.2, parseFloat((curScale + 0.1).toFixed(2)))),
+                          })
+                        }
+                        className="w-6 h-6 rounded bg-black/80 hover:bg-brand-gold hover:text-black border border-brand-gold/40 flex items-center justify-center text-xs text-brand-goldLight transition shadow-sm font-bold shrink-0"
+                        title="تكبير (+10%)"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Fit / Cover Quick Modes */}
+                    <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/10">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                            scale: 0.75,
+                            posX: 50,
+                            posY: 50,
+                          })
+                        }
+                        className="py-1 px-1.5 bg-white/10 hover:bg-brand-gold hover:text-black text-brand-goldLight rounded text-[10px] font-bold transition border border-white/10 flex items-center justify-center gap-1"
+                        title="احتواء كامل الصحن"
+                      >
+                        <span>🍽️ احتواء كامل (75%)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                            scale: 1.25,
+                            posX: 50,
+                            posY: selectedImageSlot === 0 ? 68 : 30,
+                          })
+                        }
+                        className="py-1 px-1.5 bg-white/10 hover:bg-brand-gold hover:text-black text-brand-goldLight rounded text-[10px] font-bold transition border border-white/10 flex items-center justify-center gap-1"
+                        title="تعبئة الإطار"
+                      >
+                        <span>🖼️ تعبئة الإطار (125%)</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Flips Options (Horizontal & Vertical) */}
+                  <div className="grid grid-cols-2 gap-2 bg-black/60 p-2.5 rounded-lg border border-white/10 text-[11px] text-gray-200">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-semibold flex items-center gap-1">
+                        <FlipHorizontal className="w-3.5 h-3.5 text-brand-gold" />
+                        <span>أفقي:</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                            flipX: !norm.flipX,
+                          })
+                        }
+                        className={`px-2 py-1 rounded text-[9.5px] font-bold transition border flex items-center gap-1 ${
+                          norm.flipX
+                            ? 'bg-brand-gold text-black border-brand-gold shadow'
+                            : 'bg-white/10 text-brand-goldLight border-white/20 hover:bg-white/20'
+                        }`}
+                      >
+                        <FlipHorizontal className="w-3 h-3" />
+                        <span>{norm.flipX ? 'مقلوب' : 'عادي'}</span>
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-semibold flex items-center gap-1">
+                        <FlipVertical className="w-3.5 h-3.5 text-brand-gold" />
+                        <span>رأسي:</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                            flipY: !norm.flipY,
+                          })
+                        }
+                        className={`px-2 py-1 rounded text-[9.5px] font-bold transition border flex items-center gap-1 ${
+                          norm.flipY
+                            ? 'bg-brand-gold text-black border-brand-gold shadow'
+                            : 'bg-white/10 text-brand-goldLight border-white/20 hover:bg-white/20'
+                        }`}
+                      >
+                        <FlipVertical className="w-3 h-3" />
+                        <span>{norm.flipY ? 'مقلوب' : 'عادي'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Vertical Y */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[11px] text-gray-200 font-semibold">
                       <span>↕️ الموضع الرأسي (أعلى / أسفل):</span>
-                      <span className="font-mono text-brand-gold font-bold">{curPosY}%</span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          className="w-12 bg-black border border-white/20 text-brand-gold text-center text-[10px] font-mono font-bold rounded py-0.5"
+                          value={curPosY}
+                          onChange={(e) => updateImageTransform(selectedImagePageIdx, selectedImageSlot, { posY: Number(e.target.value) })}
+                        />
+                        <span className="text-[9px] text-gray-400 font-bold">%</span>
+                      </div>
                     </div>
                     <input
                       type="range"
@@ -368,10 +676,23 @@ const ArchSettings = ({ targetScope }) => {
                       onChange={(e) => updateImageTransform(selectedImagePageIdx, selectedImageSlot, { posY: Number(e.target.value) })}
                     />
                   </div>
-                  <div>
-                    <div className="flex justify-between text-[11px] text-gray-200 font-semibold mb-1">
+
+                  {/* Horizontal X */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[11px] text-gray-200 font-semibold">
                       <span>↔️ الموضع الأفقي (يمين / يسار):</span>
-                      <span className="font-mono text-brand-gold font-bold">{curPosX}%</span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          className="w-12 bg-black border border-white/20 text-brand-gold text-center text-[10px] font-mono font-bold rounded py-0.5"
+                          value={curPosX}
+                          onChange={(e) => updateImageTransform(selectedImagePageIdx, selectedImageSlot, { posX: Number(e.target.value) })}
+                        />
+                        <span className="text-[9px] text-gray-400 font-bold">%</span>
+                      </div>
                     </div>
                     <input
                       type="range"
@@ -383,21 +704,108 @@ const ArchSettings = ({ targetScope }) => {
                       onChange={(e) => updateImageTransform(selectedImagePageIdx, selectedImageSlot, { posX: Number(e.target.value) })}
                     />
                   </div>
-                  <div>
-                    <div className="flex justify-between text-[11px] text-gray-200 font-semibold mb-1">
-                      <span>🔍 مستوى التكبير والزووم:</span>
-                      <span className="font-mono text-brand-gold font-bold">{curScale.toFixed(2)}x</span>
+
+                  {/* Filter Removal & Clarity Notification Badge */}
+                  <div className="bg-brand-green/20 border border-brand-accent/40 rounded-xl p-2 flex items-center gap-2 text-[10.5px] text-slate-200 shadow-sm">
+                    <Sparkles className="w-4 h-4 text-brand-gold shrink-0" />
+                    <span>تم إزالة أي تظليل داكن أو فلتر من فوق مكان الصور لتعرض الصور بأعلى دقة ونقاء 100%.</span>
+                  </div>
+
+                  {/* Photo Brightness & Lighting Boost Section */}
+                  <div className="bg-gradient-to-b from-black/80 to-black/60 p-3 rounded-xl border border-brand-gold/40 space-y-2.5 shadow-inner">
+                    <div className="flex justify-between items-center text-[11px] text-gray-200 font-bold">
+                      <span className="flex items-center gap-1.5 text-brand-goldLight">
+                        <Sun className="w-4 h-4 text-yellow-400 animate-pulse" />
+                        <span>💡 رفع وتعديل إضاءة هذه الصورة (Brightness):</span>
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="50"
+                          max="200"
+                          step="5"
+                          className="w-14 bg-black border border-brand-gold/70 text-brand-gold text-center text-[11px] font-mono font-bold rounded py-0.5 outline-none focus:ring-1 focus:ring-brand-gold"
+                          value={norm.brightness !== undefined ? norm.brightness : 100}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (!isNaN(val)) {
+                              updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                                brightness: Math.min(200, Math.max(50, val)),
+                              });
+                            }
+                          }}
+                        />
+                        <span className="text-[10px] text-gray-400 font-bold">%</span>
+                      </div>
                     </div>
+
+                    {/* Quick Brightness Chips */}
+                    <div className="grid grid-cols-5 gap-1">
+                      {[
+                        { label: '100% عادي', val: 100 },
+                        { label: '115% طباعة', val: 115 },
+                        { label: '130% ساطع', val: 130 },
+                        { label: '150% قوي ✨', val: 150 },
+                        { label: '175% أقصى ⚡', val: 175 },
+                      ].map((chip) => (
+                        <button
+                          key={chip.val}
+                          type="button"
+                          onClick={() =>
+                            updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                              brightness: chip.val,
+                            })
+                          }
+                          className={`py-1 text-[9px] font-mono font-bold rounded transition border ${
+                            (norm.brightness !== undefined ? norm.brightness : 100) === chip.val
+                              ? 'bg-brand-gold text-black border-brand-gold shadow-sm'
+                              : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/15'
+                          }`}
+                        >
+                          {chip.label}
+                        </button>
+                      ))}
+                    </div>
+
                     <input
                       type="range"
-                      min="1.0"
-                      max="3.0"
-                      step="0.05"
-                      className="control-slider"
-                      value={curScale}
-                      onChange={(e) => updateImageTransform(selectedImagePageIdx, selectedImageSlot, { scale: Number(e.target.value) })}
+                      min="50"
+                      max="200"
+                      step="5"
+                      className="control-slider w-full"
+                      value={norm.brightness !== undefined ? norm.brightness : 100}
+                      onChange={(e) =>
+                        updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                          brightness: Number(e.target.value),
+                        })
+                      }
                     />
+
+                    {/* Contrast Control Slider */}
+                    <div className="pt-2 border-t border-white/10 space-y-1.5">
+                      <div className="flex justify-between items-center text-[10.5px] text-gray-300 font-semibold">
+                        <span>🌓 تباين ووضوح الصورة (Contrast):</span>
+                        <span className="text-[10px] text-brand-gold font-mono font-bold bg-black px-1.5 py-0.5 rounded border border-brand-gold/30">
+                          {norm.contrast !== undefined ? norm.contrast : 100}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="60"
+                        max="180"
+                        step="5"
+                        className="control-slider w-full"
+                        value={norm.contrast !== undefined ? norm.contrast : 100}
+                        onChange={(e) =>
+                          updateImageTransform(selectedImagePageIdx, selectedImageSlot, {
+                            contrast: Number(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
                   </div>
+
+                  {/* Quick Upload & Reset */}
                   <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/10">
                     <label className="py-1.5 px-2 bg-brand-gold hover:bg-brand-goldLight text-black rounded-lg text-[10.5px] font-bold transition flex items-center justify-center gap-1 cursor-pointer shadow-sm">
                       <Camera className="w-3.5 h-3.5" />
@@ -425,9 +833,10 @@ const ArchSettings = ({ targetScope }) => {
                       type="button"
                       onClick={() => resetImageTransform(selectedImagePageIdx, selectedImageSlot)}
                       className="py-1.5 px-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[10.5px] font-semibold transition flex items-center justify-center gap-1 border border-white/15"
+                      title="إعادة ضبط الموضع والتكبير (100%)"
                     >
                       <RotateCcw className="w-3.5 h-3.5 text-brand-gold" />
-                      <span>إعادة ضبط המوضع</span>
+                      <span>إعادة ضبط (100%)</span>
                     </button>
                   </div>
                 </div>

@@ -14,7 +14,17 @@
 }
 
 @page {
-  size: 210mm 297mm;
+  size: auto;
+  margin: 0;
+}
+
+@page :landscape {
+  size: A4 landscape;
+  margin: 0;
+}
+
+@page :portrait {
+  size: A4 portrait;
   margin: 0;
 }
 
@@ -22,10 +32,8 @@
   html, body, #root, main {
     margin: 0 !important;
     padding: 0 !important;
-    background: #050a07 !important;
+    background: #000000 !important;
     width: 100% !important;
-    max-width: 210mm !important;
-    min-width: 210mm !important;
     height: auto !important;
     overflow: visible !important;
     border: none !important;
@@ -56,10 +64,8 @@
     break-inside: avoid !important;
     width: 210mm !important;
     height: 297mm !important;
-    max-width: 210mm !important;
-    max-height: 297mm !important;
-    min-width: 210mm !important;
-    min-height: 297mm !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
     overflow: hidden !important;
     position: relative !important;
     top: 0 !important;
@@ -70,14 +76,28 @@
   .a4-page {
     width: 210mm !important;
     height: 297mm !important;
-    max-width: 210mm !important;
-    max-height: 297mm !important;
-    min-width: 210mm !important;
-    min-height: 297mm !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
     box-shadow: none !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    background-color: #000000 !important;
+  }
+
+  .a4-landscape-page-wrapper, .a4-landscape-page {
+    width: 297mm !important;
+    height: 210mm !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    page-break-after: always !important;
+    break-after: page !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
     background-color: #000000 !important;
@@ -99,7 +119,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   background-image: 
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 10 L33 27 L50 30 L33 33 L30 50 L27 33 L10 30 L27 27 Z' fill='%23c9aa58' fill-opacity='0.02'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 10 L33 27 L50 30 L33 33 L30 50 L27 33 L10 30 L27 27 Z' fill='%238dc63f' fill-opacity='0.025'/%3E%3C/svg%3E");
 }
 
 .a4-page-wrapper {
@@ -112,7 +132,38 @@
   margin: 24px auto;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   position: relative;
-  background: #050a07;
+  background: #0a1610;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.a4-landscape-page {
+  width: 297mm;
+  height: 210mm;
+  max-width: 297mm;
+  max-height: 210mm;
+  min-width: 297mm;
+  min-height: 210mm;
+  background-color: #000000;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.a4-landscape-page-wrapper {
+  width: 297mm;
+  height: 210mm;
+  max-width: 297mm;
+  max-height: 210mm;
+  min-width: 297mm;
+  min-height: 210mm;
+  margin: 24px auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  position: relative;
+  background: #0a1610;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -128,34 +179,44 @@
   border-radius: 2px;
 }
 [contenteditable="true"]:focus {
-  background-color: rgba(201, 170, 88, 0.15);
+  background-color: rgba(141, 198, 63, 0.15);
   border-radius: 2px;
 }
 
 .category-pill {
-  background: linear-gradient(135deg, rgba(14, 65, 37, 0.96) 0%, rgba(4, 26, 14, 0.98) 100%);
-  border: 1px solid rgba(201, 170, 88, 0.6);
+  background: linear-gradient(135deg, rgba(22, 42, 28, 0.96) 0%, rgba(10, 22, 14, 0.98) 100%);
+  border: 1px solid rgba(141, 198, 63, 0.7);
   border-radius: 6px;
-  padding: 4px 18px 4px 6px;
+  padding: 3px 12px;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  width: fit-content;
+  max-width: 96%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
 }
 
 .category-num-circle {
-  background: linear-gradient(135deg, #c9aa58 0%, #8f7535 100%);
-  color: #03140a;
+  background: linear-gradient(135deg, #8dc63f 0%, #6ea822 100%);
+  color: #0b1c11;
   font-weight: 900;
-  font-size: 15px;
-  width: 30px;
-  height: 30px;
+  font-size: 13px;
+  width: 24px;
+  height: 24px;
   border-radius: 4px;
   font-family: 'Cinzel', serif;
   text-align: center;
   line-height: 1;
   padding: 0;
-  box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+  box-shadow: inset 0 1px 3px rgba(255,255,255,0.4);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .item-number-badge {
@@ -163,9 +224,9 @@
   height: 24px;
   padding: 0 4px;
   border-radius: 4px;
-  border: 1px solid rgba(201, 170, 88, 0.6);
-  background: rgba(14, 65, 37, 0.4);
-  color: #c9aa58;
+  border: 1px solid rgba(141, 198, 63, 0.6);
+  background: rgba(22, 42, 28, 0.6);
+  color: #8dc63f;
   font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
@@ -179,7 +240,7 @@
 
 .price-badge-pill {
   background: transparent;
-  color: #c9aa58;
+  color: #8dc63f;
   font-weight: 700;
   font-size: 14.5px;
   white-space: nowrap;
@@ -191,14 +252,14 @@
 
 .leader-dots {
   flex-grow: 1;
-  border-bottom: 2px dotted rgba(201, 170, 88, 0.25);
+  border-bottom: 2px dotted rgba(141, 198, 63, 0.3);
   margin: 0 14px;
   position: relative;
   top: -7px;
 }
 
 .dietary-bar {
-  border: 1px solid rgba(201, 170, 88, 0.5);
+  border: 1px solid rgba(141, 198, 63, 0.5);
   border-radius: 9999px;
   background: rgba(0, 0, 0, 0.7);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -206,8 +267,8 @@
 
 .upload-btn {
   background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(201, 170, 88, 0.9);
-  color: #e6cd85;
+  border: 1px solid rgba(141, 198, 63, 0.9);
+  color: #a6e247;
   padding: 5px 10px;
   border-radius: 6px;
   font-size: 10.5px;
@@ -222,8 +283,8 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 .upload-btn:hover {
-  background: #c9aa58;
-  color: #000;
+  background: #8dc63f;
+  color: #0b1c11;
   transform: scale(1.04);
 }
 
@@ -232,8 +293,8 @@
   left: 20px;
   top: 80px;
   width: 420px;
-  background: rgba(10, 15, 12, 0.96);
-  border: 1px solid rgba(201, 170, 88, 0.5);
+  background: rgba(10, 20, 14, 0.96);
+  border: 1px solid rgba(141, 198, 63, 0.5);
   border-radius: 14px;
   padding: 18px;
   box-shadow: 0 12px 45px rgba(0, 0, 0, 0.9);
@@ -249,7 +310,7 @@
   width: 6px;
 }
 .control-panel::-webkit-scrollbar-thumb {
-  background: #c9aa58;
+  background: #8dc63f;
   border-radius: 3px;
 }
 
@@ -262,19 +323,19 @@
   display: flex;
   justify-content: space-between;
   font-size: 11.5px;
-  color: #e6cd85;
+  color: #a6e247;
   margin-bottom: 6px;
   font-weight: 600;
 }
 .control-slider {
   width: 100%;
-  accent-color: #c9aa58;
+  accent-color: #8dc63f;
 }
 
 .cms-input {
   width: 100%;
   background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(201, 170, 88, 0.35);
+  border: 1px solid rgba(141, 198, 63, 0.35);
   color: white;
   padding: 6px 10px;
   border-radius: 6px;
@@ -283,14 +344,14 @@
   transition: all 0.2s;
 }
 .cms-input:focus {
-  border-color: #c9aa58;
+  border-color: #8dc63f;
   outline: none;
   background: rgba(0, 0, 0, 0.85);
-  box-shadow: 0 0 10px rgba(201, 170, 88, 0.25);
+  box-shadow: 0 0 10px rgba(141, 198, 63, 0.25);
 }
 .cms-label {
   font-size: 13px; /* Increased label size */
-  color: #a2b3a8;
+  color: #8da596;
   font-weight: 600;
 }
 .cms-item-card {
@@ -301,8 +362,8 @@
   margin-bottom: 10px;
 }
 .action-btn {
-  background: #0f3d23;
-  border: 1px solid #c9aa58;
+  background: #162a1c;
+  border: 1px solid #8dc63f;
   color: white;
   width: 26px;
   height: 26px;
@@ -316,8 +377,13 @@
   transition: all 0.2s;
 }
 .action-btn:hover {
-  background: #c9aa58;
-  color: #000;
+  background: #8dc63f;
+  color: #0b1c11;
+}
+.action-btn.delete:hover {
+  background: #e53e3e;
+  border-color: #e53e3e;
+  color: white;
 }
 .action-btn.delete:hover {
   background: #e53e3e;

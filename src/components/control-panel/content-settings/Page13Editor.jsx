@@ -50,7 +50,7 @@ export const Page13Editor = ({ pageIdx = 12, page }) => {
             className="cms-input text-xs"
             value={page.header?.subtitle || ''}
             onChange={(e) => updateHeader(pageIdx, 'subtitle', e.target.value)}
-            placeholder="17 · CATERING & INFOS"
+            placeholder="18 · CATERING & INFOS"
           />
         </div>
 
@@ -195,7 +195,7 @@ export const Page13Editor = ({ pageIdx = 12, page }) => {
 
           <div>
             <div className="flex justify-between text-[10px] text-gray-300 mb-1">
-              <span>حجم خط النصوص:</span>
+              <span>حجم خط القوائم:</span>
               <span className="text-brand-gold font-mono">{p.legendTextSize || 8}px</span>
             </div>
             <input
@@ -206,6 +206,48 @@ export const Page13Editor = ({ pageIdx = 12, page }) => {
               className="control-slider"
               value={p.legendTextSize || 8}
               onChange={(e) => updateSetting(pageScope, 'legendTextSize', parseFloat(e.target.value))}
+            />
+          </div>
+        </div>
+
+        {/* Dynamic Symbol Notice Control */}
+        <div className="pt-2 border-t border-white/10 space-y-2">
+          <div>
+            <label className="text-[10px] text-gray-300 mb-0.5 block font-semibold">
+              نص ملاحظة الرموز السفلية (Standardzubereitung Notice):
+            </label>
+            <textarea
+              rows={2}
+              className="cms-input text-[10.5px] leading-relaxed text-gray-200"
+              value={p.hinweiseNoticeText !== undefined ? p.hinweiseNoticeText : 'Die Symbole beziehen sich auf die Standardzubereitung. Gerichte mit 🌶️ sind pikant; 🌶️🌶️ kennzeichnet die extra scharfe Variante.'}
+              onChange={(e) => updateSetting(pageScope, 'hinweiseNoticeText', e.target.value)}
+            />
+          </div>
+
+          <div className="bg-black/50 p-2 rounded-lg border border-white/10">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[10px] text-gray-300 font-semibold">حجم خط ملاحظة الرموز (Notice Font Size):</span>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min="6"
+                  max="16"
+                  step="0.5"
+                  className="w-14 bg-black border border-brand-gold/60 text-brand-gold text-center text-[10px] font-mono font-bold rounded py-0.5"
+                  value={p.hinweiseNoticeSize !== undefined ? p.hinweiseNoticeSize : 8.5}
+                  onChange={(e) => updateSetting(pageScope, 'hinweiseNoticeSize', parseFloat(e.target.value))}
+                />
+                <span className="text-[9px] text-gray-400">px</span>
+              </div>
+            </div>
+            <input
+              type="range"
+              min="6"
+              max="16"
+              step="0.5"
+              className="control-slider"
+              value={p.hinweiseNoticeSize !== undefined ? p.hinweiseNoticeSize : 8.5}
+              onChange={(e) => updateSetting(pageScope, 'hinweiseNoticeSize', parseFloat(e.target.value))}
             />
           </div>
         </div>
@@ -240,6 +282,172 @@ export const Page13Editor = ({ pageIdx = 12, page }) => {
               className="control-slider"
               value={p.legendOffsetY || 0}
               onChange={(e) => updateSetting(pageScope, 'legendOffsetY', parseFloat(e.target.value))}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Page 13 Whole Block Position & Card Border Controls (إطارات وتحريك كروت صفحة 13) */}
+      <div className="bg-gradient-to-r from-[#0c2417] to-[#06140d] border border-brand-gold/60 rounded-xl p-3 space-y-3 shadow-md">
+        <span className="text-[11px] font-bold text-brand-gold flex items-center gap-1">
+          <Sliders className="w-3.5 h-3.5 text-yellow-400" />
+          <span>تحكّم كُتلة وإطارات صناديق صفحة 13 (ككتلة أو كإطار):</span>
+        </span>
+
+        {/* 1. Whole Block Position & Scale */}
+        <div className="space-y-2 bg-black/60 p-2.5 rounded-lg border border-white/10">
+          <span className="text-[10px] font-bold text-brand-goldLight block">1. تحريك وتكبير محتوى صفحة 13 ككتلة كاملة:</span>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[10px] text-gray-300 font-semibold">إزاحة الكتلة عمودياً (رفع للأعلى / تنزيل):</span>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min="-250"
+                  max="250"
+                  step="2"
+                  className="w-14 bg-black border border-brand-gold/60 text-brand-gold text-center text-[10px] font-mono font-bold rounded py-0.5"
+                  value={p.page13OffsetY || 0}
+                  onChange={(e) => updateSetting(pageScope, 'page13OffsetY', parseFloat(e.target.value) || 0)}
+                />
+                <span className="text-[9px] text-gray-400">px</span>
+              </div>
+            </div>
+            <input
+              type="range"
+              min="-250"
+              max="250"
+              step="2"
+              className="control-slider"
+              value={p.page13OffsetY || 0}
+              onChange={(e) => updateSetting(pageScope, 'page13OffsetY', parseFloat(e.target.value))}
+            />
+
+            {/* Quick Raise Presets */}
+            <div className="flex items-center justify-between pt-1 gap-1">
+              <span className="text-[9px] text-gray-400">اختصارات الرفع السريع:</span>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => updateSetting(pageScope, 'page13OffsetY', -40)}
+                  className="px-2 py-0.5 bg-brand-gold/20 hover:bg-brand-gold hover:text-black border border-brand-gold/60 rounded text-[9px] font-bold text-brand-goldLight transition"
+                >
+                  🚀 رفع للأعلى (-40px)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateSetting(pageScope, 'page13OffsetY', -80)}
+                  className="px-2 py-0.5 bg-yellow-500/20 hover:bg-yellow-500 hover:text-black border border-yellow-500/60 rounded text-[9px] font-bold text-yellow-300 transition"
+                >
+                  ⬆️ رفع أكثر (-80px)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateSetting(pageScope, 'page13OffsetY', 0)}
+                  className="px-1.5 py-0.5 bg-black/60 hover:bg-white/10 border border-white/10 rounded text-[9px] text-gray-400 transition"
+                >
+                  📍 مركز (0)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[10px] text-gray-300">إزاحة الكتلة أفقياً (X Left/Right):</span>
+              <span className="text-[10px] text-brand-gold font-mono font-bold">{p.page13OffsetX || 0}px</span>
+            </div>
+            <input
+              type="range"
+              min="-100"
+              max="100"
+              step="2"
+              className="control-slider"
+              value={p.page13OffsetX || 0}
+              onChange={(e) => updateSetting(pageScope, 'page13OffsetX', parseFloat(e.target.value))}
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[10px] text-gray-300">تكبير وتصغير محتوى صفحة 13 (Content Scale %):</span>
+              <span className="text-[10px] text-yellow-300 font-mono font-bold">{p.page13ContentScale || 100}%</span>
+            </div>
+            <input
+              type="range"
+              min="60"
+              max="140"
+              step="1"
+              className="control-slider"
+              value={p.page13ContentScale || 100}
+              onChange={(e) => updateSetting(pageScope, 'page13ContentScale', parseFloat(e.target.value))}
+            />
+          </div>
+        </div>
+
+        {/* 2. Card Borders & Spacing Controls */}
+        <div className="space-y-2 bg-black/60 p-2.5 rounded-lg border border-white/10">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold text-brand-goldLight">2. التنسيق إطار إطار لكل صندوق:</span>
+            <button
+              type="button"
+              onClick={() => updateSetting(pageScope, 'showPage13CardBorders', p.showPage13CardBorders === false ? true : false)}
+              className={`px-2 py-0.5 rounded text-[9.5px] font-bold border transition ${
+                p.showPage13CardBorders !== false
+                  ? 'bg-brand-gold/20 text-brand-gold border-brand-gold/60'
+                  : 'bg-black/40 text-gray-400 border-white/10'
+              }`}
+            >
+              {p.showPage13CardBorders !== false ? '✓ الإطارات مفعّلة' : 'الإطارات مخفية'}
+            </button>
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[10px] text-gray-300">سماكة إطارات الصناديق (Border Width):</span>
+              <span className="text-[10px] text-brand-gold font-mono font-bold">{p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="6"
+              step="0.5"
+              className="control-slider"
+              value={p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}
+              onChange={(e) => updateSetting(pageScope, 'page13BorderWidth', parseFloat(e.target.value))}
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[10px] text-gray-300">شفافية الإطارات الذهبية (Border Opacity):</span>
+              <span className="text-[10px] text-brand-gold font-mono font-bold">{p.page13BorderOpacity !== undefined ? p.page13BorderOpacity : 50}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              className="control-slider"
+              value={p.page13BorderOpacity !== undefined ? p.page13BorderOpacity : 50}
+              onChange={(e) => updateSetting(pageScope, 'page13BorderOpacity', parseFloat(e.target.value))}
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[10px] text-gray-300">التباعد الفاصل بين الصناديق (Card Gap):</span>
+              <span className="text-[10px] text-brand-gold font-mono font-bold">{p.page13CardGap !== undefined ? p.page13CardGap : 8}px</span>
+            </div>
+            <input
+              type="range"
+              min="2"
+              max="24"
+              step="1"
+              className="control-slider"
+              value={p.page13CardGap !== undefined ? p.page13CardGap : 8}
+              onChange={(e) => updateSetting(pageScope, 'page13CardGap', parseFloat(e.target.value))}
             />
           </div>
         </div>

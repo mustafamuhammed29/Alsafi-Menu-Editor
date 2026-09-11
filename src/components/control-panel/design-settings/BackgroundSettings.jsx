@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
-import { Layers, Check, Sparkles, Upload, RefreshCw } from 'lucide-react';
+import { Layers, Check, Sparkles, Upload, RefreshCw, Sun } from 'lucide-react';
 import { useMenu } from '../../../context/MenuContext';
 import { optimizeImageFile } from '../../../utils/imageOptimizer';
 
 const BackgroundSettings = () => {
-  const { pages, globalSettings, pageOverrides, updateSetting } = useMenu();
+  const { pages, globalSettings, pageOverrides, updateSetting, isPlainPaperMode, togglePlainPaperMode } = useMenu();
   const bgFileInputRef = useRef(null);
 
   const updateGlobalBackground = (key, value) => {
@@ -44,39 +44,104 @@ const BackgroundSettings = () => {
 
   return (
     <div className="space-y-4">
+      {/* ☀️ PLAIN PAPER + THERMAL LAMINATION PRESET CARD */}
+      <div className={`p-3 rounded-xl border transition ${
+        isPlainPaperMode
+          ? 'bg-amber-950/70 border-amber-400 text-white shadow-lg'
+          : 'bg-black/40 border-amber-500/30 text-amber-100'
+      }`}>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+            <Sun className={`w-4 h-4 ${isPlainPaperMode ? 'text-yellow-300 animate-spin-slow' : 'text-amber-400'}`} />
+            <span>وضع الورق العادي والتغليف الحراري (+20% سطوع)</span>
+          </h3>
+          <button
+            type="button"
+            onClick={togglePlainPaperMode}
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer border ${
+              isPlainPaperMode
+                ? 'bg-yellow-400 text-black border-yellow-200 shadow-md font-black'
+                : 'bg-amber-950/60 hover:bg-amber-900 text-amber-300 border-amber-500/50'
+            }`}
+          >
+            <span>{isPlainPaperMode ? '☀️ مفعّل' : 'تفعيل الوضع'}</span>
+          </button>
+        </div>
+        <p className="text-[10px] text-slate-300 mt-1.5 leading-relaxed">
+          عند تفعيل هذا الوضع، يقوم النظام بتفتيح سطوع الخلفية والصور بنسبة +20% تلقائياً لمنع إعتام الألوان عند الطباعة على ورق عادي خفيف وتغليفه حرارياً.
+        </p>
+      </div>
       {/* Base Background Style Selection */}
       <div className="control-group bg-black/40 p-3 rounded-xl border border-white/5 space-y-3">
         <h3 className="text-xs font-bold text-brand-goldLight flex items-center gap-1.5">
           <Layers className="w-3.5 h-3.5 text-brand-gold" />
           <span>لون ونمط الخلفية الأساسي</span>
         </h3>
-        <p className="text-[10px] text-slate-400">
-          اختر النمط الأساسي للخلفية. الأسود الحقيقي هو الأفضل والأكثر أماناً للطباعة بدون بهتان.
+        <p className="text-[10px] text-slate-400 leading-relaxed">
+          اختر النمط واللون الأساسي لصفحات المنيو وفق الهوية البصرية. يمكنك تجربة جميع الأنماط مباشرة وملاحظة الفخامة والوضوح.
         </p>
         <div className="grid grid-cols-1 gap-2 mt-2">
           {[
-            { id: 'true-black', label: 'أسود حقيقي 100% (الأفضل والأوضح للطباعة)', color: '#000000' },
-            { id: 'solid-green', label: 'أخضر داكن سادة (فخم وهادئ للعين)', color: '#050a07' },
-            { id: 'gradient', label: 'تدرج أخضر (النمط الكلاسيكي للشاشات)', color: 'linear-gradient(90deg, #0a1f13, #050a07)' },
+            {
+              id: 'solid-green',
+              label: 'أخضر الصافي الملكي الداكن (المعتمد في الهوية البصرية)',
+              desc: 'درجة الأخضر الفاخر المعتمدة في الهوية - متناسقة 100% مع الألوان الليمونية',
+              color: '#0a1610',
+            },
+            {
+              id: 'gradient',
+              label: 'تدرج أخضر الصافي الفاخر (انسيابي للشاشات والعرض)',
+              desc: 'تدرج ناعم يعطي عمقاً بصرياً مريحاً للعين وتوهجاً فخماً في أعلى الصفحة',
+              color: 'linear-gradient(135deg, #163322, #0a1610)',
+            },
+            {
+              id: 'emerald-deep',
+              label: 'أخضر غاباتي عميق (مستوحى من الزي الرسمي والبطاقات)',
+              desc: 'درجة الأخضر العميقة المستخدمة في يونيفورم الموظفين والوجه الخلفي لكروت العمل',
+              color: 'linear-gradient(180deg, #173322, #112418)',
+            },
+            {
+              id: 'lime-vibrant-dark',
+              label: 'تدرج هالة ليمونية علوية (إشعاع وبريق الشعار)',
+              desc: 'إضاءة دائرية خافتة من أعلى الصفحة تعكس بريق الأخضر الليموني',
+              color: 'radial-gradient(circle at top, #1b3d26, #0a1610)',
+            },
+            {
+              id: 'damascus-dark',
+              label: 'أخضر دمشقي عريق (هادئ ومائل للسواد الملكي)',
+              desc: 'عمق تراثي فخم جداً يعطي بروزاً ساطعاً للنصوص والأسعار',
+              color: 'linear-gradient(180deg, #0e2416, #07130b)',
+            },
+            {
+              id: 'true-black',
+              label: 'أسود مطفي 100% للطباعة عالية التباين',
+              desc: 'أسود نقي وأمان تام عند الطباعة مع توفير فائق في أحبار الطابعات',
+              color: '#000000',
+            },
           ].map((style) => (
             <button
               key={style.id}
               type="button"
               onClick={() => updateGlobalBackground('bgStyle', style.id)}
-              className={`flex items-center gap-3 p-2 rounded-lg border transition ${
+              className={`flex items-start gap-3 p-2.5 rounded-xl border transition text-right ${
                 (globalSettings.bgStyle || 'solid-green') === style.id
-                  ? 'bg-brand-gold/20 border-brand-gold text-brand-goldLight shadow-sm'
-                  : 'bg-black/60 border-white/10 text-gray-300 hover:border-white/30'
+                  ? 'bg-brand-gold/15 border-brand-gold text-white shadow-md'
+                  : 'bg-black/60 border-white/10 text-gray-300 hover:border-white/30 hover:bg-black/80'
               }`}
             >
               <div 
-                className="w-6 h-6 rounded-full border border-white/20 shadow-sm shrink-0"
+                className="w-6 h-6 rounded-full border border-white/30 shadow-md shrink-0 mt-0.5"
                 style={{ background: style.color }}
               />
-              <span className="text-[11px] font-semibold">{style.label}</span>
-              {(globalSettings.bgStyle || 'solid-green') === style.id && (
-                <Check className="w-3.5 h-3.5 ml-auto text-brand-gold" />
-              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11.5px] font-bold text-white leading-tight block">{style.label}</span>
+                  {(globalSettings.bgStyle || 'solid-green') === style.id && (
+                    <Check className="w-4 h-4 text-brand-gold shrink-0 ml-1.5" />
+                  )}
+                </div>
+                <span className="text-[9.5px] text-gray-400 block mt-0.5 leading-snug">{style.desc}</span>
+              </div>
             </button>
           ))}
         </div>
@@ -86,31 +151,33 @@ const BackgroundSettings = () => {
           <div className="flex justify-between items-center mb-2">
             <span className="text-[10.5px] text-gray-300 font-semibold flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-              زخرفة ونمط الخلفية:
+              زخرفة ونمط الخلفية المائية:
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-1 mb-3">
+          <div className="grid grid-cols-4 gap-1.5 mb-3">
             {[
-              { id: 'stars', label: 'نجوم', icon: '✨' },
-              { id: 'cutlery', label: 'مائدة', icon: '🍴' },
-              { id: 'diamonds', label: 'معين', icon: '🔶' },
-              { id: 'dots', label: 'نقاط', icon: '•' },
-              { id: 'logoLetter', label: 'حرف نصي', icon: 'A' },
+              { id: 'logoLetter', label: 'مونوغرام A المورق', icon: '🌿' },
+              { id: 'alsafiLeaf', label: 'أوراق الصافي', icon: '🍃' },
+              { id: 'stars', label: 'نجوم دمشقية', icon: '✨' },
+              { id: 'diamonds', label: 'معين ملكي', icon: '🔶' },
+              { id: 'cutlery', label: 'مائدة فاخرة', icon: '🍴' },
+              { id: 'dots', label: 'نقاط ناعمة', icon: '•' },
+              { id: 'none', label: 'سادة بدون زخرفة', icon: '🚫' },
               { id: 'custom', label: 'صورة مخصصة', icon: '🖼️' },
             ].map((ptn) => (
               <button
                 key={ptn.id}
                 type="button"
                 onClick={() => updateGlobalBackground('bgPatternType', ptn.id)}
-                className={`py-1 px-1 rounded text-[9.5px] font-semibold transition text-center flex flex-col items-center gap-0.5 ${
-                  (globalSettings.bgPatternType || 'stars') === ptn.id
-                    ? 'bg-brand-gold text-black font-bold shadow-sm'
-                    : 'bg-black/60 text-gray-400 hover:text-gray-200 border border-white/5 hover:border-white/20'
+                className={`py-1.5 px-1 rounded-lg text-[9.5px] font-bold transition text-center flex flex-col items-center gap-0.5 border ${
+                  (globalSettings.bgPatternType || 'logoLetter') === ptn.id
+                    ? 'bg-brand-gold text-black border-brand-gold shadow-sm font-black'
+                    : 'bg-black/60 text-gray-400 hover:text-gray-200 border-white/5 hover:border-white/20'
                 }`}
               >
-                <span className="text-xs">{ptn.icon}</span>
-                <span>{ptn.label}</span>
+                <span className="text-sm">{ptn.icon}</span>
+                <span className="leading-tight">{ptn.label}</span>
               </button>
             ))}
           </div>
@@ -156,19 +223,52 @@ const BackgroundSettings = () => {
 
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] text-gray-400">شفافية الزخرفة ووضوحها:</span>
-            <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-              {globalSettings.bgPatternOpacity !== undefined ? globalSettings.bgPatternOpacity : 2}%
-            </span>
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                value={globalSettings.bgPatternOpacity !== undefined ? globalSettings.bgPatternOpacity : 2}
+                onChange={(e) => updateGlobalBackground('bgPatternOpacity', Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
+                className="w-12 text-center text-[10px] text-brand-gold font-mono font-bold bg-black/80 px-1 py-0.5 rounded border border-brand-gold/30"
+              />
+              <span className="text-[9px] text-gray-400 font-bold">%</span>
+            </div>
           </div>
           <input
             type="range"
             min="0"
-            max="15"
+            max="100"
             step="1"
             className="control-slider"
             value={globalSettings.bgPatternOpacity !== undefined ? globalSettings.bgPatternOpacity : 2}
             onChange={(e) => updateGlobalBackground('bgPatternOpacity', Number(e.target.value))}
           />
+
+          {/* Quick Opacity Presets */}
+          <div className="flex gap-1 mt-1.5">
+            {[
+              { val: 2, label: 'هادئ 2%' },
+              { val: 10, label: 'أنيق 10%' },
+              { val: 25, label: 'واضح 25%' },
+              { val: 50, label: 'بارز 50%' },
+              { val: 100, label: 'كامل 100%' },
+            ].map((preset) => (
+              <button
+                key={preset.val}
+                type="button"
+                onClick={() => updateGlobalBackground('bgPatternOpacity', preset.val)}
+                className={`flex-1 py-0.5 text-[8.5px] rounded border transition ${
+                  (globalSettings.bgPatternOpacity !== undefined ? globalSettings.bgPatternOpacity : 2) === preset.val
+                    ? 'bg-brand-gold text-black border-brand-gold font-bold'
+                    : 'bg-black/40 text-gray-400 border-white/10 hover:text-white'
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
 
           
           {/* Pattern Scale Slider */}
@@ -193,11 +293,12 @@ const BackgroundSettings = () => {
             <span className="text-[10px] text-gray-400 block mb-1.5">لون الزخرفة:</span>
             <div className="flex gap-2">
               {[
-                { id: '#c9aa58', label: 'ذهبي كلاسيكي' },
-                { id: '#c0c0c0', label: 'فضي أنيق' },
-                { id: '#0a1f13', label: 'أخضر داكن' },
-                { id: '#000000', label: 'أسود مطفي' },
+                { id: '#8dc63f', label: 'أخضر الصافي المعتمد' },
+                { id: '#a6e247', label: 'ليموني مشرق' },
+                { id: '#162a1c', label: 'أخضر ملكي داكن' },
                 { id: '#ffffff', label: 'أبيض ناصع' },
+                { id: '#c9aa58', label: 'ذهبي كلاسيكي' },
+                { id: '#000000', label: 'أسود مطفي' },
               ].map((c) => (
                 <button
                   key={c.id}
@@ -205,7 +306,7 @@ const BackgroundSettings = () => {
                   title={c.label}
                   onClick={() => updateGlobalBackground('bgPatternColor', c.id)}
                   className={`w-6 h-6 rounded-full border-2 transition ${
-                    (globalSettings.bgPatternColor || '#c9aa58') === c.id
+                    (globalSettings.bgPatternColor || '#8dc63f') === c.id
                       ? 'border-brand-gold scale-110 shadow-sm'
                       : 'border-white/20 hover:scale-105'
                   }`}

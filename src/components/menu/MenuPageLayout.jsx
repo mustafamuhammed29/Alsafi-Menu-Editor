@@ -5,9 +5,11 @@ import PageDecorativeBorder from '../common/PageDecorativeBorder';
 import PageCalloutCard from '../common/PageCalloutCard';
 import FloatingShapeOverlay from '../common/FloatingShapeOverlay';
 import PageBackgroundLayer from '../common/PageBackgroundLayer';
+import PageFooter from '../common/PageFooter';
+import PrintGuidesOverlay from '../common/PrintGuidesOverlay';
 import ArchSidebar from './ArchSidebar';
 import CategorySection from './CategorySection';
-import { useMenu } from '../../context/MenuContext';
+import { useMenu, normalizeImage } from '../../context/MenuContext';
 
 export const MenuPageLayout = ({
   pageData,
@@ -22,7 +24,7 @@ export const MenuPageLayout = ({
 }) => {
   const p = pageSettings;
   const w = p.archWidth;
-  const { updatePageCallout, updateFloatingShape, deleteFloatingShape, updateSetting } = useMenu();
+  const { updatePageCallout, updateFloatingShape, deleteFloatingShape, updateSetting, showPrintGuides, showLayoutGrid } = useMenu();
 
   const containerRef = useRef(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -31,100 +33,19 @@ export const MenuPageLayout = ({
     ? pageData.categories.reduce((acc, cat) => acc + (cat.items?.length || 0), 0)
     : 0;
 
-  // Smart Dynamic Auto-Fit Spacing & Typography baseline calculation based on item count
+  // 100% Unified Typography Sizes across All Pages
   const hasCallout = Boolean(p.showCalloutCards !== false && pageData.bottomCallout);
 
-  let baseGap = 16;
-  let baseCatGap = 22;
-  let baseItemTitleSize = 19.5;
-  let baseDescSize = 13.5;
-  let basePriceSize = 19.5;
-  let baseCatTitleSize = 22;
-  let baseAllergenSize = 11;
+  // Unified base font sizes
+  let smartItemTitleSize = p.itemTitleSize !== undefined ? Number(p.itemTitleSize) : 14.5;
+  let smartDescSize      = p.descSize !== undefined ? Number(p.descSize) : 10;
+  let smartPriceSize     = p.priceSize !== undefined ? Number(p.priceSize) : 14;
+  let smartCatTitleSize  = p.catTitleSize !== undefined ? Number(p.catTitleSize) : 16;
+  let smartAllergenSize  = p.allergenSize !== undefined ? Number(p.allergenSize) : 8.5;
 
-  if (totalItems >= 20) {
-    // 20+ items (Page 12 drinks)
-    baseGap = 0;
-    baseCatGap = 4;
-    baseItemTitleSize = 13;
-    baseDescSize = 9.5;
-    basePriceSize = 13;
-    baseCatTitleSize = 14;
-    baseAllergenSize = 8.5;
-  } else if (totalItems >= 11) {
-    baseGap = 2;
-    baseCatGap = 6;
-    baseItemTitleSize = 14;
-    baseDescSize = 10.5;
-    basePriceSize = 14;
-    baseCatTitleSize = 15.5;
-    baseAllergenSize = 9.5;
-  } else if (totalItems === 10) {
-    // e.g. Page 02 (Mezze + Vorspeisen mit Fleisch) and Page 08 (Burger + Veggie)
-    baseGap = 3.5;
-    baseCatGap = 7;
-    baseItemTitleSize = 15;
-    baseDescSize = 11;
-    basePriceSize = 15;
-    baseCatTitleSize = 16.5;
-    baseAllergenSize = 10;
-  } else if (totalItems === 9) {
-    // e.g. Page 06 (Wraps)
-    baseGap = 6.5;
-    baseCatGap = 10;
-    baseItemTitleSize = 16;
-    baseDescSize = 11.5;
-    basePriceSize = 16;
-    baseCatTitleSize = 17.5;
-    baseAllergenSize = 10.5;
-  } else if (totalItems === 8) {
-    // e.g. Page 03 (Veggi), Page 05 (Boxen), Page 07 (XXL), Page 09 (Spezialitäten)
-    baseGap = hasCallout ? 3 : 9;
-    baseCatGap = hasCallout ? 6 : 13;
-    baseItemTitleSize = hasCallout ? 14.5 : 17;
-    baseDescSize = hasCallout ? 11 : 12;
-    basePriceSize = hasCallout ? 14.5 : 17;
-    baseCatTitleSize = hasCallout ? 16 : 19;
-    baseAllergenSize = hasCallout ? 9.5 : 11;
-  } else if (totalItems === 7) {
-    // e.g. Page 04 (Salate), Page 10 (Grillgerichte), Page 11 (Beilagen & Desserts)
-    baseGap = hasCallout ? 8 : 16;
-    baseCatGap = hasCallout ? 12 : 20;
-    baseItemTitleSize = hasCallout ? 16.5 : 18.5;
-    baseDescSize = hasCallout ? 12 : 13;
-    basePriceSize = hasCallout ? 16.5 : 18.5;
-    baseCatTitleSize = hasCallout ? 18.5 : 21;
-    baseAllergenSize = hasCallout ? 10.5 : 12;
-  } else {
-    // 6 or fewer items (Page 01 Frühstück)
-    baseGap = hasCallout ? 10 : 22;
-    baseCatGap = hasCallout ? 14 : 26;
-    baseItemTitleSize = hasCallout ? 17.5 : 20.5;
-    baseDescSize = hasCallout ? 13 : 14;
-    basePriceSize = hasCallout ? 17.5 : 20.5;
-    baseCatTitleSize = hasCallout ? 20 : 24;
-    baseAllergenSize = hasCallout ? 11 : 13;
-  }
-
-  // Check for explicit page-specific overrides in pageOverrides
-  const pageScope = `page${pageIndex + 1}`;
-  const isPageSpecific = p._isPageSpecificOverride || false;
-
-  // Global scale multipliers if user adjusted global typography sliders
-  const globalTitleMultiplier = (p.itemTitleSize && p.itemTitleSize !== 14) ? (p.itemTitleSize / 14) : 1;
-  const globalPriceMultiplier = (p.priceSize && p.priceSize !== 13.5) ? (p.priceSize / 13.5) : 1;
-  const globalDescMultiplier  = (p.descSize && p.descSize !== 10) ? (p.descSize / 10) : 1;
-  const globalCatMultiplier   = (p.catTitleSize && p.catTitleSize !== 16) ? (p.catTitleSize / 16) : 1;
-  const globalGapMultiplier   = (p.itemGap && p.itemGap !== 8) ? (p.itemGap / 8) : 1;
-  const globalCatGapMultiplier= (p.categoryGap && p.categoryGap !== 18) ? (p.categoryGap / 18) : 1;
-
-  let smartItemTitleSize = parseFloat((baseItemTitleSize * globalTitleMultiplier).toFixed(1));
-  let smartPriceSize     = parseFloat((basePriceSize * globalPriceMultiplier).toFixed(1));
-  let smartDescSize      = parseFloat((baseDescSize * globalDescMultiplier).toFixed(1));
-  let smartCatTitleSize  = parseFloat((baseCatTitleSize * globalCatMultiplier).toFixed(1));
-  let smartAllergenSize  = baseAllergenSize;
-  let smartGap           = parseFloat((baseGap * globalGapMultiplier).toFixed(1));
-  let smartCatGap        = parseFloat((baseCatGap * globalCatGapMultiplier).toFixed(1));
+  // Spacing gaps adapt smoothly to total items without altering font sizes
+  let smartGap = p.itemGap !== undefined ? Number(p.itemGap) : (totalItems >= 20 ? 1 : totalItems >= 11 ? 4 : totalItems >= 9 ? 7 : (hasCallout ? 6 : 10));
+  let smartCatGap = p.categoryGap !== undefined ? Number(p.categoryGap) : (totalItems >= 20 ? 4 : totalItems >= 11 ? 8 : totalItems >= 9 ? 12 : (hasCallout ? 10 : 16));
 
   // User Content Scale Slider multiplier (e.g. 110% -> 1.10)
   const userScale = p.contentScale !== undefined && p.contentScale > 0 ? p.contentScale / 100 : 1;
@@ -140,9 +61,9 @@ export const MenuPageLayout = ({
   }
 
   // Minimum legible font size constraints
-  smartItemTitleSize = Math.max(12, smartItemTitleSize);
-  smartPriceSize     = Math.max(12, smartPriceSize);
-  smartDescSize      = Math.max(9, smartDescSize);
+  smartItemTitleSize = Math.max(11, smartItemTitleSize);
+  smartPriceSize     = Math.max(11, smartPriceSize);
+  smartDescSize      = Math.max(8, smartDescSize);
 
   // Real-time A4 height overflow detection
   useEffect(() => {
@@ -160,23 +81,37 @@ export const MenuPageLayout = ({
   }, [pageData, pageSettings, smartItemTitleSize, smartDescSize, smartGap, smartCatGap]);
 
   // Premium Background Styling
-  let bgColor = '#050a07'; 
+  let bgColor = '#0a1610'; 
   let bgImage = '';
 
-  if (p.bgStyle === 'gradient' || !p.bgStyle || p.bgStyle === 'solid-green') {
-    // Elegant radial/linear mix for a luxurious deep green feel
-    bgColor = '#060d09';
-    bgImage = 'radial-gradient(ellipse at top center, #0a1710 0%, #050a07 70%, #020503 100%)';
+  if (p.bgStyle === 'gradient') {
+    bgColor = '#0a1610';
+    bgImage = 'radial-gradient(ellipse at top center, #163322 0%, #0a1610 70%, #040d08 100%)';
+  } else if (p.bgStyle === 'solid-green' || !p.bgStyle) {
+    bgColor = '#0a1610';
+    bgImage = 'none';
+  } else if (p.bgStyle === 'emerald-deep') {
+    bgColor = '#112418';
+    bgImage = 'linear-gradient(180deg, #173322 0%, #112418 60%, #0a1810 100%)';
+  } else if (p.bgStyle === 'lime-vibrant-dark') {
+    bgColor = '#0a1610';
+    bgImage = 'radial-gradient(ellipse at 50% 12%, #1b3d26 0%, #0a1610 65%, #050c08 100%)';
+  } else if (p.bgStyle === 'damascus-dark') {
+    bgColor = '#07130b';
+    bgImage = 'linear-gradient(180deg, #0e2416 0%, #07130b 60%, #030805 100%)';
   } else if (p.bgStyle === 'true-black') {
     bgColor = '#000000';
     bgImage = 'radial-gradient(ellipse at top center, #0a0a0a 0%, #000000 80%)';
   }
-  const patternOpacity = p.bgPatternOpacity !== undefined ? (p.bgPatternOpacity / 100).toFixed(3) : 0.02;
+
+  const patternOpacity = p.bgPatternOpacity !== undefined ? (p.bgPatternOpacity / 100).toFixed(3) : 0.025;
   const patternScale = p.bgPatternScale !== undefined ? p.bgPatternScale / 100 : 1;
-  const patternColor = p.bgPatternColor || '#c9aa58';
+  const patternColor = p.bgPatternColor || '#8dc63f';
   let patternSvg = '';
   
-  if (p.bgPatternType === 'custom' && p.customPatternImage) {
+  if (p.bgPatternType === 'none') {
+    patternSvg = '';
+  } else if (p.bgPatternType === 'custom' && p.customPatternImage) {
     const svgStr = `<svg width="${80 * patternScale}" height="${80 * patternScale}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><image href="${p.customPatternImage}" width="100" height="100" opacity="${patternOpacity}" /></svg>`;
     const base64Svg = btoa(unescape(encodeURIComponent(svgStr)));
     patternSvg = `url("data:image/svg+xml;base64,${base64Svg}")`;
@@ -188,17 +123,21 @@ export const MenuPageLayout = ({
       svgContent = `<svg width='${60 * patternScale}' height='${60 * patternScale}' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'><path d='M30 15 L35 30 L30 45 L25 30 Z' fill='${patternColor}' fill-opacity='${patternOpacity}'/></svg>`;
     } else if (p.bgPatternType === 'dots') {
       svgContent = `<svg width='${40 * patternScale}' height='${40 * patternScale}' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'><circle cx='20' cy='20' r='2.5' fill='${patternColor}' fill-opacity='${patternOpacity}'/></svg>`;
+    } else if (p.bgPatternType === 'alsafiLeaf') {
+      svgContent = `<svg width='${70 * patternScale}' height='${70 * patternScale}' viewBox='0 0 70 70' xmlns='http://www.w3.org/2000/svg'><g fill='${patternColor}' fill-opacity='${patternOpacity}' transform='rotate(25 35 35)'><path d='M35 15 C45 20, 48 35, 35 48 C22 35, 25 20, 35 15 Z' /><line x1='35' y1='18' x2='35' y2='52' stroke='${patternColor}' stroke-width='1' stroke-opacity='${patternOpacity}' /></g></svg>`;
     } else if (p.bgPatternType === 'logoLetter') {
-      svgContent = `<svg width='${80 * patternScale}' height='${80 * patternScale}' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'><text x='40' y='50' font-family='serif' font-size='36' font-weight='bold' text-anchor='middle' fill='${patternColor}' fill-opacity='${patternOpacity}'>A</text></svg>`;
+      svgContent = `<svg width='${80 * patternScale}' height='${80 * patternScale}' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'><g fill='${patternColor}' fill-opacity='${patternOpacity}'><text x='36' y='52' font-family='Cinzel, serif' font-size='38' font-weight='bold' text-anchor='middle'>A</text><path d='M44 24 C48 18, 56 19, 58 25 C54 29, 47 28, 44 24 Z' /></g></svg>`;
     } else {
       svgContent = `<svg width='${60 * patternScale}' height='${60 * patternScale}' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'><path d='M30 10 L33 27 L50 30 L33 33 L30 50 L27 33 L10 30 L27 27 Z' fill='${patternColor}' fill-opacity='${patternOpacity}'/></svg>`;
     }
-    const base64Svg = btoa(unescape(encodeURIComponent(svgContent)));
-    patternSvg = `url("data:image/svg+xml;base64,${base64Svg}")`;
+    if (svgContent) {
+      const base64Svg = btoa(unescape(encodeURIComponent(svgContent)));
+      patternSvg = `url("data:image/svg+xml;base64,${base64Svg}")`;
+    }
   }
 
-  if (p.bgPatternOpacity === undefined || p.bgPatternOpacity > 0) {
-    if (bgImage) {
+  if (patternSvg && (p.bgPatternOpacity === undefined || p.bgPatternOpacity > 0)) {
+    if (bgImage && bgImage !== 'none') {
        bgImage = `${patternSvg}, ${bgImage}`;
     } else {
        bgImage = patternSvg;
@@ -242,8 +181,20 @@ export const MenuPageLayout = ({
       <div 
         ref={containerRef}
         className={`a4-page ${isOverflowing ? 'a4-overflow-detected' : ''}`} 
-        style={{ backgroundColor: bgColor, backgroundImage: bgImage || 'none' }}
+        style={{ 
+          backgroundColor: bgColor, 
+          backgroundImage: bgImage || 'none',
+          filter: (p.pageBrightness && p.pageBrightness !== 100) || (p.pageContrast && p.pageContrast !== 100)
+            ? `brightness(${p.pageBrightness || 100}%) contrast(${p.pageContrast || 100}%)`
+            : undefined,
+        }}
       >
+        <PrintGuidesOverlay
+          orientation="portrait"
+          showPrintGuides={showPrintGuides}
+          showLayoutGrid={showLayoutGrid}
+          pageLabel={`صفحة ${pageData.pageNumber || pageIndex + 1}`}
+        />
         {/* Debug / Edit mode Visual Overflow Warning with One-Click Smart Auto-Fit Button */}
         {isOverflowing && (
           <div className="a4-overflow-badge no-print" title="المحتوى يتجاوز الحد الأقصى لارتفاع صفحة A4 (297mm)">
@@ -283,7 +234,7 @@ export const MenuPageLayout = ({
           borderLeft={p.borderLeft !== false}
           borderRight={p.borderRight !== false}
           cornerStyle={p.borderCornerStyle || 'royal'}
-          borderInset={p.borderInset !== undefined ? p.borderInset : 18}
+          borderInset={p.borderInset !== undefined ? p.borderInset : 32}
           borderWidth={p.borderWidth !== undefined ? p.borderWidth : 1.5}
           borderOpacity={p.borderOpacity !== undefined ? p.borderOpacity : 85}
         />
@@ -309,14 +260,16 @@ export const MenuPageLayout = ({
           archStyle={p.archStyle || 'classic'}
           archBorderWidth={p.archBorderWidth !== undefined ? p.archBorderWidth : 1.5}
           archInnerBorderWidth={p.archInnerBorderWidth !== undefined ? p.archInnerBorderWidth : 3}
-          archBorderColor={p.archBorderColor || '#c9aa58'}
-          archInnerColor={p.archInnerColor || '#0f3d23'}
+          archBorderColor={p.archBorderColor || '#8dc63f'}
+          archInnerColor={p.archInnerColor || '#162a1c'}
           showArchBorder={p.showArchBorder !== false}
           photoBlend={p.photoBlend || 'smooth'}
           photoFeather={p.photoFeather || 60}
-            onImageChange={(imgIdx, dataUrl) => onUpdateImage(pageIndex, imgIdx, dataUrl)}
-            onImageTransform={onImageTransform}
-            onResetTransform={onResetTransform}
+          imageBrightness={p.imageBrightness || 100}
+          imageContrast={p.imageContrast || 100}
+          onImageChange={(imgIdx, dataUrl) => onUpdateImage(pageIndex, imgIdx, dataUrl)}
+          onImageTransform={onImageTransform}
+          onResetTransform={onResetTransform}
           />
         )}
 
@@ -325,8 +278,8 @@ export const MenuPageLayout = ({
           className="relative ml-auto h-full py-5 flex flex-col justify-between z-20 box-border"
           style={{
             width: isTwoColumnMode ? '100%' : `calc(100% - ${Math.max(100, (p.archWidth !== undefined ? p.archWidth : 280) - ((p.archStyle === 'straight' ? 0 : (p.archCurveDepth !== undefined ? p.archCurveDepth : 110)) * 0.45)) + 10}px)`,
-            paddingRight: `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 28}px`,
-            paddingLeft: isTwoColumnMode ? `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 28}px` : `${p.contentPaddingLeft !== undefined ? p.contentPaddingLeft : 12}px`,
+            paddingRight: `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 34}px`,
+            paddingLeft: isTwoColumnMode ? `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 34}px` : `${p.contentPaddingLeft !== undefined ? p.contentPaddingLeft : 28}px`,
           }}
         >
           {/* Content Wrapper — ZERO transform/zoom to guarantee sharp text.
@@ -391,7 +344,7 @@ export const MenuPageLayout = ({
                     <span className="text-red-500 text-[9.5px]">🌶️</span> Pikant
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="text-red-600 text-[9.5px]">🌶️🌶️</span> Scharf
+                    <span className="text-red-600 text-[9.5px]">🌶️🌶️</span> Extra Scharf
                   </span>
                 </div>
               )}
@@ -435,43 +388,47 @@ export const MenuPageLayout = ({
                       />
                       {/* Decorative image filler for the shorter column */}
                       {cIdx === 1 && colImages.length > 0 && (
-                        <div className="mt-8 flex-1 flex flex-col justify-start items-center opacity-90 px-4 pb-4 gap-6">
+                        <div className="mt-4 flex-1 flex flex-col justify-start items-center opacity-95 px-1 pb-2 gap-4">
                           {colImages.map((img, idx) => (
                             <div key={idx} className="w-full flex flex-col items-center">
                               {idx === 0 && (
-                                <div className="w-full flex justify-center items-center mb-3 gap-2">
-                                  <span className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[#c9aa58] opacity-60"></span>
-                                  <span className="text-[#c9aa58] text-[10px]">❦</span>
-                                  <span className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[#c9aa58] opacity-60"></span>
+                                <div className="w-full flex justify-center items-center mb-2.5 gap-2">
+                                  <span className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[#8dc63f] opacity-60"></span>
+                                  <span className="text-[#8dc63f] text-[10px]">❦</span>
+                                  <span className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[#8dc63f] opacity-60"></span>
                                 </div>
                               )}
                               <div 
-                                className="rounded-t-[120px] rounded-b-md border-[3px] border-[#c9aa58] p-1 shadow-lg relative overflow-hidden transition-all duration-200"
+                                className="rounded-t-[120px] rounded-b-md border-[3px] border-[#8dc63f] p-1 shadow-lg relative overflow-hidden transition-all duration-200"
                                 style={{ 
-                                  height: `${p.twoColumnImageHeight || 180}px`,
-                                  width: `${p.twoColumnImageWidth || 90}%`,
+                                  height: `${p.twoColumnImageHeight || 245}px`,
+                                  width: `${p.twoColumnImageWidth !== undefined ? p.twoColumnImageWidth : 100}%`,
                                   borderWidth: `${p.twoColumnImageBorder !== undefined ? p.twoColumnImageBorder : 3}px`
                                 }}
                               >
-                                <img 
-                                  src={img} 
-                                  crossOrigin="anonymous" 
-                                  className="w-full h-full object-cover"
-                                  alt="Decorative" 
-                                  style={{
-                                    objectPosition: `${pageData.imagesTransform?.[idx]?.x ?? 50}% ${pageData.imagesTransform?.[idx]?.y ?? 50}%`,
-                                    transform: `scale(${pageData.imagesTransform?.[idx]?.zoom ?? 1})`
-                                  }}
-                                />
-                                <div 
-                                  className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" 
-                                  style={{ borderRadius: '115px 115px 4px 4px' }}
-                                ></div>
+                                {(() => {
+                                  const imgNorm = normalizeImage(pageData.images?.[idx] || img, idx);
+                                  const dishBrightness = ((imgNorm.brightness || 100) * ((p.imageBrightness || 100) / 100));
+                                  const dishContrast = ((imgNorm.contrast || 100) * ((p.imageContrast || 100) / 100));
+                                  return (
+                                    <img 
+                                      src={imgNorm.url || img} 
+                                      crossOrigin="anonymous" 
+                                      className="w-full h-full object-cover" 
+                                      alt="Decorative" 
+                                      style={{
+                                        objectPosition: `${imgNorm.posX ?? 50}% ${imgNorm.posY ?? 50}%`,
+                                        transform: `scale(${imgNorm.scale ?? 1}) ${imgNorm.flipX ? 'scaleX(-1)' : ''} ${imgNorm.flipY ? 'scaleY(-1)' : ''}`,
+                                        filter: `brightness(${dishBrightness}%) contrast(${dishContrast}%)`,
+                                      }}
+                                    />
+                                  );
+                                })()}
                               </div>
-                              <div className="w-full flex justify-center items-center mt-3 gap-2">
-                                <span className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[#c9aa58] opacity-60"></span>
-                                <span className="text-[#c9aa58] text-[10px]">{idx === 0 && colImages.length > 1 ? '❧' : '❦'}</span>
-                                <span className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[#c9aa58] opacity-60"></span>
+                              <div className="w-full flex justify-center items-center mt-2.5 gap-2">
+                                <span className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[#8dc63f] opacity-60"></span>
+                                <span className="text-[#8dc63f] text-[10px]">{idx === 0 && colImages.length > 1 ? '❧' : '❦'}</span>
+                                <span className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[#8dc63f] opacity-60"></span>
                               </div>
                             </div>
                           ))}
@@ -517,29 +474,17 @@ export const MenuPageLayout = ({
               )}
             </div>
 
-            {/* Page Footer */}
-            <footer
-              className="absolute bottom-5 pt-0.5 pb-0.5 border-t border-brand-gold/30 flex items-center justify-between text-brand-textMuted tracking-widest font-cinzel z-30"
-              style={{
-                fontSize: `${p.footerTextSize || 9.5}px`,
-                left: isTwoColumnMode ? `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 28}px` : `${p.contentPaddingLeft !== undefined ? p.contentPaddingLeft : 12}px`,
-                right: `${p.contentPaddingRight !== undefined ? p.contentPaddingRight : 28}px`
-              }}
-            >
-              <span className="transition-transform duration-75" style={{ transform: `translate(${p.footerTextOffsetX || 0}px, ${p.footerTextOffsetY || 0}px)`, display: 'inline-block' }}>
-                ALSAFI RESTAURANT · HEIDELBERG
-              </span>
-              <div className="transition-transform duration-75" style={{ transform: `translate(${p.pageNumberOffsetX || 0}px, ${p.pageNumberOffsetY || 0}px)` }}>
-                <EditableText
-                  value={pageData.pageNumber}
-                  onChange={(v) => onUpdateHeader(pageIndex, 'pageNumber', v)}
-                  className="text-brand-gold font-bold block"
-                  style={{ fontSize: `${p.pageNumberSize || 14}px` }}
-                />
-              </div>
-            </footer>
           </div>
         </div>
+
+        {/* Unified Universal Page Footer — 100% Identical Level & Position */}
+        <PageFooter
+          pageData={pageData}
+          pageIndex={pageIndex}
+          pageSettings={pageSettings}
+          onUpdateHeader={onUpdateHeader}
+          isTwoColumnMode={isTwoColumnMode}
+        />
       </div>
     </div>
   );

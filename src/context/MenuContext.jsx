@@ -1,25 +1,195 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_PAGES } from '../data/initialPages';
+import { INITIAL_PAGES, DEFAULT_COVER_PAGE } from '../data/initialPages';
+import { DEFAULT_FLYER_DATA } from '../data/initialFlyer';
+import { DEFAULT_BIFOLD_FLYER } from '../data/initialBifoldFlyer';
 import { DEFAULT_SETTINGS } from '../data/defaultSettings';
 
 const MenuContext = createContext(null);
 
 export const normalizeImage = (img, idx = 0) => {
-  if (!img) return { url: '', scale: 1.25, posX: 50, posY: idx === 0 ? 68 : 30 };
+  if (!img) return { url: '', scale: 1.0, posX: 50, posY: idx === 0 ? 68 : 30, flipX: false, flipY: false, brightness: 100, contrast: 100 };
   if (typeof img === 'string') {
-    return { url: img, scale: 1.25, posX: 50, posY: idx === 0 ? 68 : 30 };
+    return { url: img, scale: 1.0, posX: 50, posY: idx === 0 ? 68 : 30, flipX: false, flipY: false, brightness: 100, contrast: 100 };
   }
   return {
     url: img.url || '',
-    scale: typeof img.scale === 'number' ? img.scale : 1.25,
+    scale: typeof img.scale === 'number' ? img.scale : 1.0,
     posX: typeof img.posX === 'number' ? img.posX : 50,
     posY: typeof img.posY === 'number' ? img.posY : (idx === 0 ? 68 : 30),
+    flipX: Boolean(img.flipX),
+    flipY: Boolean(img.flipY),
+    brightness: typeof img.brightness === 'number' ? img.brightness : 100,
+    contrast: typeof img.contrast === 'number' ? img.contrast : 100,
   };
 };
 
-export const DATA_VERSION = '2026_08_18_OFFICIAL_MENU_V10';
+export const DATA_VERSION = '2026_09_03_BRAND_IDENTITY_ALSAFI_V32';
+
+// Global cache sync check before any state initialization
+try {
+  const currentVersion = localStorage.getItem('alsafi_menu_version');
+  if (currentVersion !== DATA_VERSION) {
+    localStorage.removeItem('alsafi_menu_pages');
+    localStorage.removeItem('alsafi_cover_page');
+    localStorage.removeItem('alsafi_bifold_flyer_data');
+    localStorage.removeItem('alsafi_menu_settings');
+    localStorage.setItem('alsafi_menu_version', DATA_VERSION);
+  }
+} catch (e) {
+  console.warn('Storage sync error:', e);
+}
 
 export const MenuProvider = ({ children }) => {
+  // 0. App Mode: 'menu' (14 Pages Menu) | 'flyer' (4-Panel Bi-Fold Promotional Flyer)
+  const [appMode, setAppMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('alsafi_app_mode');
+      return saved === 'flyer' ? 'flyer' : 'menu';
+    } catch {
+      return 'menu';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('alsafi_app_mode', appMode);
+    } catch (e) {
+      console.warn('Failed to save app mode:', e);
+    }
+  }, [appMode]);
+
+  // 0.1 Independent 4-Panel Bi-Fold Flyer State (Protected & Isolated)
+  const [bifoldFlyerData, setBifoldFlyerData] = useState(() => {
+    try {
+      const savedVersion = localStorage.getItem('alsafi_menu_version');
+      const saved = localStorage.getItem('alsafi_bifold_flyer_data');
+      if (savedVersion === DATA_VERSION && saved) {
+        return JSON.parse(saved);
+      }
+      return DEFAULT_BIFOLD_FLYER;
+    } catch {
+      return DEFAULT_BIFOLD_FLYER;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('alsafi_bifold_flyer_data', JSON.stringify(bifoldFlyerData));
+    } catch (e) {
+      console.warn('Failed to save bifold flyer data:', e);
+    }
+  }, [bifoldFlyerData]);
+
+  // 0.2 View Mode for Brochure canvas ('both' | 'outside' | 'inside')
+  const [trifoldViewMode, setTrifoldViewMode] = useState('both');
+
+  const updateFlyerPanel1 = (field, val) => {
+    setBifoldFlyerData((prev) => ({
+      ...prev,
+      panel1: {
+        ...(prev.panel1 || {}),
+        [field]: val,
+      },
+    }));
+  };
+
+  const updateFlyerPanel2 = (field, val) => {
+    setBifoldFlyerData((prev) => ({
+      ...prev,
+      panel2: {
+        ...(prev.panel2 || {}),
+        [field]: val,
+      },
+    }));
+  };
+
+  const updateFlyerPanel3 = (field, val) => {
+    setBifoldFlyerData((prev) => ({
+      ...prev,
+      panel3: {
+        ...(prev.panel3 || {}),
+        [field]: val,
+      },
+    }));
+  };
+
+  const updateFlyerPanel4 = (field, val) => {
+    setBifoldFlyerData((prev) => ({
+      ...prev,
+      panel4: {
+        ...(prev.panel4 || {}),
+        [field]: val,
+      },
+    }));
+  };
+
+  const updateFlyerPanel5 = (field, val) => {
+    setBifoldFlyerData((prev) => ({
+      ...prev,
+      panel5: {
+        ...(prev.panel5 || {}),
+        [field]: val,
+      },
+    }));
+  };
+
+  const updateFlyerPanel6 = (field, val) => {
+    setBifoldFlyerData((prev) => ({
+      ...prev,
+      panel6: {
+        ...(prev.panel6 || {}),
+        [field]: val,
+      },
+    }));
+  };
+
+  const updateFlyerFontSizes = (field, val) => {
+    setBifoldFlyerData((prev) => ({
+      ...prev,
+      fontSizeSettings: {
+        ...(prev.fontSizeSettings || {
+          categoryTitleSize: 12,
+          itemNameSize: 10.5,
+          itemDescSize: 8.5,
+          priceSize: 10.5,
+        }),
+        [field]: val,
+      },
+    }));
+  };
+  const updateFlyerFontSize = updateFlyerFontSizes;
+
+  const resetBifoldFlyer = () => {
+    setBifoldFlyerData(DEFAULT_BIFOLD_FLYER);
+    localStorage.setItem('alsafi_bifold_flyer_data', JSON.stringify(DEFAULT_BIFOLD_FLYER));
+  };
+
+  // 1. Independent Cover Page State (Protected & Isolated)
+  const [coverPageData, setCoverPageData] = useState(() => {
+    try {
+      const savedVersion = localStorage.getItem('alsafi_menu_version');
+      const saved = localStorage.getItem('alsafi_cover_page');
+      if (savedVersion === DATA_VERSION && saved) {
+        return JSON.parse(saved);
+      }
+      localStorage.setItem('alsafi_menu_version', DATA_VERSION);
+      localStorage.setItem('alsafi_cover_page', JSON.stringify(DEFAULT_COVER_PAGE));
+      return DEFAULT_COVER_PAGE;
+    } catch {
+      return DEFAULT_COVER_PAGE;
+    }
+  });
+
+  const [showCoverPage, setShowCoverPage] = useState(() => {
+    try {
+      const saved = localStorage.getItem('alsafi_show_cover_page');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  // 2. Pure 13 Menu Pages (Pages 1 to 13)
   const [pages, setPages] = useState(() => {
     try {
       const savedVersion = localStorage.getItem('alsafi_menu_version');
@@ -27,10 +197,14 @@ export const MenuProvider = ({ children }) => {
 
       if (savedVersion === DATA_VERSION && saved) {
         const parsed = JSON.parse(saved);
-        return parsed;
+        const filtered = parsed.filter((p) => p.id !== 'page0' && p.layout !== 'cover');
+        // Self-healing: verify page 5 does not contain category 13
+        const hasWrongSection13OnPage5 = filtered.some((p) => p.id === 'page5' && p.categories?.some((c) => c.code === '13' || c.title?.includes('KINDERGERICHTE')));
+        if (!hasWrongSection13OnPage5 && filtered.length > 0) {
+          return filtered;
+        }
       }
 
-      // If version changed or fresh start, load official INITIAL_PAGES completely
       localStorage.setItem('alsafi_menu_version', DATA_VERSION);
       localStorage.setItem('alsafi_menu_pages', JSON.stringify(INITIAL_PAGES));
       localStorage.setItem('alsafi_menu_settings', JSON.stringify(DEFAULT_SETTINGS));
@@ -47,6 +221,7 @@ export const MenuProvider = ({ children }) => {
     localStorage.setItem('alsafi_menu_version', DATA_VERSION);
     localStorage.setItem('alsafi_menu_pages', JSON.stringify(INITIAL_PAGES));
     localStorage.setItem('alsafi_menu_settings', JSON.stringify(DEFAULT_SETTINGS));
+    // Note: coverPageData is deliberately preserved and NOT erased!
   };
 
   const [globalSettings, setGlobalSettings] = useState(() => {
@@ -54,7 +229,11 @@ export const MenuProvider = ({ children }) => {
       const savedVersion = localStorage.getItem('alsafi_menu_version');
       const saved = localStorage.getItem('alsafi_menu_settings');
       if (savedVersion === DATA_VERSION && saved) {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        if (parsed.qrCodes) {
+          parsed.qrCodes = parsed.qrCodes.map(q => q.id === 'whatsapp' && (q.url?.includes('49176') || !q.url) ? { ...q, url: 'https://wa.me/4962217259000' } : q);
+        }
+        return { ...DEFAULT_SETTINGS, ...parsed };
       }
       return DEFAULT_SETTINGS;
     } catch {
@@ -91,7 +270,75 @@ export const MenuProvider = ({ children }) => {
     } catch (_) {}
   }, [previewZoom]);
 
+  // 📐 Print Blueprint Diagram & Layout Grid State (Screen visual preview overlay)
+  const [showPrintGuides, setShowPrintGuides] = useState(() => {
+    try {
+      const saved = localStorage.getItem('alsafi_show_print_guides');
+      return saved !== null ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
+  });
+
+  // ☀️ Plain Paper & Thermal Lamination Brightness Mode State
+  const [isPlainPaperMode, setIsPlainPaperMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('alsafi_plain_paper_mode');
+      return saved !== null ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const togglePlainPaperMode = () => setIsPlainPaperMode((prev) => !prev);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('alsafi_plain_paper_mode', JSON.stringify(isPlainPaperMode));
+    } catch (_) {}
+  }, [isPlainPaperMode]);
+
+  const [showLayoutGrid, setShowLayoutGrid] = useState(() => {
+    try {
+      const saved = localStorage.getItem('alsafi_show_layout_grid');
+      return saved !== null ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const togglePrintGuides = () => setShowPrintGuides((prev) => !prev);
+  const toggleLayoutGrid = () => setShowLayoutGrid((prev) => !prev);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('alsafi_show_print_guides', JSON.stringify(showPrintGuides));
+    } catch (_) {}
+  }, [showPrintGuides]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('alsafi_show_layout_grid', JSON.stringify(showLayoutGrid));
+    } catch (_) {}
+  }, [showLayoutGrid]);
+
   // Autosave to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('alsafi_cover_page', JSON.stringify(coverPageData));
+    } catch (e) {
+      console.warn('Failed to save cover page:', e);
+    }
+  }, [coverPageData]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('alsafi_show_cover_page', JSON.stringify(showCoverPage));
+    } catch (e) {
+      console.warn('Failed to save showCoverPage:', e);
+    }
+  }, [showCoverPage]);
+
   useEffect(() => {
     try {
       localStorage.setItem('alsafi_menu_pages', JSON.stringify(pages));
@@ -116,7 +363,69 @@ export const MenuProvider = ({ children }) => {
     }
   }, [pageOverrides]);
 
-  // Page level updates
+  // ─── Cover Page Handlers (Independent) ──────────────────────────────────────
+  const updateCoverPage = (updates) => {
+    setCoverPageData((prev) => ({ ...prev, ...updates }));
+  };
+
+  const updateCoverHeader = (field, value) => {
+    setCoverPageData((prev) => ({
+      ...prev,
+      header: {
+        ...(prev.header || {}),
+        [field]: value,
+      },
+    }));
+  };
+
+  const updateCoverStory = (field, value) => {
+    setCoverPageData((prev) => ({
+      ...prev,
+      story: {
+        ...(prev.story || {}),
+        [field]: value,
+      },
+    }));
+  };
+
+  const updateCoverBrother = (brotherIdx, field, value) => {
+    setCoverPageData((prev) => {
+      const brothers = [...(prev.brothers || [])];
+      if (brothers[brotherIdx]) {
+        brothers[brotherIdx] = {
+          ...brothers[brotherIdx],
+          [field]: value,
+        };
+      }
+      return {
+        ...prev,
+        brothers,
+      };
+    });
+  };
+
+  const updateCoverGalleryCard = (cardIdx, field, value) => {
+    setCoverPageData((prev) => {
+      const cards = [...(prev.galleryCards || [])];
+      if (cards[cardIdx]) {
+        cards[cardIdx] = {
+          ...cards[cardIdx],
+          [field]: value,
+        };
+      }
+      return {
+        ...prev,
+        galleryCards,
+      };
+    });
+  };
+
+  const resetCoverPage = () => {
+    setCoverPageData(DEFAULT_COVER_PAGE);
+    localStorage.setItem('alsafi_cover_page', JSON.stringify(DEFAULT_COVER_PAGE));
+  };
+
+  // ─── Menu Pages 1-13 Handlers ───────────────────────────────────────────────
   const updatePage = (pageIndex, updatedPage) => {
     setPages((prev) => {
       const copy = [...prev];
@@ -225,7 +534,7 @@ export const MenuProvider = ({ children }) => {
   };
 
   const resetImageTransform = (pageIdx, imgIdx) => {
-    updateImageTransform(pageIdx, imgIdx, { scale: 1, posX: 50, posY: 50 });
+    updateImageTransform(pageIdx, imgIdx, { scale: 1, posX: 50, posY: 50, flipX: false, flipY: false, brightness: 100, contrast: 100 });
   };
 
   // Floating Geometric Food Shapes Handlers
@@ -242,7 +551,7 @@ export const MenuProvider = ({ children }) => {
         size: 90,
         rotation: 0,
         borderWidth: 2,
-        borderColor: '#c9aa58',
+        borderColor: '#8dc63f',
         showGlow: true,
         icon: '✨',
         badgeText: '👑 CHEF TIPP',
@@ -391,7 +700,16 @@ export const MenuProvider = ({ children }) => {
 
   const getEffectiveSettingsForPage = (pageIndex) => {
     const pageKey = `page${pageIndex + 1}`;
-    return { ...globalSettings, ...(pageOverrides[pageKey] || {}) };
+    const base = { ...globalSettings, ...(pageOverrides[pageKey] || {}) };
+    if (isPlainPaperMode) {
+      return {
+        ...base,
+        pageBrightness: Math.min(180, (base.pageBrightness || 100) + 20),
+        imageBrightness: Math.min(180, (base.imageBrightness || 100) + 25),
+        coverHeroBrightness: Math.min(180, (base.coverHeroBrightness || 100) + 25),
+      };
+    }
+    return base;
   };
 
   // Smart Typography Maximizer: Expands fonts & fills unused page height to the maximum possible readable size!
@@ -427,9 +745,105 @@ export const MenuProvider = ({ children }) => {
     });
   };
 
+  // Smart Typography & Geometry Unifier: Unifies all typography, category badges, prices, and footer across all pages
+  const unifyAllTypography = () => {
+    // 1. Remove individual typography & badge size overrides from each page
+    setPageOverrides((prev) => {
+      const copy = { ...prev };
+      Object.keys(copy).forEach((pageKey) => {
+        if (copy[pageKey]) {
+          const {
+            itemTitleSize,
+            priceSize,
+            descSize,
+            catTitleSize,
+            allergenSize,
+            titleSize,
+            subtitleSize,
+            taglineSize,
+            footerTextSize,
+            pageNumberSize,
+            categoryPillPaddingX,
+            categoryPillPaddingY,
+            categoryPillPaddingLeft,
+            categoryPillPaddingRight,
+            categoryPillRadius,
+            categoryBadgeStyle,
+            categoryPillNoWrap,
+            categoryLetterSpacing,
+            contentScale,
+            ...rest
+          } = copy[pageKey];
+          copy[pageKey] = rest;
+        }
+      });
+      return copy;
+    });
+
+    // 2. Set global settings to ideal luxury standard sizes
+    setGlobalSettings((prev) => ({
+      ...prev,
+      catTitleSize: 16,
+      itemTitleSize: 14.5,
+      priceSize: 14,
+      descSize: 10,
+      allergenSize: 8.5,
+      titleSize: 28,
+      subtitleSize: 11.5,
+      taglineSize: 13.5,
+      footerTextSize: 10,
+      pageNumberSize: 15,
+      footerBottomOffset: 36,
+      categoryPillPaddingX: 12,
+      categoryPillPaddingY: 4,
+      categoryPillRadius: 6,
+      categoryPillNoWrap: true,
+      categoryBadgeStyle: 'pill',
+      categoryLetterSpacing: 0.12,
+    }));
+  };
+
+  // Safe Margins Enforcer: Instantly shifts frame corners, content padding, and footers strictly inside the 8mm/10mm Safe Print Area
+  const enforceSafePrintInsets = () => {
+    setPageOverrides((prev) => {
+      const copy = { ...prev };
+      Object.keys(copy).forEach((pageKey) => {
+        if (copy[pageKey]) {
+          const {
+            footerBottomOffset,
+            borderInset,
+            contentPaddingRight,
+            contentPaddingLeft,
+            ...rest
+          } = copy[pageKey];
+          copy[pageKey] = rest;
+        }
+      });
+      return copy;
+    });
+
+    setGlobalSettings((prev) => ({
+      ...prev,
+      footerBottomOffset: 36,
+      borderInset: 32,
+      contentPaddingRight: 34,
+      contentPaddingLeft: 32,
+    }));
+  };
+
   // Export / Import
   const exportBackup = () => {
-    const dataStr = JSON.stringify({ pages, globalSettings, pageOverrides }, null, 2);
+    const dataStr = JSON.stringify(
+      {
+        pages,
+        globalSettings,
+        pageOverrides,
+        coverPageData,
+        showCoverPage,
+      },
+      null,
+      2
+    );
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -444,10 +858,16 @@ export const MenuProvider = ({ children }) => {
     reader.onload = (event) => {
       try {
         const data = JSON.parse(event.target.result);
-        if (data.pages) setPages(data.pages);
+        if (data.pages) {
+          // Filter out page0 if previously saved inside pages array
+          const cleanPages = data.pages.filter((p) => p.id !== 'page0' && p.layout !== 'cover');
+          setPages(cleanPages);
+        }
         if (data.globalSettings) setGlobalSettings(data.globalSettings);
         if (data.pageOverrides) setPageOverrides(data.pageOverrides);
-        alert('تم استرجاع البيانات بنجاح!');
+        if (data.coverPageData) setCoverPageData(data.coverPageData);
+        if (data.showCoverPage !== undefined) setShowCoverPage(data.showCoverPage);
+        alert('تم استرجاع النسخة الاحتياطية بنجاح!');
       } catch (error) {
         alert('حدث خطأ أثناء قراءة ملف النسخة الاحتياطية.');
       }
@@ -458,14 +878,43 @@ export const MenuProvider = ({ children }) => {
   const restoreFromCode = (payload) => {
     if (payload.gs) setGlobalSettings(payload.gs);
     if (payload.po) setPageOverrides(payload.po);
-    if (payload.pg) setPages(payload.pg);
+    if (payload.pg) {
+      const cleanPages = payload.pg.filter((p) => p.id !== 'page0' && p.layout !== 'cover');
+      setPages(cleanPages);
+    }
+    if (payload.coverPageData) setCoverPageData(payload.coverPageData);
+    if (payload.showCoverPage !== undefined) setShowCoverPage(payload.showCoverPage);
   };
 
   return (
     <MenuContext.Provider
       value={{
+        appMode,
+        setAppMode,
+        bifoldFlyerData,
+        setBifoldFlyerData,
+        trifoldViewMode,
+        setTrifoldViewMode,
+        updateFlyerPanel1,
+        updateFlyerPanel2,
+        updateFlyerPanel3,
+        updateFlyerPanel4,
+        updateFlyerPanel5,
+        updateFlyerPanel6,
+        updateFlyerFontSizes,
+        resetBifoldFlyer,
         pages,
         setPages,
+        coverPageData,
+        setCoverPageData,
+        showCoverPage,
+        setShowCoverPage,
+        updateCoverPage,
+        updateCoverHeader,
+        updateCoverStory,
+        updateCoverBrother,
+        updateCoverGalleryCard,
+        resetCoverPage,
         globalSettings,
         setGlobalSettings,
         pageOverrides,
@@ -490,8 +939,19 @@ export const MenuProvider = ({ children }) => {
         zoomInPreview,
         zoomOutPreview,
         resetPreviewZoom,
+        showPrintGuides,
+        setShowPrintGuides,
+        togglePrintGuides,
+        showLayoutGrid,
+        setShowLayoutGrid,
+        toggleLayoutGrid,
+        isPlainPaperMode,
+        setIsPlainPaperMode,
+        togglePlainPaperMode,
         maximizePageTypography,
         maximizeAllPagesTypography,
+        unifyAllTypography,
+        enforceSafePrintInsets,
         updateSetting,
         resetScope,
         resetToOfficialPdfData,

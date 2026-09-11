@@ -2,3 +2,11 @@ node_modules/
 dist/
 .env
 .DS_Store
+
+# Local binaries and exports
+bin/
+*.pdf
+*backup*.json
+*.json
+!package.json
+!package-lock.json

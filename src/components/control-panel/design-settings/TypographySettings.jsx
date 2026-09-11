@@ -34,6 +34,7 @@ const TypographySettings = ({
     updatePageImage,
     maximizePageTypography,
     maximizeAllPagesTypography,
+    unifyAllTypography,
   } = useMenu();
 
   const [customPct, setCustomPct] = useState(100);
@@ -45,6 +46,29 @@ const TypographySettings = ({
 
   return (
     <div className="space-y-4">
+      {/* 👑 Universal Unify All Pages Sizes Banner */}
+      <div className="bg-gradient-to-r from-amber-500/20 via-yellow-500/25 to-amber-500/20 border border-brand-gold/60 rounded-xl p-3 shadow-xl flex items-center justify-between gap-3">
+        <div>
+          <span className="text-[12px] font-bold text-white block flex items-center gap-1.5">
+            <span>👑</span>
+            <span>توحيد أحجام ومقاسات جميع الصفحات</span>
+          </span>
+          <span className="text-[10px] text-brand-goldLight block">
+            يجعل خطوط العناوين والتصنيفات والمستطيل والأسعار والتذييل متطابقة 100% في كل الصفحات
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            unifyAllTypography();
+          }}
+          className="px-3.5 py-2 bg-gradient-to-r from-brand-gold via-amber-400 to-yellow-500 hover:from-yellow-400 hover:to-brand-gold text-black font-black text-xs rounded-lg shadow-lg hover:shadow-yellow-500/20 transition-all transform hover:scale-105 active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer border border-white/40"
+        >
+          <span>✨</span>
+          <span>توحيد الكل الآن</span>
+        </button>
+      </div>
+
       {/* 3. Typography & Text Scaling */}
       <div className="control-group bg-black/40 p-3 rounded-xl border border-white/5 space-y-3">
         <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
@@ -217,6 +241,137 @@ const TypographySettings = ({
               </p>
             </div>
 
+            {/* 1. Whole Block Position & Scale Controls (رفع وتصغير/تكبير كامل محتوى صفحة 13) */}
+            <div className="bg-black/60 p-2.5 rounded-lg border border-brand-gold/40 space-y-2">
+              <span className="text-[10px] font-bold text-brand-goldLight block">1. رفع وتكبير كامل محتوى صفحة 13 ككتلة واحدة:</span>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-200 font-semibold">إزاحة الكتلة عمودياً (رفع للأعلى / تنزيل):</span>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number" min="-250" max="250" step="2"
+                      className="w-14 bg-black border border-brand-gold/60 text-brand-gold text-center text-[10px] font-mono font-bold rounded py-0.5"
+                      value={currentSettings.page13OffsetY || 0}
+                      onChange={(e) => updateSetting('page13', 'page13OffsetY', parseFloat(e.target.value) || 0)}
+                    />
+                    <span className="text-[9px] text-gray-400">px</span>
+                  </div>
+                </div>
+                <input
+                  type="range" min="-250" max="250" step="2" className="control-slider"
+                  value={currentSettings.page13OffsetY || 0}
+                  onChange={(e) => updateSetting('page13', 'page13OffsetY', parseFloat(e.target.value))}
+                />
+
+                {/* Quick Presets */}
+                <div className="flex items-center justify-between pt-1 gap-1">
+                  <span className="text-[9px] text-gray-400">اختصارات الرفع السريع:</span>
+                  <div className="flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => updateSetting('page13', 'page13OffsetY', -40)}
+                      className="px-2 py-0.5 bg-brand-gold/20 hover:bg-brand-gold hover:text-black border border-brand-gold/60 rounded text-[9px] font-bold text-brand-goldLight transition"
+                    >
+                      🚀 رفع للأعلى (-40px)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateSetting('page13', 'page13OffsetY', -80)}
+                      className="px-2 py-0.5 bg-yellow-500/20 hover:bg-yellow-500 hover:text-black border border-yellow-500/60 rounded text-[9px] font-bold text-yellow-300 transition"
+                    >
+                      ⬆️ رفع أكثر (-80px)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateSetting('page13', 'page13OffsetY', 0)}
+                      className="px-1.5 py-0.5 bg-black/60 hover:bg-white/10 border border-white/10 rounded text-[9px] text-gray-400 transition"
+                    >
+                      📍 مركز (0)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-300">إزاحة أفقية (يمين / يسار):</span>
+                  <span className="text-[10px] text-brand-gold font-mono font-bold">{currentSettings.page13OffsetX || 0}px</span>
+                </div>
+                <input
+                  type="range" min="-100" max="100" step="2" className="control-slider"
+                  value={currentSettings.page13OffsetX || 0}
+                  onChange={(e) => updateSetting('page13', 'page13OffsetX', parseFloat(e.target.value))}
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-300">تكبير وتصغير محتوى صفحة 13 (Content Scale %):</span>
+                  <span className="text-[10px] text-yellow-300 font-mono font-bold">{currentSettings.page13ContentScale || 100}%</span>
+                </div>
+                <input
+                  type="range" min="60" max="140" step="1" className="control-slider"
+                  value={currentSettings.page13ContentScale || 100}
+                  onChange={(e) => updateSetting('page13', 'page13ContentScale', parseFloat(e.target.value))}
+                />
+              </div>
+            </div>
+
+            {/* 2. Card Borders & Spacing Controls */}
+            <div className="bg-black/60 p-2.5 rounded-lg border border-white/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-brand-goldLight">2. التنسيق إطار إطار لكل صندوق:</span>
+                <button
+                  type="button"
+                  onClick={() => updateSetting('page13', 'showPage13CardBorders', currentSettings.showPage13CardBorders === false ? true : false)}
+                  className={`px-2 py-0.5 rounded text-[9.5px] font-bold border transition ${
+                    currentSettings.showPage13CardBorders !== false
+                      ? 'bg-brand-gold/20 text-brand-gold border-brand-gold/60'
+                      : 'bg-black/40 text-gray-400 border-white/10'
+                  }`}
+                >
+                  {currentSettings.showPage13CardBorders !== false ? '✓ الإطارات مفعّلة' : 'الإطارات مخفية'}
+                </button>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-300">سماكة إطارات الصناديق (Border Width):</span>
+                  <span className="text-[10px] text-brand-gold font-mono font-bold">{currentSettings.page13BorderWidth !== undefined ? currentSettings.page13BorderWidth : 1.5}px</span>
+                </div>
+                <input
+                  type="range" min="0" max="6" step="0.5" className="control-slider"
+                  value={currentSettings.page13BorderWidth !== undefined ? currentSettings.borderWidth : 1.5}
+                  onChange={(e) => updateSetting('page13', 'page13BorderWidth', parseFloat(e.target.value))}
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-300">شفافية الإطارات الذهبية (Border Opacity):</span>
+                  <span className="text-[10px] text-brand-gold font-mono font-bold">{currentSettings.page13BorderOpacity !== undefined ? currentSettings.page13BorderOpacity : 50}%</span>
+                </div>
+                <input
+                  type="range" min="0" max="100" step="5" className="control-slider"
+                  value={currentSettings.page13BorderOpacity !== undefined ? currentSettings.page13BorderOpacity : 50}
+                  onChange={(e) => updateSetting('page13', 'page13BorderOpacity', parseFloat(e.target.value))}
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-300">التباعد الفاصل بين الصناديق (Card Gap):</span>
+                  <span className="text-[10px] text-brand-gold font-mono font-bold">{currentSettings.page13CardGap !== undefined ? currentSettings.page13CardGap : 8}px</span>
+                </div>
+                <input
+                  type="range" min="2" max="24" step="1" className="control-slider"
+                  value={currentSettings.page13CardGap !== undefined ? currentSettings.page13CardGap : 8}
+                  onChange={(e) => updateSetting('page13', 'page13CardGap', parseFloat(e.target.value))}
+                />
+              </div>
+            </div>
+
             {/* Page 13 Logo Size */}
             <div>
               <div className="flex justify-between items-center mb-1">
@@ -271,7 +426,7 @@ const TypographySettings = ({
             {/* Page 13 Legend Text Size */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-[11px] text-gray-300 font-semibold">حجم خط قائمة الحساسية والملاحظات:</span>
+                <span className="text-[11px] text-gray-300 font-semibold">حجم خط قائمة الحساسية:</span>
                 <span className="text-[11px] text-brand-accent font-mono font-bold bg-brand-green/30 px-1.5 py-0.5 rounded border border-brand-accent/30">
                   {currentSettings.legendTextSize !== undefined ? currentSettings.legendTextSize : 8}px
                 </span>
@@ -282,6 +437,24 @@ const TypographySettings = ({
                 onChange={(e) => {
                   updateSetting('page13', 'legendTextSize', parseFloat(e.target.value));
                   updateSetting('global', 'legendTextSize', parseFloat(e.target.value));
+                }}
+              />
+            </div>
+
+            {/* Page 13 Symbol Notice Size (Standardzubereitung Notice) */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] text-yellow-300 font-semibold">حجم خط ملاحظة الرموز (Standardzubereitung Notice):</span>
+                <span className="text-[11px] text-yellow-300 font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-yellow-500/40">
+                  {currentSettings.hinweiseNoticeSize !== undefined ? currentSettings.hinweiseNoticeSize : 8.5}px
+                </span>
+              </div>
+              <input
+                type="range" min="6" max="16" step="0.5" className="control-slider"
+                value={currentSettings.hinweiseNoticeSize !== undefined ? currentSettings.hinweiseNoticeSize : 8.5}
+                onChange={(e) => {
+                  updateSetting('page13', 'hinweiseNoticeSize', parseFloat(e.target.value));
+                  updateSetting('global', 'hinweiseNoticeSize', parseFloat(e.target.value));
                 }}
               />
             </div>
@@ -415,23 +588,168 @@ const TypographySettings = ({
           </>
         )}
 
-        {/* 4. Category Title Size */}
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[11px] text-gray-300 font-semibold">حجم عنوان القسم:</span>
-            <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-              {currentSettings.catTitleSize !== undefined ? currentSettings.catTitleSize : 16}px
-            </span>
+        {/* 4. Category Title Size & Badge Design */}
+        <div className="bg-black/30 border border-white/5 rounded-xl p-2.5 space-y-2.5">
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[11px] text-gray-300 font-semibold">حجم خط عنوان القسم:</span>
+              <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
+                {currentSettings.catTitleSize !== undefined ? currentSettings.catTitleSize : 16}px
+              </span>
+            </div>
+            <input
+              type="range"
+              min="11"
+              max="24"
+              step="0.5"
+              className="control-slider"
+              value={currentSettings.catTitleSize !== undefined ? currentSettings.catTitleSize : 16}
+              onChange={(e) => updateSetting(targetScope, 'catTitleSize', parseFloat(e.target.value))}
+            />
           </div>
-          <input
-            type="range"
-            min="12"
-            max="26"
-            step="0.5"
-            className="control-slider"
-            value={currentSettings.catTitleSize !== undefined ? currentSettings.catTitleSize : 16}
-            onChange={(e) => updateSetting(targetScope, 'catTitleSize', parseFloat(e.target.value))}
-          />
+
+          {/* Badge Style Selector */}
+          <div>
+            <span className="text-[10px] text-gray-400 block mb-1">شكل مستطيل/شارة القسم:</span>
+            <div className="grid grid-cols-5 gap-1">
+              {[
+                { id: 'pill', label: 'أخضر ملكي' },
+                { id: 'outline', label: 'إطار مفرغ' },
+                { id: 'gold', label: 'ذهبي' },
+                { id: 'art-deco', label: 'Art Deco' },
+                { id: 'minimal', label: 'نص نقي' },
+              ].map((b) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  onClick={() => updateSetting(targetScope, 'categoryBadgeStyle', b.id)}
+                  className={`py-1 text-[9.5px] font-bold rounded border transition ${
+                    (currentSettings.categoryBadgeStyle || 'pill') === b.id
+                      ? 'bg-brand-gold text-black border-brand-gold'
+                      : 'bg-black/40 text-gray-300 border-white/10 hover:text-white'
+                  }`}
+                >
+                  {b.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 1. Horizontal Movement (Move Left / Right) */}
+          <div className="pt-2 border-t border-white/5 space-y-1.5">
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] text-gray-300 font-bold">تحريك المستطيل (يمين ↔ يسار):</span>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  min="-350"
+                  max="350"
+                  step="1"
+                  value={currentSettings.categoryPillOffsetX || 0}
+                  onChange={(e) => updateSetting(targetScope, 'categoryPillOffsetX', parseFloat(e.target.value) || 0)}
+                  className="w-14 text-center text-[10px] text-brand-gold font-mono font-bold bg-black/80 px-1 py-0.5 rounded border border-brand-gold/40"
+                />
+                <span className="text-[9px] text-gray-400">px</span>
+                <button
+                  type="button"
+                  onClick={() => updateSetting(targetScope, 'categoryPillOffsetX', 0)}
+                  className="text-[9px] text-gray-400 hover:text-brand-gold bg-black/40 border border-white/10 rounded px-1.5 py-0.5"
+                >
+                  إعادة للمنتصف
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] text-gray-400">يسار (-350)</span>
+              <input
+                type="range"
+                min="-350"
+                max="350"
+                step="1"
+                className="control-slider flex-1"
+                value={currentSettings.categoryPillOffsetX || 0}
+                onChange={(e) => updateSetting(targetScope, 'categoryPillOffsetX', parseFloat(e.target.value))}
+              />
+              <span className="text-[9px] text-gray-400">يمين (+350)</span>
+            </div>
+          </div>
+
+          {/* 2. Rectangle Length / Padding Controls (Total, Right side, Left side) */}
+          <div className="pt-2 border-t border-white/5 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] text-gray-300 font-bold">طول وتصغير المستطيل (Padding):</span>
+              <span className="text-[10px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
+                {currentSettings.categoryPillPaddingX !== undefined ? currentSettings.categoryPillPaddingX : 12}px
+              </span>
+            </div>
+            
+            {/* General Length Slider */}
+            <input
+              type="range"
+              min="0"
+              max="80"
+              step="1"
+              className="control-slider"
+              value={currentSettings.categoryPillPaddingX !== undefined ? currentSettings.categoryPillPaddingX : 12}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                updateSetting(targetScope, 'categoryPillPaddingX', val);
+                updateSetting(targetScope, 'categoryPillPaddingLeft', val);
+                updateSetting(targetScope, 'categoryPillPaddingRight', val);
+              }}
+            />
+
+            {/* Independent Left & Right Edge Trimming / Sizing */}
+            <div className="grid grid-cols-2 gap-2 bg-black/40 p-2 rounded-lg border border-white/5">
+              <div>
+                <div className="flex justify-between items-center mb-0.5">
+                  <span className="text-[9px] text-gray-400">طرف اليمين:</span>
+                  <span className="text-[9px] text-brand-gold font-mono">
+                    {currentSettings.categoryPillPaddingRight !== undefined ? currentSettings.categoryPillPaddingRight : (currentSettings.categoryPillPaddingX || 12)}px
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="80"
+                  step="1"
+                  className="control-slider"
+                  value={currentSettings.categoryPillPaddingRight !== undefined ? currentSettings.categoryPillPaddingRight : (currentSettings.categoryPillPaddingX || 12)}
+                  onChange={(e) => updateSetting(targetScope, 'categoryPillPaddingRight', parseFloat(e.target.value))}
+                />
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-0.5">
+                  <span className="text-[9px] text-gray-400">طرف اليسار:</span>
+                  <span className="text-[9px] text-brand-gold font-mono">
+                    {currentSettings.categoryPillPaddingLeft !== undefined ? currentSettings.categoryPillPaddingLeft : (currentSettings.categoryPillPaddingX || 12)}px
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="80"
+                  step="1"
+                  className="control-slider"
+                  value={currentSettings.categoryPillPaddingLeft !== undefined ? currentSettings.categoryPillPaddingLeft : (currentSettings.categoryPillPaddingX || 12)}
+                  onChange={(e) => updateSetting(targetScope, 'categoryPillPaddingLeft', parseFloat(e.target.value))}
+                />
+              </div>
+            </div>
+
+            {/* No-wrap Toggle */}
+            <button
+              type="button"
+              onClick={() => updateSetting(targetScope, 'categoryPillNoWrap', currentSettings.categoryPillNoWrap === false ? true : false)}
+              className={`w-full py-1.5 px-2 rounded text-[9.5px] font-bold border transition ${
+                currentSettings.categoryPillNoWrap !== false
+                  ? 'bg-brand-gold/20 text-brand-gold border-brand-gold/60'
+                  : 'bg-black/40 text-gray-400 border-white/10'
+              }`}
+            >
+              {currentSettings.categoryPillNoWrap !== false ? '✓ سطر واحد فقط (منع انقسام النص وتشويه المستطيل)' : 'سطور متعددة (Wrap)'}
+            </button>
+          </div>
         </div>
 
         {/* 5. Page Main Title Size */}
@@ -543,87 +861,330 @@ const TypographySettings = ({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[11px] text-gray-300 font-semibold">حجم نص التذييل:</span>
-                <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-                  {currentSettings.footerTextSize !== undefined ? currentSettings.footerTextSize : 10}px
-                </span>
+          {/* Comprehensive Unified Footer & Page Number Controls */}
+          <div className="bg-gradient-to-b from-[#0a1710] to-black/70 border border-brand-gold/30 rounded-xl p-3.5 space-y-3.5 shadow-xl">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <div>
+                <span className="text-[12px] font-bold text-white block">تنسيق وتوحيد التذييل ورقم الصفحة</span>
+                <span className="text-[9.5px] text-brand-goldLight block">ضبط الحجم والمستوى والمكان ليكون متطابقاً في كل الصفحات</span>
               </div>
-              <input
-                type="range" min="6" max="20" step="0.5" className="control-slider"
-                value={currentSettings.footerTextSize !== undefined ? currentSettings.footerTextSize : 10}
-                onChange={(e) => updateSetting(targetScope, 'footerTextSize', parseFloat(e.target.value))}
-              />
+              <button
+                type="button"
+                onClick={() => {
+                  updateSetting(targetScope, 'footerText', 'ALSAFI RESTAURANT · HEIDELBERG');
+                  updateSetting(targetScope, 'footerTextSize', 10);
+                  updateSetting(targetScope, 'footerTextLetterSpacing', 0.25);
+                  updateSetting(targetScope, 'footerTextColor', 'muted');
+                  updateSetting(targetScope, 'footerTextOffsetX', 0);
+                  updateSetting(targetScope, 'footerTextOffsetY', 0);
+                  updateSetting(targetScope, 'pageNumberSize', 15);
+                  updateSetting(targetScope, 'pageNumberWeight', 'bold');
+                  updateSetting(targetScope, 'pageNumberColor', 'gold');
+                  updateSetting(targetScope, 'pageNumberOffsetX', 0);
+                  updateSetting(targetScope, 'pageNumberOffsetY', 0);
+                  updateSetting(targetScope, 'footerBottomOffset', 20);
+                  updateSetting(targetScope, 'footerDividerOpacity', 30);
+                  updateSetting(targetScope, 'showFooterDivider', true);
+                  updateSetting(targetScope, 'showFooterText', true);
+                  updateSetting(targetScope, 'showPageNumber', true);
+                }}
+                className="text-[9px] text-brand-gold hover:text-white bg-brand-gold/10 hover:bg-brand-gold/20 border border-brand-gold/30 rounded px-2 py-1 transition"
+                title="استعادة الإعدادات الموحدة الافتراضية"
+              >
+                إعادة ضبط
+              </button>
             </div>
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[11px] text-gray-300 font-semibold">إزاحة عمودية (لأسفل/لأعلى):</span>
-                <span className="text-[11px] text-brand-accent font-mono font-bold">
-                  {currentSettings.footerTextOffsetY || 0}px
-                </span>
-              </div>
-              <input
-                type="range" min="-200" max="200" step="1" className="control-slider"
-                value={currentSettings.footerTextOffsetY || 0}
-                onChange={(e) => updateSetting(targetScope, 'footerTextOffsetY', parseFloat(e.target.value))}
-              />
-            </div>
-            <div className="col-span-2">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[11px] text-gray-300 font-semibold">إزاحة أفقية (يمين/يسار):</span>
-                <span className="text-[11px] text-brand-accent font-mono font-bold">
-                  {currentSettings.footerTextOffsetX || 0}px
-                </span>
-              </div>
-              <input
-                type="range" min="-200" max="200" step="1" className="control-slider"
-                value={currentSettings.footerTextOffsetX || 0}
-                onChange={(e) => updateSetting(targetScope, 'footerTextOffsetX', parseFloat(e.target.value))}
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[11px] text-gray-300 font-semibold">حجم رقم الصفحة:</span>
-                <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-                  {currentSettings.pageNumberSize !== undefined ? currentSettings.pageNumberSize : 12}px
-                </span>
+            {/* 1. Footer Text Configuration (Text, Size, Letter Spacing, Color) */}
+            <div className="bg-black/40 border border-white/5 rounded-xl p-2.5 space-y-2.5">
+              <span className="text-[10.5px] font-bold text-brand-goldLight block">نص التذييل (Restaurant Insignia):</span>
+              
+              <div>
+                <label className="text-[9.5px] text-gray-400 block mb-0.5">النص المكتوب في الأسفل:</label>
+                <input
+                  type="text"
+                  dir="ltr"
+                  className="cms-input font-cinzel text-xs font-bold text-brand-gold"
+                  value={currentSettings.footerText !== undefined ? currentSettings.footerText : 'ALSAFI RESTAURANT · HEIDELBERG'}
+                  onChange={(e) => updateSetting(targetScope, 'footerText', e.target.value)}
+                  placeholder="ALSAFI RESTAURANT · HEIDELBERG"
+                />
               </div>
-              <input
-                type="range" min="8" max="24" step="0.5" className="control-slider"
-                value={currentSettings.pageNumberSize !== undefined ? currentSettings.pageNumberSize : 12}
-                onChange={(e) => updateSetting(targetScope, 'pageNumberSize', parseFloat(e.target.value))}
-              />
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-[9.5px] text-gray-400">حجم خط النص:</span>
+                    <span className="text-[9.5px] text-brand-gold font-mono font-bold">{currentSettings.footerTextSize !== undefined ? currentSettings.footerTextSize : 10}px</span>
+                  </div>
+                  <input
+                    type="range" min="6" max="18" step="0.5" className="control-slider"
+                    value={currentSettings.footerTextSize !== undefined ? currentSettings.footerTextSize : 10}
+                    onChange={(e) => updateSetting(targetScope, 'footerTextSize', parseFloat(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-[9.5px] text-gray-400">تباعد الحروف:</span>
+                    <span className="text-[9.5px] text-brand-gold font-mono font-bold">{currentSettings.footerTextLetterSpacing !== undefined ? currentSettings.footerTextLetterSpacing : 0.25}em</span>
+                  </div>
+                  <input
+                    type="range" min="0.05" max="0.5" step="0.02" className="control-slider"
+                    value={currentSettings.footerTextLetterSpacing !== undefined ? currentSettings.footerTextLetterSpacing : 0.25}
+                    onChange={(e) => updateSetting(targetScope, 'footerTextLetterSpacing', parseFloat(e.target.value))}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-[9.5px] text-gray-400">إزاحة أفقية X (نص):</span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number" min="-350" max="350" step="1"
+                        value={currentSettings.footerTextOffsetX || 0}
+                        onChange={(e) => updateSetting(targetScope, 'footerTextOffsetX', parseFloat(e.target.value) || 0)}
+                        className="w-12 text-center text-[9px] text-brand-gold font-mono font-bold bg-black/80 px-1 py-0.5 rounded border border-brand-gold/30"
+                      />
+                      <span className="text-[8px] text-gray-400">px</span>
+                    </div>
+                  </div>
+                  <input
+                    type="range" min="-350" max="350" step="1" className="control-slider"
+                    value={currentSettings.footerTextOffsetX || 0}
+                    onChange={(e) => updateSetting(targetScope, 'footerTextOffsetX', parseFloat(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-[9.5px] text-gray-400">إزاحة عمودية Y (نص):</span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number" min="-100" max="100" step="1"
+                        value={currentSettings.footerTextOffsetY || 0}
+                        onChange={(e) => updateSetting(targetScope, 'footerTextOffsetY', parseFloat(e.target.value) || 0)}
+                        className="w-12 text-center text-[9px] text-brand-gold font-mono font-bold bg-black/80 px-1 py-0.5 rounded border border-brand-gold/30"
+                      />
+                      <span className="text-[8px] text-gray-400">px</span>
+                    </div>
+                  </div>
+                  <input
+                    type="range" min="-100" max="100" step="1" className="control-slider"
+                    value={currentSettings.footerTextOffsetY || 0}
+                    onChange={(e) => updateSetting(targetScope, 'footerTextOffsetY', parseFloat(e.target.value))}
+                  />
+                </div>
+              </div>
+
+              {/* Text Color Selection */}
+              <div>
+                <span className="text-[9.5px] text-gray-400 block mb-1">لون وتأثير النص:</span>
+                <div className="grid grid-cols-4 gap-1">
+                  {[
+                    { id: 'muted', label: 'رمادي فاخر' },
+                    { id: 'gold', label: 'ذهبي' },
+                    { id: 'gold-gradient', label: 'تدرج لامع' },
+                    { id: 'white', label: 'أبيض' },
+                  ].map((col) => (
+                    <button
+                      key={col.id}
+                      type="button"
+                      onClick={() => updateSetting(targetScope, 'footerTextColor', col.id)}
+                      className={`py-1 text-[9px] font-bold rounded border transition ${
+                        (currentSettings.footerTextColor || 'muted') === col.id
+                          ? 'bg-brand-gold text-black border-brand-gold shadow-sm'
+                          : 'bg-black/40 text-gray-400 border-white/10 hover:text-white'
+                      }`}
+                    >
+                      {col.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[11px] text-gray-300 font-semibold">إزاحة عمودية (لأسفل/لأعلى):</span>
-                <span className="text-[11px] text-brand-accent font-mono font-bold">
-                  {currentSettings.pageNumberOffsetY || 0}px
-                </span>
+
+            {/* 2. Page Number Controls (Size, Weight, Color, Offsets) */}
+            <div className="bg-black/40 border border-white/5 rounded-xl p-2.5 space-y-2.5">
+              <span className="text-[10.5px] font-bold text-brand-goldLight block">رقم الصفحة (Page Number):</span>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-[9.5px] text-gray-400">حجم خط الرقم:</span>
+                    <span className="text-[9.5px] text-brand-gold font-mono font-bold">{currentSettings.pageNumberSize !== undefined ? currentSettings.pageNumberSize : 15}px</span>
+                  </div>
+                  <input
+                    type="range" min="8" max="28" step="0.5" className="control-slider"
+                    value={currentSettings.pageNumberSize !== undefined ? currentSettings.pageNumberSize : 15}
+                    onChange={(e) => updateSetting(targetScope, 'pageNumberSize', parseFloat(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <span className="text-[9.5px] text-gray-400 block mb-0.5">سمك الرقم:</span>
+                  <div className="grid grid-cols-3 gap-1">
+                    {[
+                      { id: 'normal', label: 'عادي' },
+                      { id: 'bold', label: 'عريض' },
+                      { id: 'black', label: 'سميك' },
+                    ].map((w) => (
+                      <button
+                        key={w.id}
+                        type="button"
+                        onClick={() => updateSetting(targetScope, 'pageNumberWeight', w.id)}
+                        className={`py-1 text-[9px] font-bold rounded border transition ${
+                          (currentSettings.pageNumberWeight || 'bold') === w.id
+                            ? 'bg-brand-gold text-black border-brand-gold'
+                            : 'bg-black/40 text-gray-400 border-white/10'
+                        }`}
+                      >
+                        {w.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <input
-                type="range" min="-200" max="200" step="1" className="control-slider"
-                value={currentSettings.pageNumberOffsetY || 0}
-                onChange={(e) => updateSetting(targetScope, 'pageNumberOffsetY', parseFloat(e.target.value))}
-              />
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-[9.5px] text-gray-400">إزاحة أفقية X (رقم):</span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number" min="-350" max="350" step="1"
+                        value={currentSettings.pageNumberOffsetX || 0}
+                        onChange={(e) => updateSetting(targetScope, 'pageNumberOffsetX', parseFloat(e.target.value) || 0)}
+                        className="w-12 text-center text-[9px] text-brand-gold font-mono font-bold bg-black/80 px-1 py-0.5 rounded border border-brand-gold/30"
+                      />
+                      <span className="text-[8px] text-gray-400">px</span>
+                    </div>
+                  </div>
+                  <input
+                    type="range" min="-350" max="350" step="1" className="control-slider"
+                    value={currentSettings.pageNumberOffsetX || 0}
+                    onChange={(e) => updateSetting(targetScope, 'pageNumberOffsetX', parseFloat(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-[9.5px] text-gray-400">إزاحة عمودية Y (رقم):</span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number" min="-100" max="100" step="1"
+                        value={currentSettings.pageNumberOffsetY || 0}
+                        onChange={(e) => updateSetting(targetScope, 'pageNumberOffsetY', parseFloat(e.target.value) || 0)}
+                        className="w-12 text-center text-[9px] text-brand-gold font-mono font-bold bg-black/80 px-1 py-0.5 rounded border border-brand-gold/30"
+                      />
+                      <span className="text-[8px] text-gray-400">px</span>
+                    </div>
+                  </div>
+                  <input
+                    type="range" min="-100" max="100" step="1" className="control-slider"
+                    value={currentSettings.pageNumberOffsetY || 0}
+                    onChange={(e) => updateSetting(targetScope, 'pageNumberOffsetY', parseFloat(e.target.value))}
+                  />
+                </div>
+              </div>
+
+              {/* Page Number Color Selection */}
+              <div>
+                <span className="text-[9.5px] text-gray-400 block mb-1">لون رقم الصفحة:</span>
+                <div className="grid grid-cols-3 gap-1">
+                  {[
+                    { id: 'gold', label: 'ذهبي أصيل' },
+                    { id: 'gold-gradient', label: 'تدرج ذهبي' },
+                    { id: 'white', label: 'أبيض ناصع' },
+                  ].map((col) => (
+                    <button
+                      key={col.id}
+                      type="button"
+                      onClick={() => updateSetting(targetScope, 'pageNumberColor', col.id)}
+                      className={`py-1 text-[9px] font-bold rounded border transition ${
+                        (currentSettings.pageNumberColor || 'gold') === col.id
+                          ? 'bg-brand-gold text-black border-brand-gold shadow-sm'
+                          : 'bg-black/40 text-gray-400 border-white/10 hover:text-white'
+                      }`}
+                    >
+                      {col.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="col-span-2">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[11px] text-gray-300 font-semibold">إزاحة أفقية (يمين/يسار):</span>
-                <span className="text-[11px] text-brand-accent font-mono font-bold">
-                  {currentSettings.pageNumberOffsetX || 0}px
-                </span>
+
+            {/* 3. Global Vertical Level (Bottom Offset) & Divider Line */}
+            <div className="bg-black/40 border border-white/5 rounded-xl p-2.5 space-y-2.5">
+              <span className="text-[10.5px] font-bold text-brand-goldLight block">المستوى العام والارتفاع لجميع الصفحات:</span>
+
+              <div>
+                <div className="flex justify-between items-center mb-0.5">
+                  <span className="text-[9.5px] text-gray-400">الارتفاع من أسفل الصفحة (Bottom Level):</span>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number" min="0" max="120" step="1"
+                      value={currentSettings.footerBottomOffset !== undefined ? currentSettings.footerBottomOffset : 26}
+                      onChange={(e) => updateSetting(targetScope, 'footerBottomOffset', parseFloat(e.target.value) || 0)}
+                      className="w-12 text-center text-[9px] text-brand-gold font-mono font-bold bg-black/80 px-1 py-0.5 rounded border border-brand-gold/30"
+                    />
+                    <span className="text-[8px] text-gray-400">px</span>
+                  </div>
+                </div>
+                <input
+                  type="range" min="0" max="120" step="1" className="control-slider"
+                  value={currentSettings.footerBottomOffset !== undefined ? currentSettings.footerBottomOffset : 26}
+                  onChange={(e) => updateSetting(targetScope, 'footerBottomOffset', parseFloat(e.target.value))}
+                />
+
+                <div className="flex items-center justify-between pt-1 gap-1">
+                  <span className="text-[9px] text-gray-400">نسب الارتفاع:</span>
+                  <div className="flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => updateSetting(targetScope, 'footerBottomOffset', 26)}
+                      className="px-2 py-0.5 bg-brand-gold/20 hover:bg-brand-gold hover:text-black border border-brand-gold/50 rounded text-[9px] font-bold text-brand-goldLight transition"
+                    >
+                      🎯 متناسق مع الزاوية (26px)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateSetting(targetScope, 'footerBottomOffset', 32)}
+                      className="px-2 py-0.5 bg-black/60 hover:bg-white/10 border border-white/10 rounded text-[9px] text-gray-300 transition"
+                    >
+                      🛡️ مرتفع قليلاً (32px)
+                    </button>
+                  </div>
+                </div>
               </div>
-              <input
-                type="range" min="-200" max="200" step="1" className="control-slider"
-                value={currentSettings.pageNumberOffsetX || 0}
-                onChange={(e) => updateSetting(targetScope, 'pageNumberOffsetX', parseFloat(e.target.value))}
-              />
+
+              {/* Divider Line Controls */}
+              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5">
+                <div>
+                  <div className="flex justify-between items-center mb-0.5">
+                    <span className="text-[9.5px] text-gray-400">عتامة الخط الذهبي:</span>
+                    <span className="text-[9.5px] text-brand-gold font-mono">{currentSettings.footerDividerOpacity !== undefined ? currentSettings.footerDividerOpacity : 30}%</span>
+                  </div>
+                  <input
+                    type="range" min="0" max="100" step="5" className="control-slider"
+                    value={currentSettings.footerDividerOpacity !== undefined ? currentSettings.footerDividerOpacity : 30}
+                    onChange={(e) => updateSetting(targetScope, 'footerDividerOpacity', parseFloat(e.target.value))}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[9.5px] text-gray-400">إظهار الخط الفاصل:</span>
+                  <button
+                    type="button"
+                    onClick={() => updateSetting(targetScope, 'showFooterDivider', currentSettings.showFooterDivider === false ? true : false)}
+                    className={`relative w-8 h-4.5 rounded-full border transition-all ${
+                      currentSettings.showFooterDivider !== false ? 'bg-brand-gold border-brand-gold' : 'bg-gray-700 border-gray-600'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 w-3.5 h-3.5 bg-white rounded-full shadow transition-all ${
+                      currentSettings.showFooterDivider !== false ? 'left-3.5' : 'left-0.5'
+                    }`} />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -706,16 +1267,16 @@ const TypographySettings = ({
               <div className="flex justify-between items-center mb-1">
                 <span className="text-[11px] text-brand-goldLight font-bold">طول إطار الصورة:</span>
                 <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-                  {currentSettings.twoColumnImageHeight || 180}px
+                  {currentSettings.twoColumnImageHeight || 245}px
                 </span>
               </div>
               <input
                 type="range"
                 min="80"
-                max="400"
+                max="450"
                 step="5"
                 className="control-slider"
-                value={currentSettings.twoColumnImageHeight || 180}
+                value={currentSettings.twoColumnImageHeight || 245}
                 onChange={(e) => updateSetting(targetScope, 'twoColumnImageHeight', Number(e.target.value))}
               />
             </div>
@@ -723,7 +1284,7 @@ const TypographySettings = ({
               <div className="flex justify-between items-center mb-1">
                 <span className="text-[11px] text-brand-goldLight font-bold">عرض إطار الصورة:</span>
                 <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-                  {currentSettings.twoColumnImageWidth || 90}%
+                  {currentSettings.twoColumnImageWidth !== undefined ? currentSettings.twoColumnImageWidth : 100}%
                 </span>
               </div>
               <input
@@ -732,7 +1293,7 @@ const TypographySettings = ({
                 max="100"
                 step="1"
                 className="control-slider"
-                value={currentSettings.twoColumnImageWidth || 90}
+                value={currentSettings.twoColumnImageWidth !== undefined ? currentSettings.twoColumnImageWidth : 100}
                 onChange={(e) => updateSetting(targetScope, 'twoColumnImageWidth', Number(e.target.value))}
               />
             </div>
@@ -1144,6 +1705,25 @@ const TypographySettings = ({
               value={currentSettings.borderOpacity !== undefined ? currentSettings.borderOpacity : 85}
               onChange={(e) => updateSetting(targetScope, 'borderOpacity', parseFloat(e.target.value))}
             />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[11px] text-yellow-300 font-semibold">إزاحة الإطار والزوايا للداخل (Border Inset):</span>
+              <span className="text-[11px] text-yellow-300 font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-yellow-500/40">
+                {currentSettings.borderInset !== undefined ? currentSettings.borderInset : 24}px
+              </span>
+            </div>
+            <input
+              type="range" min="0" max="45" step="1" className="control-slider"
+              value={currentSettings.borderInset !== undefined ? currentSettings.borderInset : 24}
+              onChange={(e) => updateSetting(targetScope, 'borderInset', parseFloat(e.target.value))}
+            />
+            <div className="flex justify-between items-center text-[9px] text-gray-400 mt-1">
+              <span>0px (ملتصق بالحافة)</span>
+              <span>24px (آمن للطباعة)</span>
+              <span>45px (منكمش جداً)</span>
+            </div>
           </div>
         </div>
       </div>

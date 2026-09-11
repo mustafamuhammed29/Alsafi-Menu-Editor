@@ -1,7 +1,8 @@
 import React from 'react';
-import { Sparkles, RotateCcw } from 'lucide-react';
+import { Sparkles, RotateCcw, Ruler } from 'lucide-react';
 import MenuPageLayout from './MenuPageLayout';
 import InfoPageLayout from './InfoPageLayout';
+import PrintGuidesOverlay from '../common/PrintGuidesOverlay';
 import { useMenu } from '../../context/MenuContext';
 
 export const A4Page = ({ pageData, pageIndex, pageSettings }) => {
@@ -14,6 +15,9 @@ export const A4Page = ({ pageData, pageIndex, pageSettings }) => {
     resetImageTransform,
     maximizePageTypography,
     updateSetting,
+    showPrintGuides,
+    togglePrintGuides,
+    showLayoutGrid,
   } = useMenu();
 
   return (
@@ -33,6 +37,21 @@ export const A4Page = ({ pageData, pageIndex, pageSettings }) => {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Quick Page Print Blueprint Toggle */}
+          <button
+            type="button"
+            onClick={togglePrintGuides}
+            className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition flex items-center gap-1 cursor-pointer ${
+              showPrintGuides 
+                ? 'bg-amber-500 text-black border-yellow-300 font-black' 
+                : 'bg-black/80 hover:bg-white/15 text-gray-300 border-white/10'
+            }`}
+            title="إظهار/إخفاء مخطط حدود القص والمنطقة الآمنة لهذه الصفحة"
+          >
+            <Ruler className="w-3.5 h-3.5" />
+            <span>{showPrintGuides ? 'مخطط القص: مفعل' : 'مخطط القص'}</span>
+          </button>
+
           <button
             type="button"
             onClick={() => maximizePageTypography(pageIndex)}

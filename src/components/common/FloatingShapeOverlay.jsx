@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Move, Trash2, Camera, RotateCw, ZoomIn, Sparkles, X, Crown, Smile } from 'lucide-react';
+import { Move, Trash2, Camera, RotateCw, ZoomIn, ZoomOut, Sparkles, X, Crown, Smile, Maximize2, Minimize2, Image, Crop } from 'lucide-react';
 import { useMenu } from '../../context/MenuContext';
 import { optimizeImageFile } from '../../utils/imageOptimizer';
 
@@ -10,6 +10,28 @@ export const SHAPE_DEFS = {
     icon: '🖼️',
     clipPath: 'none',
     svgBorder: (size, color, stroke) => null,
+  },
+  roundRect: {
+    name: 'مستطيل ملكي ناعم (Rounded Gold Frame)',
+    icon: '🔲',
+    clipPath: 'inset(2% round 12px)',
+    svgBorder: (size, color, stroke) => (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+        <rect x="2" y="2" width="96" height="96" rx="12" fill="none" stroke={color} strokeWidth={stroke * 1.5} />
+        <rect x="5" y="5" width="90" height="90" rx="9" fill="none" stroke={color} strokeWidth="0.8" strokeDasharray="3,3" opacity="0.85" />
+      </svg>
+    ),
+  },
+  arch: {
+    name: 'قوس أندلسي فاخر (Moorish Arch)',
+    icon: '🕌',
+    clipPath: 'polygon(0% 100%, 0% 35%, 15% 15%, 50% 0%, 85% 15%, 100% 35%, 100% 100%)',
+    svgBorder: (size, color, stroke) => (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+        <polygon points="2,98 2,35 15,16 50,2 85,16 98,35 98,98" fill="none" stroke={color} strokeWidth={stroke * 1.5} />
+        <polygon points="6,94 6,37 18,20 50,6 82,20 94,37 94,94" fill="none" stroke={color} strokeWidth="0.8" strokeDasharray="3,3" opacity="0.85" />
+      </svg>
+    ),
   },
   circle: {
     name: 'دائرة ملكية (Circle)',
@@ -53,6 +75,17 @@ export const SHAPE_DEFS = {
       <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
         <polygon points="50,2 98,50 50,98 2,50" fill="none" stroke={color} strokeWidth={stroke * 1.5} />
         <polygon points="50,6 94,50 50,94 6,50" fill="none" stroke={color} strokeWidth="0.8" opacity="0.8" strokeDasharray="3,3" />
+      </svg>
+    ),
+  },
+  square: {
+    name: 'مربع كلاسيكي (Classic Square)',
+    icon: '⏹️',
+    clipPath: 'inset(2% round 4px)',
+    svgBorder: (size, color, stroke) => (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+        <rect x="2" y="2" width="96" height="96" rx="4" fill="none" stroke={color} strokeWidth={stroke * 1.5} />
+        <rect x="5" y="5" width="90" height="90" rx="2" fill="none" stroke={color} strokeWidth="0.8" strokeDasharray="3,3" opacity="0.8" />
       </svg>
     ),
   },
@@ -216,9 +249,10 @@ export const FloatingShapeOverlay = ({
         const posX = shape.posX !== undefined ? shape.posX : 50;
         const posY = shape.posY !== undefined ? shape.posY : 50;
         const rotation = shape.rotation || 0;
-        const borderColor = shape.borderColor || '#c9aa58';
+        const borderColor = shape.borderColor || '#8dc63f';
         const borderWidth = shape.borderWidth !== undefined ? shape.borderWidth : 2;
         const isAlsafiLogo = shape.contentType === 'logo' || shape.shapeType === 'alsafi' || shape.isLogo;
+        const isActive = activeShapeId === shape.id;
 
         return (
           <div
@@ -253,21 +287,25 @@ export const FloatingShapeOverlay = ({
               {/* Layer 1: Clipped Image or Logo or Icon/Text */}
               <div
                 className={`w-full relative flex items-center justify-center overflow-hidden ${
-                  shape.shapeType === 'free' ? 'h-auto bg-transparent' : 'h-full bg-[#050f09]'
+                  shape.shapeType === 'free' || shape.noClip ? 'h-auto bg-transparent' : 'h-full bg-[#050f09]'
                 }`}
                 style={{
-                  clipPath: shapeDef.clipPath,
+                  clipPath: shape.noClip || shape.shapeType === 'free' ? 'none' : shapeDef.clipPath,
                 }}
               >
                 {shape.image ? (
                   <img
                     src={shape.image}
                     alt="Food Spotlight"
-                    className={`w-full pointer-events-none ${
-                      shape.shapeType === 'free'
-                        ? 'h-auto object-contain'
-                        : 'h-full object-cover object-center'
+                    className={`w-full pointer-events-none transition-transform ${
+                      shape.shapeType === 'free' || shape.imageFit === 'contain'
+                        ? 'h-full object-contain'
+                        : 'h-full object-cover'
                     }`}
+                    style={{
+                      transform: `scale(${shape.imageScale !== undefined ? shape.imageScale : 1.0}) translate(${(shape.imagePosX !== undefined ? shape.imagePosX : 50) - 50}%, ${(shape.imagePosY !== undefined ? shape.imagePosY : 50) - 50}%)`,
+                      transformOrigin: `${shape.imagePosX !== undefined ? shape.imagePosX : 50}% ${shape.imagePosY !== undefined ? shape.imagePosY : 50}%`,
+                    }}
                     draggable={false}
                   />
                 ) : isAlsafiLogo ? (
@@ -286,7 +324,7 @@ export const FloatingShapeOverlay = ({
                             width: `${Math.max(22, size * 0.38)}px`,
                             height: `${Math.max(22, size * 0.38)}px`,
                           }}
-                          className="rounded-full bg-gradient-to-br from-brand-goldLight via-brand-gold to-yellow-800 flex items-center justify-center font-cinzel font-bold text-brand-bg shadow-md"
+                          className="rounded-full bg-gradient-to-br from-[#a6e247] via-[#8dc63f] to-[#162a1c] flex items-center justify-center font-cinzel font-bold text-white shadow-md"
                         >
                           <span style={{ fontSize: `${Math.max(11, size * 0.2)}px` }}>A</span>
                         </div>
@@ -342,8 +380,8 @@ export const FloatingShapeOverlay = ({
 
               </div>
 
-              {/* Layer 2: Ornate SVG Border Frame */}
-              {shapeDef.svgBorder(size, borderColor, borderWidth)}
+              {/* Layer 2: Ornate SVG Border Frame (only when not free) */}
+              {!shape.noClip && shapeDef.svgBorder(size, borderColor, borderWidth)}
 
               {/* Optional Text Overlay Badge on bottom of shape */}
               {shape.image && shape.badgeText && (
@@ -395,6 +433,56 @@ export const FloatingShapeOverlay = ({
               >
                 <Camera className="w-3 h-3" />
               </button>
+
+              {/* Toggle No-Crop / Full View */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUpdateShape(pageIndex, shape.id, {
+                    imageFit: shape.imageFit === 'contain' ? 'cover' : 'contain',
+                  });
+                }}
+                className={`p-1 rounded transition text-[10px] font-bold ${
+                  shape.imageFit === 'contain'
+                    ? 'bg-brand-gold text-black'
+                    : 'text-brand-goldLight hover:bg-brand-gold hover:text-black'
+                }`}
+                title={shape.imageFit === 'contain' ? 'إلغاء احتواء الصورة' : 'احتواء الصورة كاملة بدون قص'}
+              >
+                {shape.imageFit === 'contain' ? '📐' : '🖼️'}
+              </button>
+
+              {/* Zoom Image Inside Shape */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const cur = shape.imageScale !== undefined ? shape.imageScale : 1.0;
+                  onUpdateShape(pageIndex, shape.id, {
+                    imageScale: Math.max(0.3, parseFloat((cur - 0.15).toFixed(2))),
+                  });
+                }}
+                className="p-1 hover:bg-brand-gold hover:text-black text-brand-goldLight rounded transition text-[10px]"
+                title="تصغير الصورة داخل الإطار (-)"
+              >
+                <ZoomOut className="w-3 h-3" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const cur = shape.imageScale !== undefined ? shape.imageScale : 1.0;
+                  onUpdateShape(pageIndex, shape.id, {
+                    imageScale: Math.min(3.0, parseFloat((cur + 0.15).toFixed(2))),
+                  });
+                }}
+                className="p-1 hover:bg-brand-gold hover:text-black text-brand-goldLight rounded transition text-[10px]"
+                title="تكبير الصورة داخل الإطار (+)"
+              >
+                <ZoomIn className="w-3 h-3" />
+              </button>
+
               <button
                 type="button"
                 onClick={(e) => {
@@ -404,9 +492,9 @@ export const FloatingShapeOverlay = ({
                   });
                 }}
                 className="p-1 hover:bg-brand-gold hover:text-black text-brand-goldLight rounded transition font-bold text-[10px]"
-                title="تكبير الحجم (+15px)"
+                title="تكبير حجم الإطار (+15px)"
               >
-                <ZoomIn className="w-3 h-3" />
+                <Maximize2 className="w-3 h-3" />
               </button>
               <button
                 type="button"

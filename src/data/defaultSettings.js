@@ -9,19 +9,19 @@ export const DEFAULT_SETTINGS = {
   archStyle: 'classic',       // 'classic' | 'subtle' | 'straight' | 'wave'
   archBorderWidth: 1.5,       // 0px to 6px
   archInnerBorderWidth: 3,    // 0px to 8px
-  archBorderColor: '#c9aa58', // Gold outer line
-  archInnerColor: '#0f3d23',  // Dark green inner line
+  archBorderColor: '#8dc63f', // Brand Lime Green outer line
+  archInnerColor: '#162a1c',  // Deep Forest Green inner line
   showArchBorder: true,       // Toggle dividing line
   logoImage: 'logo.jpg',
   logoSize: 36,
   page13LogoSize: 54, // Separate & independent logo size for Page 13 (Info & Legend)
 
   // Custom Page Background Image & Watermark (Alsafi Neon Sign Wall)
-  bgStyle: 'true-black',      // 'true-black' | 'solid-green' | 'gradient'
-  bgPatternType: 'stars',     // 'stars' | 'cutlery' | 'diamonds' | 'dots'
-  bgPatternOpacity: 2,        // 0 to 15 (opacity of the gold star background pattern)
+  bgStyle: 'solid-green',     // 'true-black' | 'solid-green' | 'gradient'
+  bgPatternType: 'logoLetter',// 'stars' | 'cutlery' | 'diamonds' | 'dots' | 'logoLetter'
+  bgPatternOpacity: 3,        // 0 to 100 (opacity of the background ornament pattern)
   bgPatternScale: 100,        // 50 to 300 (scale percentage of the pattern)
-  bgPatternColor: '#c9aa58',  // default gold color for the pattern
+  bgPatternColor: '#8dc63f',  // default AlsaFi brand lime green for the pattern
   customBgImage: DEFAULT_ALSAFI_BG,
   bgOpacity: 45,              // 0% to 100%
   bgBlur: 0,                  // 0px to 20px
@@ -52,7 +52,7 @@ export const DEFAULT_SETTINGS = {
     {
       id: 'whatsapp',
       title: 'WHATSAPP BESTELLUNG',
-      url: 'https://wa.me/4917634567890',
+      url: 'https://wa.me/4962217259000',
       customImage: '',
       subtitle: 'Reservierung & Chat',
     },
@@ -62,8 +62,8 @@ export const DEFAULT_SETTINGS = {
   contentOffsetX: 0,
   contentOffsetY: 0,
   contentScale: 100,            // 50% to 120% — scale entire content block as one unit
-  contentPaddingRight: 14,
-  contentPaddingLeft: 8,
+  contentPaddingRight: 34,
+  contentPaddingLeft: 32,
   printBleedScale: 100,       // 100% to 108% for full overscan bleed
 
   // Page 13 Legend & Allergens Section Positioning & Typography
@@ -73,8 +73,19 @@ export const DEFAULT_SETTINGS = {
   legendPaddingBottom: 4,
   legendTextSize: 9.5,        // Font size for Allergen & Additives list items (legible print size)
   legendTitleSize: 11,        // Font size for Legend box titles
+  hinweiseNoticeSize: 8.5,    // Font size for standard preparation & spicy symbol notice
+  hinweiseNoticeText: 'Die Symbole beziehen sich auf die Standardzubereitung. Gerichte mit 🌶️ sind pikant; 🌶️🌶️ kennzeichnet die extra scharfe Variante.',
   showHinweiseCard: true,     // Toggle for Hinweise & Symbole card
   showAllergenLegend: true,   // Toggle for Allergen & Additives tables
+
+  // Page 13 Block Position & Card Border Controls (Whole Block & Card by Card)
+  page13OffsetY: 0,
+  page13OffsetX: 0,
+  page13ContentScale: 100,
+  page13CardGap: 8,
+  page13BorderWidth: 1.5,
+  page13BorderOpacity: 50,
+  showPage13CardBorders: true,
 
   // Dish Allergens Display
   showDishAllergens: true,    // Toggle for dish-level allergen tags
@@ -87,7 +98,7 @@ export const DEFAULT_SETTINGS = {
   borderLeft: true,
   borderRight: true,
   borderCornerStyle: 'royal', // 'royal' | 'geometric' | 'none'
-  borderInset: 4,             // 0px to 24px (4px gives edge-to-edge luxury look)
+  borderInset: 32,             // 32px places frame & royal corners safely inside printable safe area
   borderWidth: 1.5,           // 0.5px to 4px
   borderOpacity: 85,          // 20% to 100%
 
@@ -95,10 +106,21 @@ export const DEFAULT_SETTINGS = {
   photoBlend: 'smooth',       // 'smooth' | 'vignette' | 'sharp'
   photoFeather: 60,
 
+  // Global Page & Photo Lighting (Print Brightness Optimization)
+  pageBrightness: 100,        // 80% to 160% (whole page brightness)
+  pageContrast: 100,          // 80% to 140% (whole page contrast)
+  imageBrightness: 100,       // 80% to 180% (food photos brightness boost)
+  imageContrast: 100,         // 80% to 140% (food photos contrast)
+  coverHeroBrightness: 100,   // 80% to 180% (cover photo brightness)
+  coverHeroVignette: 35,      // 0% to 100% (cover vignette shadow intensity)
+
   // Whitespace Optimization & Luxury Ornaments
   autoFitPageSpacing: true,   // Dynamically distributes item gaps based on page density
   bottomOrnamentStyle: 'none', // Default is none to maximize food space
   showCalloutCards: true,     // Shows Chef Recommendation callout cards on spare-space pages
+  twoColumnImageHeight: 245,  // Enlarged height for two-column decorative images (80px - 450px)
+  twoColumnImageWidth: 100,   // Width % for two-column decorative images (50% - 100%)
+  twoColumnImageBorder: 3,    // Border width in px
 
   // Spacing
   itemGap: 8,
@@ -121,7 +143,24 @@ export const DEFAULT_SETTINGS = {
   allergenSize: 8,
   itemNumSize: 12,
 
-  // Footer Typography
-  pageNumberSize: 15,
+  // Footer & Page Numbers (100% Unified Across All Pages)
+  footerText: 'ALSAFI RESTAURANT · HEIDELBERG',
   footerTextSize: 10,
+  footerTextLetterSpacing: 0.25,
+  footerTextColor: 'muted',
+  footerTextOffsetX: 0,
+  footerTextOffsetY: 0,
+  pageNumberSize: 15,
+  pageNumberWeight: 'bold',
+  pageNumberColor: 'gold',
+  pageNumberOffsetX: 0,
+  pageNumberOffsetY: 0,
+  footerBottomOffset: 36,
+  footerPaddingRight: 34,
+  footerPaddingLeft: 34,
+  footerDividerWidth: 1,
+  footerDividerOpacity: 30,
+  showFooterDivider: true,
+  showFooterText: true,
+  showPageNumber: true,
 };

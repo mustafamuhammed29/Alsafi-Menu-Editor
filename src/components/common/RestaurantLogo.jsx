@@ -43,7 +43,7 @@ export const RestaurantLogo = ({
             height: `${effectiveHeight}px`,
             fontSize: `${Math.max(12, effectiveHeight * 0.45)}px`,
           }}
-          className="rounded-full bg-gradient-to-br from-brand-goldLight via-brand-gold to-yellow-800 flex items-center justify-center font-cinzel font-bold text-brand-bg shadow-md transition-transform group-hover:scale-105"
+          className="rounded-full bg-gradient-to-br from-[#a6e247] via-[#8dc63f] to-[#162a1c] flex items-center justify-center font-cinzel font-bold text-white shadow-md transition-transform group-hover:scale-105"
         >
           A
         </div>

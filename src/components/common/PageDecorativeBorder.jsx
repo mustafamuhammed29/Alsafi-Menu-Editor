@@ -36,16 +36,16 @@ export const PageDecorativeBorder = ({
         style={{ opacity }}
       >
         <defs>
-          {/* Subtle Gold Gradient */}
+          {/* Vibrant Brand Green Gradients */}
           <linearGradient id="goldFrameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#c9aa58" />
-            <stop offset="50%" stopColor="#e6cd85" />
-            <stop offset="100%" stopColor="#9a7b2c" />
+            <stop offset="0%" stopColor="#8dc63f" />
+            <stop offset="50%" stopColor="#a6e247" />
+            <stop offset="100%" stopColor="#6ea822" />
           </linearGradient>
           <linearGradient id="emeraldFrameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#e6cd85" />
-            <stop offset="50%" stopColor="#c9aa58" />
-            <stop offset="100%" stopColor="#a38942" />
+            <stop offset="0%" stopColor="#a6e247" />
+            <stop offset="50%" stopColor="#8dc63f" />
+            <stop offset="100%" stopColor="#5d911b" />
           </linearGradient>
         </defs>
 
@@ -158,12 +158,12 @@ export const PageDecorativeBorder = ({
                 />
                 <path
                   d="M 6,6 L 6,24 C 6,12 12,6 24,6 Z"
-                  fill="rgba(201, 170, 88, 0.15)"
+                  fill="rgba(141, 198, 63, 0.15)"
                   stroke="url(#emeraldFrameGrad)"
                   strokeWidth="1"
                 />
-                <circle cx="10" cy="10" r="2.5" fill="#e6cd85" />
-                <path d="M 0,14 C 7,14 14,7 14,0" fill="none" stroke="#c9aa58" strokeWidth="1" />
+                <circle cx="10" cy="10" r="2.5" fill="#a6e247" />
+                <path d="M 0,14 C 7,14 14,7 14,0" fill="none" stroke="#8dc63f" strokeWidth="1" />
               </g>
             )}
 
@@ -178,12 +178,12 @@ export const PageDecorativeBorder = ({
                 />
                 <path
                   d="M 6,6 L 6,24 C 6,12 12,6 24,6 Z"
-                  fill="rgba(201, 170, 88, 0.15)"
+                  fill="rgba(141, 198, 63, 0.15)"
                   stroke="url(#emeraldFrameGrad)"
                   strokeWidth="1"
                 />
-                <circle cx="10" cy="10" r="2.5" fill="#e6cd85" />
-                <path d="M 0,14 C 7,14 14,7 14,0" fill="none" stroke="#c9aa58" strokeWidth="1" />
+                <circle cx="10" cy="10" r="2.5" fill="#a6e247" />
+                <path d="M 0,14 C 7,14 14,7 14,0" fill="none" stroke="#8dc63f" strokeWidth="1" />
               </g>
             )}
 
@@ -198,12 +198,12 @@ export const PageDecorativeBorder = ({
                 />
                 <path
                   d="M 6,6 L 6,24 C 6,12 12,6 24,6 Z"
-                  fill="rgba(201, 170, 88, 0.15)"
+                  fill="rgba(141, 198, 63, 0.15)"
                   stroke="url(#emeraldFrameGrad)"
                   strokeWidth="1"
                 />
-                <circle cx="10" cy="10" r="2.5" fill="#e6cd85" />
-                <path d="M 0,14 C 7,14 14,7 14,0" fill="none" stroke="#c9aa58" strokeWidth="1" />
+                <circle cx="10" cy="10" r="2.5" fill="#a6e247" />
+                <path d="M 0,14 C 7,14 14,7 14,0" fill="none" stroke="#8dc63f" strokeWidth="1" />
               </g>
             )}
 
@@ -218,12 +218,12 @@ export const PageDecorativeBorder = ({
                 />
                 <path
                   d="M 6,6 L 6,24 C 6,12 12,6 24,6 Z"
-                  fill="rgba(201, 170, 88, 0.15)"
+                  fill="rgba(141, 198, 63, 0.15)"
                   stroke="url(#emeraldFrameGrad)"
                   strokeWidth="1"
                 />
-                <circle cx="10" cy="10" r="2.5" fill="#e6cd85" />
-                <path d="M 0,14 C 7,14 14,7 14,0" fill="none" stroke="#c9aa58" strokeWidth="1" />
+                <circle cx="10" cy="10" r="2.5" fill="#a6e247" />
+                <path d="M 0,14 C 7,14 14,7 14,0" fill="none" stroke="#8dc63f" strokeWidth="1" />
               </g>
             )}
           </>

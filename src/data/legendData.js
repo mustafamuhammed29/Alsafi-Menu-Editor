@@ -37,8 +37,8 @@ export const ADDITIVES = [
 export const RESTAURANT_INFO = {
   phone: '06221 72 59 000',
   email: 'info@alsafi-heidelberg.de',
-  address: 'Hertzstraße 1, 69126 Heidelberg - Kaufland',
+  address: 'Hertzstraße 1, 69126 Heidelberg – Kaufland',
   deliveryServices: 'Lieferando · Uber Eats · Wolt',
-  openingHours: 'Montag-Samstag 11:00-22:00 Uhr\nSonntag & Feiertage 12:00-22:00 Uhr',
-  deliveryHours: 'Montag-Samstag 14:00-21:00 Uhr\nSonntag & Feiertage 12:00-21:00 Uhr',
+  openingHours: 'Montag–Samstag 11:00–22:00 Uhr\nSonntag & Feiertage 12:00–22:00 Uhr',
+  deliveryHours: 'Montag–Samstag 14:00–21:00 Uhr\nSonntag & Feiertage 12:00–21:00 Uhr',
 };

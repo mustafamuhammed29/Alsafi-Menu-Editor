@@ -8,13 +8,17 @@ export default {
     extend: {
       colors: {
         brand: {
-          bg: '#050a07',
-          gold: '#c9aa58',
-          goldLight: '#e6cd85',
-          green: '#0f3d23',
-          greenLight: '#185d37',
-          accent: '#8fa83b',
-          textMuted: '#a2b3a8',
+          bg: '#0a1610',
+          gold: '#8dc63f',
+          goldLight: '#a6e247',
+          lime: '#8dc63f',
+          limeLight: '#a6e247',
+          green: '#162a1c',
+          greenLight: '#234a32',
+          forest: '#162a1c',
+          forestDark: '#0e1d13',
+          accent: '#8dc63f',
+          textMuted: '#8da596',
         }
       },
       fontFamily: {

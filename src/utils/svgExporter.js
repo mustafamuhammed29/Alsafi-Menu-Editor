@@ -1,4 +1,4 @@
-import { toPng } from 'html-to-image';
+import { toJpeg, toPng } from 'html-to-image';
 import JSZip from 'jszip';
 import { ensureAllFontsLoaded } from './pdfExporter';
 
@@ -9,6 +9,31 @@ const exportFilter = (node) => {
     return false;
   }
   return true;
+};
+
+const fallbackPlaceholder =
+  'data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="transparent"/%3E%3C/svg%3E';
+
+// ─── Ensure all images are fully loaded & decoded before canvas capture ──────
+const ensureAllImagesLoaded = async (rootElement) => {
+  const imgs = Array.from(rootElement.querySelectorAll('img'));
+  await Promise.allSettled(
+    imgs.map(async (img) => {
+      if (img.complete && img.naturalWidth > 0) {
+        if (img.decode) {
+          try { await img.decode(); } catch (_) {}
+        }
+        return;
+      }
+      await new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+      if (img.decode) {
+        try { await img.decode(); } catch (_) {}
+      }
+    })
+  );
 };
 
 // XML Special character escaping
@@ -22,13 +47,19 @@ const escapeXml = (unsafe) => {
     .replace(/'/g, '&apos;');
 };
 
-// ─── Extract Vector Graphics (SVGs & Images) for pure Illustrator layers ──────
+// ─── Extract Vector Graphics (SVGs & Ornaments) for pure Illustrator layers ───
 const extractVectorElements = (rootElement, pageRect) => {
   const vectors = [];
   
-  // Extract SVGs (Icons, Borders)
+  // Extract SVGs (Icons, Borders, Decorative elements)
   const svgNodes = rootElement.querySelectorAll('svg');
   svgNodes.forEach(svg => {
+    // 1. Skip elements hidden from export or print
+    if (svg.closest('.no-print') || svg.closest('.export-hidden')) return;
+
+    // 2. Skip nested SVGs to avoid duplicate exports
+    if (svg.parentElement && svg.parentElement.closest('svg')) return;
+
     const rect = svg.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
     const style = window.getComputedStyle(svg);
@@ -36,39 +67,45 @@ const extractVectorElements = (rootElement, pageRect) => {
 
     const relX = rect.left - pageRect.left;
     const relY = rect.top - pageRect.top;
-    
+
+    // 3. Clone node and manipulate attributes via standard DOM APIs (never regex on XML strings)
+    const clone = svg.cloneNode(true);
+
+    // Apply explicit rendered dimensions (safely updates width/height without affecting stroke-width or others)
+    clone.setAttribute('width', rect.width.toFixed(1));
+    clone.setAttribute('height', rect.height.toFixed(1));
+    clone.removeAttribute('x');
+    clone.removeAttribute('y');
+
+    // Ensure valid SVG namespace
+    if (!clone.getAttribute('xmlns')) {
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    }
+
+    // Replace currentColor with actual computed element color
+    const computedColor = style.color || '#ffffff';
+    const allDescendants = [clone, ...clone.querySelectorAll('*')];
+    allDescendants.forEach(node => {
+      if (node.getAttribute('stroke') === 'currentColor') {
+        node.setAttribute('stroke', computedColor);
+      }
+      if (node.getAttribute('fill') === 'currentColor') {
+        node.setAttribute('fill', computedColor);
+      }
+    });
+
+    // Cleanly serialize DOM element to valid W3C XML
+    const serializer = new XMLSerializer();
+    const cleanSvgMarkup = serializer.serializeToString(clone);
+
     vectors.push({
       type: 'svg',
-      html: svg.outerHTML,
+      html: cleanSvgMarkup,
       x: relX,
       y: relY,
       width: rect.width,
       height: rect.height,
       opacity: style.opacity !== '1' ? style.opacity : null,
-      color: style.color || '#ffffff'
-    });
-  });
-
-  // Extract Images (Photos)
-  const imgNodes = rootElement.querySelectorAll('img');
-  imgNodes.forEach(img => {
-    const rect = img.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    const style = window.getComputedStyle(img);
-    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return;
-
-    const relX = rect.left - pageRect.left;
-    const relY = rect.top - pageRect.top;
-
-    vectors.push({
-      type: 'image',
-      src: img.src,
-      x: relX,
-      y: relY,
-      width: rect.width,
-      height: rect.height,
-      opacity: style.opacity !== '1' ? style.opacity : null,
-      objectFit: style.objectFit
     });
   });
 
@@ -78,20 +115,8 @@ const extractVectorElements = (rootElement, pageRect) => {
 const generateSvgGraphicsElements = (vectors) => {
   return vectors.map((item, idx) => {
     if (item.type === 'svg') {
-      let html = item.html;
-      // Force exact dimensions and fix currentColors so Illustrator reads it right
-      html = html.replace(/^<svg([^>]*)>/i, (match, attrs) => {
-        let cleanAttrs = attrs.replace(/\b(width|height|x|y)="[^"]*"/gi, '');
-        return `<svg width="${item.width}" height="${item.height}" ${cleanAttrs}>`;
-      });
-      html = html.replace(/currentColor/gi, item.color);
-      
       return `    <g id="Vector_${idx}" transform="translate(${item.x.toFixed(1)}, ${item.y.toFixed(1)})" ${item.opacity ? `opacity="${item.opacity}"` : ''}>
-      ${html}
-    </g>`;
-    } else if (item.type === 'image') {
-      return `    <g id="Image_${idx}" transform="translate(${item.x.toFixed(1)}, ${item.y.toFixed(1)})" ${item.opacity ? `opacity="${item.opacity}"` : ''}>
-      <image width="${item.width}" height="${item.height}" xlink:href="${escapeXml(item.src)}" href="${escapeXml(item.src)}" preserveAspectRatio="${item.objectFit === 'cover' ? 'xMidYMid slice' : 'xMidYMid meet'}" />
+      ${item.html}
     </g>`;
     }
     return '';
@@ -213,15 +238,25 @@ const generateSvgTextElements = (textItems) => {
 const capturePageAsSVG = async (element) => {
   const w = element.offsetWidth || 794;
   const h = element.offsetHeight || 1123;
+  const isLandscape = w > h;
+  const widthMM = isLandscape ? '297mm' : '210mm';
+  const heightMM = isLandscape ? '210mm' : '297mm';
+  const canvasW = isLandscape ? 3508 : 2480;
+  const canvasH = isLandscape ? 2480 : 3508;
   const computedBg = window.getComputedStyle(element).backgroundColor;
-  const bgColor = computedBg && computedBg !== 'rgba(0, 0, 0, 0)' ? computedBg : '#050a07';
+  const bgColor = computedBg && computedBg !== 'rgba(0, 0, 0, 0)' ? computedBg : '#0a1610';
 
-  // 1. Measure and extract all live text nodes and vector elements before hiding
+  // 1. Ensure all photos (including arch sidebar photos) are decoded in memory
+  await ensureAllImagesLoaded(element);
+
+  // 2. Measure and extract all live text nodes and vector elements before hiding
   const pageRect = element.getBoundingClientRect();
   const textItems = extractTextNodes(element, pageRect);
   const vectorItems = extractVectorElements(element, pageRect);
 
-  // 2. Hide text and vectors temporarily to capture pure background layout at 300 DPI
+  // 3. Hide text temporarily to capture pure background layout & photography at 300 DPI
+  // NOTE: We deliberately do NOT hide SVGs here, because SVGs define <clipPath> (e.g. arch-clip)
+  // needed by the photo containers to render the arch photography properly!
   const hideTextStyle = document.createElement('style');
   hideTextStyle.id = 'temp-svg-export-style';
   hideTextStyle.innerHTML = `
@@ -231,25 +266,29 @@ const capturePageAsSVG = async (element) => {
       text-shadow: none !important;
       -webkit-text-fill-color: transparent !important;
     }
-    .temp-export-clean-bg svg,
-    .temp-export-clean-bg img {
-      opacity: 0 !important;
-      visibility: hidden !important;
+    .temp-export-clean-bg [class*="bg-clip-text"],
+    .temp-export-clean-bg [style*="background-clip: text"],
+    .temp-export-clean-bg [style*="-webkit-background-clip: text"] {
+      background: transparent !important;
+      background-image: none !important;
+      -webkit-text-fill-color: transparent !important;
     }
   `;
   document.head.appendChild(hideTextStyle);
   element.classList.add('temp-export-clean-bg');
 
-  let bgPngDataUrl;
+  let bgImgDataUrl;
   try {
-    bgPngDataUrl = await toPng(element, {
+    const captureOpts = {
       filter: exportFilter,
       backgroundColor: bgColor,
+      quality: 0.85,
       pixelRatio: 3.15, // 300 DPI precision
-      canvasWidth: 2480,
-      canvasHeight: 3508,
+      canvasWidth: w,
+      canvasHeight: h,
       skipFonts: false,
       cacheBust: false,
+      imagePlaceholder: fallbackPlaceholder,
       style: {
         transform: 'none',
         margin: '0',
@@ -265,7 +304,13 @@ const capturePageAsSVG = async (element) => {
         minHeight: `${h}px`,
         maxHeight: `${h}px`,
       },
-    });
+    };
+
+    try {
+      bgImgDataUrl = await toJpeg(element, captureOpts);
+    } catch {
+      bgImgDataUrl = await toPng(element, captureOpts);
+    }
   } finally {
     element.classList.remove('temp-export-clean-bg');
     if (hideTextStyle.parentNode) {
@@ -273,7 +318,7 @@ const capturePageAsSVG = async (element) => {
     }
   }
 
-  // 3. Generate SVG vector layers
+  // 4. Generate SVG vector layers
   const svgVectorContent = generateSvgGraphicsElements(vectorItems);
   const svgTextContent = generateSvgTextElements(textItems);
 
@@ -281,8 +326,8 @@ const capturePageAsSVG = async (element) => {
   const svgContent = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg xmlns="http://www.w3.org/2000/svg" 
      xmlns:xlink="http://www.w3.org/1999/xlink" 
-     width="210mm" 
-     height="297mm" 
+     width="${widthMM}" 
+     height="${heightMM}" 
      viewBox="0 0 ${w} ${h}" 
      version="1.1">
   <defs>
@@ -291,14 +336,14 @@ const capturePageAsSVG = async (element) => {
     </style>
   </defs>
 
-  <!-- Layer 1: High-Res Background Layout (Divs, CSS Shapes, Shadows) -->
+  <!-- Layer 1: High-Res Background Layout & Photography (Divs, CSS Shapes, Shadows, Photos) -->
   <g id="Layer_1_Background_Layout">
     <rect width="${w}" height="${h}" fill="${bgColor}" />
-    <image width="${w}" height="${h}" x="0" y="0" xlink:href="${bgPngDataUrl}" href="${bgPngDataUrl}" />
+    <image width="${w}" height="${h}" x="0" y="0" xlink:href="${bgImgDataUrl}" href="${bgImgDataUrl}" />
   </g>
 
   <!-- Layer 2: Vector Graphics, Icons & Decorative Borders -->
-  <g id="Layer_2_Vector_Graphics_and_Photos">
+  <g id="Layer_2_Vector_Graphics_and_Borders">
 ${svgVectorContent}
   </g>
 
@@ -332,10 +377,28 @@ export const exportMenuAsSVG = async (pages, onProgress) => {
     const wrapper = document.getElementById(page.id);
     if (!wrapper) continue;
 
-    const element = wrapper.querySelector('.a4-page') || wrapper;
+    const element = wrapper.querySelector('.a4-page, .a4-landscape-page') || wrapper;
+    const fileName = (page.id === 'page0' || page.pageNumber === '00')
+      ? 'Alsafi_Menu_Page_00_Cover_Editable.svg'
+      : `Alsafi_Menu_Page_${String(page.pageNumber || i).padStart(2, '0')}_Editable.svg`;
+
     const svgString = await capturePageAsSVG(element);
-    
-    zip.file(`Alsafi_Menu_Page_${String(i + 1).padStart(2, '0')}_Editable.svg`, svgString);
+
+    // Validate XML to guarantee no parse errors
+    if (typeof DOMParser !== 'undefined') {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(svgString, 'image/svg+xml');
+        const parserError = doc.querySelector('parsererror');
+        if (parserError) {
+          console.warn(`[SVG Exporter] XML Parsing warning in ${fileName}:`, parserError.textContent);
+        }
+      } catch (xmlErr) {
+        console.warn('[SVG Exporter] XML validation check error:', xmlErr);
+      }
+    }
+
+    zip.file(fileName, svgString);
     addedCount++;
   }
 
@@ -345,7 +408,11 @@ export const exportMenuAsSVG = async (pages, onProgress) => {
     onProgress(total, total, 'جاري ضغط ملفات الـ SVG وتحميلها...');
   }
 
-  const content = await zip.generateAsync({ type: 'blob' });
+  const content = await zip.generateAsync({
+    type: 'blob',
+    compression: 'DEFLATE',
+    compressionOptions: { level: 9 },
+  });
   
   // Download the ZIP
   const url = URL.createObjectURL(content);

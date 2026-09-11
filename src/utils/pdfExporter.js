@@ -15,6 +15,28 @@ const exportFilter = (node) => {
 const fallbackPlaceholder =
   'data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="transparent"/%3E%3C/svg%3E';
 
+// ─── Ensure all images are fully loaded & decoded before canvas capture ──────
+export const ensureAllImagesLoaded = async (rootElement) => {
+  const imgs = Array.from(rootElement.querySelectorAll('img'));
+  await Promise.allSettled(
+    imgs.map(async (img) => {
+      if (img.complete && img.naturalWidth > 0) {
+        if (img.decode) {
+          try { await img.decode(); } catch (_) {}
+        }
+        return;
+      }
+      await new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+      if (img.decode) {
+        try { await img.decode(); } catch (_) {}
+      }
+    })
+  );
+};
+
 // ─── True A4 @ 300 DPI pixel dimensions ────────────────────────────────────────
 // A4 = 210mm × 297mm
 // 300 DPI = 300px per inch = 300/25.4 px per mm = 11.811 px/mm
@@ -99,8 +121,9 @@ export const verifyCharacterIntegrity = (element, pageIdentifier = '') => {
  * Capture a page element as a JPEG at EXACTLY A4 @ 300 DPI (2480×3508px).
  */
 const capturePage = async (element, pixelRatio = 3.15, quality = 0.85, pageIdentifier = '') => {
-  // 1. Perform QA integrity check on DOM characters
+  // 1. Perform QA integrity check on DOM characters & ensure images are loaded
   verifyCharacterIntegrity(element, pageIdentifier);
+  await ensureAllImagesLoaded(element);
 
   const w = element.offsetWidth || 794;
   const h = element.offsetHeight || 1123;
@@ -122,7 +145,7 @@ const capturePage = async (element, pixelRatio = 3.15, quality = 0.85, pageIdent
   const opts = {
     quality: quality,
     pixelRatio: pixelRatio,
-    backgroundColor: computedBg && computedBg !== 'rgba(0, 0, 0, 0)' ? computedBg : '#050a07',
+    backgroundColor: computedBg && computedBg !== 'rgba(0, 0, 0, 0)' ? computedBg : '#0a1610',
     filter: exportFilter,
     skipFonts: false, // Ensure html-to-image reads loaded fonts from document
     cacheBust: false,
@@ -144,8 +167,8 @@ const capturePage = async (element, pixelRatio = 3.15, quality = 0.85, pageIdent
     },
     width: w,
     height: h,
-    canvasWidth: targetCanvasW,
-    canvasHeight: targetCanvasH,
+    canvasWidth: w,
+    canvasHeight: h,
   };
 
   try {
@@ -173,42 +196,7 @@ const buildPDF = async (pages, onProgress, pixelRatio = 3.15, quality = 0.85) =>
   }
   await ensureAllFontsLoaded();
 
-  const pdf = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: [A4_W_MM, A4_H_MM], // exact A4 [210, 297]
-    compress: true,
-    putOnlyUsedFonts: true,
-    floatPrecision: 'smart',
-  });
-
-  // Document metadata
-  pdf.setDocumentProperties({
-    title: 'Alsafi Restaurant Menu – Speisekarte',
-    author: 'Alsafi Restaurant Heidelberg',
-    subject: 'Speisekarte Full Bleed 300DPI',
-    keywords: 'menu, speisekarte, alsafi, halal, heidelberg',
-    creator: 'Alsafi Menu Editor PRO',
-  });
-
-  // PRINT LOCK — instructs PDF viewers to print at 100% actual size without auto-shrinking
-  try {
-    pdf.viewerPreferences({
-      PrintScaling: 'None',
-      FitWindow: false,
-      CenterWindow: true,
-      DisplayDocTitle: true,
-    });
-  } catch (_) {}
-
-  try {
-    pdf.addJS(
-      'if (typeof this.print === "function") {' +
-      '  this.print({ bUI: true, bSilent: false, bShrinkToFit: false });' +
-      '}'
-    );
-  } catch (_) {}
-
+  let pdf = null;
   let addedCount = 0;
 
   for (let i = 0; i < total; i++) {
@@ -216,27 +204,94 @@ const buildPDF = async (pages, onProgress, pixelRatio = 3.15, quality = 0.85) =>
     const pageNum = page.pageNumber || `${i + 1}`;
     
     if (onProgress) {
-      onProgress(i + 1, total, `معالجة الصفحة ${pageNum} / ${total} بدقة 300 DPI والأبعاد الدقيقة...`);
+      onProgress(i + 1, total, `معالجة الصفحة ${pageNum} / ${total} وتطبيق التصغير التلقائي لتناسب A4 (Auto-Fit)...`);
     }
 
     const wrapper = document.getElementById(page.id);
     if (!wrapper) continue;
 
-    // Use the inner .a4-page div for pixel-perfect capture
-    const element = wrapper.querySelector('.a4-page') || wrapper;
+    // Support both portrait (.a4-page) and landscape (.a4-landscape-page) elements
+    const element = wrapper.querySelector('.a4-page, .a4-landscape-page') || wrapper;
+
+    const elemW = element.offsetWidth || 794;
+    const elemH = element.offsetHeight || 1123;
+    const isLandscape = elemW > elemH;
+
+    // Target A4 Paper Dimensions in Millimetres
+    const targetW_MM = isLandscape ? A4_H_MM : A4_W_MM; // 297mm if landscape, 210mm if portrait
+    const targetH_MM = isLandscape ? A4_W_MM : A4_H_MM; // 210mm if landscape, 297mm if portrait
+    const orientation = isLandscape ? 'landscape' : 'portrait';
 
     const dataUrl = await capturePage(element, pixelRatio, quality, pageNum);
 
-    if (addedCount > 0) pdf.addPage([A4_W_MM, A4_H_MM], 'portrait');
+    // Calculate Auto-Fit proportional scale so that NO content is cropped (even A3 or custom size)
+    const elemRatio   = elemW / elemH;
+    const targetRatio = targetW_MM / targetH_MM;
 
-    // Place image: x=0, y=0, w=210mm, h=297mm → TRUE full bleed, zero margin
+    let drawW = targetW_MM;
+    let drawH = targetH_MM;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    if (Math.abs(elemRatio - targetRatio) > 0.02) {
+      // Non-standard ratio (e.g. A3, custom banner): shrink proportionally to fit target paper
+      if (elemRatio > targetRatio) {
+        drawW = targetW_MM;
+        drawH = targetW_MM / elemRatio;
+        yOffset = (targetH_MM - drawH) / 2;
+      } else {
+        drawH = targetH_MM;
+        drawW = targetH_MM * elemRatio;
+        xOffset = (targetW_MM - drawW) / 2;
+      }
+    }
+
+    if (!pdf) {
+      pdf = new jsPDF({
+        orientation: orientation,
+        unit: 'mm',
+        format: [targetW_MM, targetH_MM],
+        compress: true,
+        putOnlyUsedFonts: true,
+        floatPrecision: 'smart',
+      });
+
+      pdf.setDocumentProperties({
+        title: 'Alsafi Restaurant Menu – Speisekarte',
+        author: 'Alsafi Restaurant Heidelberg',
+        subject: 'Speisekarte Full Bleed 300DPI',
+        keywords: 'menu, speisekarte, alsafi, halal, heidelberg',
+        creator: 'Alsafi Menu Editor PRO',
+      });
+
+      try {
+        pdf.viewerPreferences({
+          PrintScaling: 'None',
+          FitWindow: true,
+          CenterWindow: true,
+          DisplayDocTitle: true,
+        });
+      } catch (_) {}
+
+      try {
+        pdf.addJS(
+          'if (typeof this.print === "function") {' +
+          '  this.print({ bUI: true, bSilent: false, bShrinkToFit: true });' +
+          '}'
+        );
+      } catch (_) {}
+    } else {
+      pdf.addPage([targetW_MM, targetH_MM], orientation);
+    }
+
+    // Place image on PDF page with 100% proportional fit
     pdf.addImage(
       dataUrl,
       'JPEG',
-      0,        // x — from left edge
-      0,        // y — from top edge
-      A4_W_MM,  // full width (210mm)
-      A4_H_MM,  // full height (297mm)
+      xOffset,
+      yOffset,
+      drawW,
+      drawH,
       `page_${i}`,
       'FAST',
     );
@@ -244,7 +299,7 @@ const buildPDF = async (pages, onProgress, pixelRatio = 3.15, quality = 0.85) =>
     addedCount++;
   }
 
-  if (addedCount === 0) throw new Error('لم يتم العثور على صفحات للمعالجة.');
+  if (addedCount === 0 || !pdf) throw new Error('لم يتم العثور على صفحات للمعالجة.');
   return pdf;
 };
 
@@ -257,17 +312,69 @@ const buildPDF = async (pages, onProgress, pixelRatio = 3.15, quality = 0.85) =>
 export const exportMenuAsPDF = async (
   pages,
   onProgress,
-  options = { dpi: 300, quality: 0.85 }
+  options = { dpi: 300, quality: 0.95, pixelRatio: 3.8 }
 ) => {
-  const pixelRatio = options.dpi === 150 ? 1.75 : 3.15; // 3.15 perfectly maps A4 to 300 DPI (2480px width)
-  const quality    = options.quality || 0.85;
+  const pixelRatio = options.dpi === 150 ? 1.75 : (options.pixelRatio || 3.8);
+  const quality    = options.quality !== undefined ? options.quality : 0.95;
 
-  if (onProgress) onProgress(0, pages.length, 'جاري تهيئة ملف الـ PDF بدقة 300 DPI...');
+  if (onProgress) onProgress(0, pages.length, 'جاري تهيئة ملف الـ PDF بأعلى دقة مطبعية (Ultra-HD)...');
 
   const pdf = await buildPDF(pages, onProgress, pixelRatio, quality);
 
   if (onProgress) onProgress(pages.length, pages.length, 'جاري حفظ الملف...');
 
-  const filename = `Alsafi_Menu_300DPI_${new Date().toISOString().slice(0, 10)}.pdf`;
+  const filename = options.dpi === 150
+    ? `Alsafi_Menu_WhatsApp_150DPI_${new Date().toISOString().slice(0, 10)}.pdf`
+    : `Alsafi_Menu_PrintReady_300DPI_${new Date().toISOString().slice(0, 10)}.pdf`;
   pdf.save(filename);
+};
+
+/**
+ * Print full menu directly with 100% fidelity to current live state @ 300 DPI.
+ * Captures exact live DOM state into high-res PDF stream and triggers browser print dialog.
+ */
+export const printMenuDirectly = async (
+  pages,
+  onProgress,
+  options = { dpi: 300, quality: 0.95, pixelRatio: 3.8 }
+) => {
+  const pixelRatio = options.dpi === 150 ? 1.75 : (options.pixelRatio || 3.8);
+  const quality    = options.quality !== undefined ? options.quality : 0.95;
+
+  if (onProgress) onProgress(0, pages.length, 'جاري تحضير أحدث نسخة من المنيو للطباعة المباشرة بدقة 300 DPI...');
+
+  const pdf = await buildPDF(pages, onProgress, pixelRatio, quality);
+
+  if (onProgress) onProgress(pages.length, pages.length, 'فتح نافذة الطباعة لأحدث نسخة...');
+
+  const pdfBlob = pdf.output('blob');
+  const blobUrl = URL.createObjectURL(pdfBlob);
+
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  iframe.src = blobUrl;
+  document.body.appendChild(iframe);
+
+  iframe.onload = () => {
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      } catch (err) {
+        console.warn('Iframe print focus fallback:', err);
+        window.open(blobUrl, '_blank');
+      }
+      setTimeout(() => {
+        try {
+          document.body.removeChild(iframe);
+          URL.revokeObjectURL(blobUrl);
+        } catch (_) {}
+      }, 60000);
+    }, 200);
+  };
 };

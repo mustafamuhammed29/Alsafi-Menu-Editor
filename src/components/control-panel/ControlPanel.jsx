@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Edit3, Palette, Download, Upload, SlidersHorizontal, ChevronRight, ChevronLeft, ZoomIn, ZoomOut, Code2, ClipboardPaste, Copy, Check, X } from 'lucide-react';
 import ContentTab from './ContentTab';
 import DesignTab from './DesignTab';
+import CoverPageEditor from './content-settings/CoverPageEditor';
+import FlyerEditor from '../flyer/FlyerEditor';
 import { useMenu } from '../../context/MenuContext';
 
 export const ControlPanel = () => {
-  const [activeTab, setActiveTab] = useState('content');
+  const [activeTab, setActiveTab] = useState('cover');
   const [collapsed, setCollapsed] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [pastedCode, setPastedCode] = useState('');
@@ -13,6 +15,8 @@ export const ControlPanel = () => {
   const [codeError, setCodeError] = useState('');
 
   const {
+    appMode,
+    setAppMode,
     exportBackup,
     importBackup,
     previewZoom,
@@ -22,6 +26,8 @@ export const ControlPanel = () => {
     globalSettings,
     pageOverrides,
     pages,
+    coverPageData,
+    showCoverPage,
     restoreFromCode,
   } = useMenu();
 
@@ -41,6 +47,8 @@ export const ControlPanel = () => {
         gs: globalSettings,
         po: pageOverrides,
         pg: pages,
+        coverPageData,
+        showCoverPage,
       };
       const json = JSON.stringify(payload);
       const code = btoa(encodeURIComponent(json));
@@ -71,10 +79,13 @@ export const ControlPanel = () => {
       if (typeof restoreFromCode === 'function') {
         restoreFromCode(payload);
       } else {
-        // Fallback: write directly to localStorage keys used by MenuContext
         localStorage.setItem('alsafi_menu_settings', JSON.stringify(payload.gs));
         if (payload.po) localStorage.setItem('alsafi_menu_overrides', JSON.stringify(payload.po));
-        if (payload.pg) localStorage.setItem('alsafi_menu_pages', JSON.stringify(payload.pg));
+        if (payload.pg) {
+          const cleanPages = payload.pg.filter((p) => p.id !== 'page0' && p.layout !== 'cover');
+          localStorage.setItem('alsafi_menu_pages', JSON.stringify(cleanPages));
+        }
+        if (payload.coverPageData) localStorage.setItem('alsafi_cover_page', JSON.stringify(payload.coverPageData));
         window.location.reload();
       }
       setShowCodeModal(false);
@@ -148,37 +159,62 @@ export const ControlPanel = () => {
           </div>
         </div>
 
-        {/* Tab Buttons */}
-        <div className="flex gap-2 mb-4 border-b border-white/10 pb-2">
-          <button
-            type="button"
-            onClick={() => setActiveTab('content')}
-            className={`flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-              activeTab === 'content'
-                ? 'bg-gradient-to-r from-brand-gold via-brand-goldLight to-brand-gold text-black shadow-md'
-                : 'bg-black/60 text-gray-400 hover:text-white border border-white/5'
-            }`}
-          >
-            <Edit3 className="w-3.5 h-3.5" />
-            <span>📝 إدارة المحتوى</span>
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => setActiveTab('design')}
-            className={`flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-              activeTab === 'design'
-                ? 'bg-gradient-to-r from-brand-gold via-brand-goldLight to-brand-gold text-black shadow-md'
-                : 'bg-black/60 text-gray-400 hover:text-white border border-white/5'
-            }`}
-          >
-            <Palette className="w-3.5 h-3.5" />
-            <span>🎨 التصميم والخطوط</span>
-          </button>
-        </div>
+        {/* Render Flyer Editor when in Flyer Mode */}
+        {appMode === 'flyer' ? (
+          <FlyerEditor />
+        ) : (
+          <>
+            {/* 3 Dedicated Standalone Tab Buttons */}
+            <div className="grid grid-cols-3 gap-1.5 mb-4 border-b border-white/10 pb-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab('cover')}
+                className={`py-2 px-1 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 ${
+                  activeTab === 'cover'
+                    ? 'bg-gradient-to-r from-brand-gold via-brand-goldLight to-brand-gold text-black shadow-md'
+                    : 'bg-black/60 text-brand-goldLight/80 hover:text-white border border-brand-gold/20'
+                }`}
+              >
+                <span>👑 صفحة الغلاف</span>
+              </button>
 
-        {/* Tab Content */}
-        {activeTab === 'content' ? <ContentTab /> : <DesignTab />}
+              <button
+                type="button"
+                onClick={() => setActiveTab('content')}
+                className={`py-2 px-1 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 ${
+                  activeTab === 'content'
+                    ? 'bg-gradient-to-r from-brand-gold via-brand-goldLight to-brand-gold text-black shadow-md'
+                    : 'bg-black/60 text-gray-400 hover:text-white border border-white/5'
+                }`}
+              >
+                <Edit3 className="w-3 h-3" />
+                <span>📝 المحتوى (1-13)</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => setActiveTab('design')}
+                className={`py-2 px-1 rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 ${
+                  activeTab === 'design'
+                    ? 'bg-gradient-to-r from-brand-gold via-brand-goldLight to-brand-gold text-black shadow-md'
+                    : 'bg-black/60 text-gray-400 hover:text-white border border-white/5'
+                }`}
+              >
+                <Palette className="w-3 h-3" />
+                <span>🎨 التصميم</span>
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'cover' ? (
+              <CoverPageEditor page={coverPageData} />
+            ) : activeTab === 'content' ? (
+              <ContentTab />
+            ) : (
+              <DesignTab />
+            )}
+          </>
+        )}
 
         {/* Export & Import Footers */}
         <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-white/10">

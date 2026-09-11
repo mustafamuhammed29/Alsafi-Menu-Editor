@@ -27,9 +27,9 @@ export const MenuItemRow = ({
 
   const handleNameChange = (newName) => {
     // Preserve existing dietary emoji suffixes
-    const iconsMatch = item.name.match(/ 🌱| 🥬| 🌶️🌶️| 🌶️/g);
-    const iconStr = iconsMatch ? iconsMatch.join('') : '';
-    onUpdateItem(catIdx, itemIdx, 'name', newName + iconStr);
+    const iconsMatch = item.name.match(/(🌱|🥬|🌶️🌶️|🌶️|🌶)/g);
+    const iconStr = iconsMatch ? ' ' + iconsMatch.join('') : '';
+    onUpdateItem(catIdx, itemIdx, 'name', newName.replace(/\s*(🌱|🥬|🌶️|🌶)+/g, '').trim() + iconStr);
   };
 
   const badgePresets = [
@@ -85,22 +85,22 @@ export const MenuItemRow = ({
           {/* Title & Badges */}
           <div className="flex items-center flex-wrap gap-1.5 shrink-0 max-w-[78%] py-0.2">
             <EditableText
-              value={item.name.replace(/ 🌱| 🥬| 🌶️🌶️| 🌶️/g, '')}
+              value={item.name.replace(/\s*(🌱|🥬|🌶️|🌶)+/g, '').trim()}
               onChange={handleNameChange}
               className="font-bold text-white tracking-wide block drop-shadow-md"
               style={{ fontSize: `${effectiveTitleSize}px`, lineHeight: 1.1, fontFamily: 'Outfit, sans-serif' }}
             />
 
-            {/* Inline Allergen / Additive badge for compact rows without descriptions (e.g. Drinks) */}
+            {/* Inline Allergen / Additive badge for compact rows without descriptions (e.g. Drinks, Beilagen) */}
             {!hasDesc && p.showDishAllergens !== false && item.allergens && item.allergens.trim() !== '' && (
               <span className="text-brand-gold/70 text-[8px] font-medium tracking-tight translate-y-[0.5px]">
-                ({item.allergens.replace(/Zusatzstoffe:\s*/g, 'Z: ').replace(/Allergene:\s*/g, 'A: ')})
+                ({item.allergens})
               </span>
             )}
 
             {/* Featured Dish Badge */}
             {item.badge && item.badge.trim() !== '' && (
-              <span className="inline-flex items-center gap-0.5 bg-gradient-to-r from-brand-gold/30 via-yellow-600/30 to-brand-gold/30 border border-brand-gold/70 text-brand-goldLight text-[8.5px] font-bold px-1.5 py-0.2 rounded-full shadow-sm tracking-wider uppercase translate-y-[1px]">
+              <span className="inline-flex items-center gap-0.5 bg-gradient-to-r from-brand-accent/30 via-green-600/30 to-brand-accent/30 border border-brand-accent/70 text-brand-goldLight text-[8.5px] font-bold px-1.5 py-0.2 rounded-full shadow-sm tracking-wider uppercase translate-y-[1px]">
                 <EditableText
                   value={item.badge}
                   onChange={(v) => onUpdateItem(catIdx, itemIdx, 'badge', v)}
@@ -120,7 +120,7 @@ export const MenuItemRow = ({
               </button>
 
               {showBadgeMenu && (
-                <div className="absolute top-full mt-1 left-0 bg-[#0a0f0c] border border-brand-gold/60 rounded-lg p-1.5 shadow-2xl z-50 w-36 text-right space-y-1">
+                <div className="absolute top-full mt-1 left-0 bg-[#0a1610] border border-brand-gold/60 rounded-lg p-1.5 shadow-2xl z-50 w-36 text-right space-y-1">
                   <div className="text-[9px] text-brand-gold font-bold border-b border-white/10 pb-0.5 mb-1">
                     اختر شارة التميز:
                   </div>
@@ -172,7 +172,7 @@ export const MenuItemRow = ({
               <EditableText
                 value={item.price}
                 onChange={(v) => onUpdateItem(catIdx, itemIdx, 'price', v)}
-                className="price-badge-pill block origin-right font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F3E5AB] to-[#D4AF37]"
+                className="price-badge-pill block origin-right font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#C2F280] via-[#A6E247] to-[#8DC63F]"
                 style={{ fontSize: `${effectivePriceSize}px` }}
               />
             </div>

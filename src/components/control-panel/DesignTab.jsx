@@ -3,6 +3,7 @@ import { RefreshCw, LayoutTemplate } from 'lucide-react';
 import { useMenu } from '../../context/MenuContext';
 
 // Import child components
+import LightingSettings from './design-settings/LightingSettings';
 import LogoSettings from './design-settings/LogoSettings';
 import BackgroundSettings from './design-settings/BackgroundSettings';
 import ArchSettings from './design-settings/ArchSettings';
@@ -27,9 +28,12 @@ export const DesignTab = () => {
         </div>
         <div>
           <h2 className="text-sm font-bold text-white">إعدادات التصميم والهوية</h2>
-          <p className="text-xs text-gray-400 mt-0.5">تحكم بالشعار، الألوان، الزخارف، الخطوط والأبعاد</p>
+          <p className="text-xs text-gray-400 mt-0.5">تحكم بالإضاءة، الشعار، الألوان، الزخارف، الخطوط والأبعاد</p>
         </div>
       </div>
+
+      {/* 1. Print Lighting & Brightness Optimization Controls */}
+      <LightingSettings targetScope={targetScope} setTargetScope={setTargetScope} />
 
       <LogoSettings targetScope={targetScope} setTargetScope={setTargetScope} />
       

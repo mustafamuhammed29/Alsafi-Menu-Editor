@@ -107,6 +107,9 @@ const DISH_EMOJI_PRESETS = [
 
 const SHAPE_TYPE_OPTIONS = [
   { id: 'free', label: '🖼️ صورة حرة (بدون قص)' },
+  { id: 'roundRect', label: '🔲 مستطيل ملكي مذهب' },
+  { id: 'square', label: '⏹️ مربع كلاسيكي' },
+  { id: 'arch', label: '🕌 قوس أندلسي' },
   { id: 'octagon', label: '❖ مثمن أندلسي' },
   { id: 'circle', label: '⭕ دائرة مذهبة' },
   { id: 'shield', label: '🛡️ درع شرفي' },
@@ -215,7 +218,7 @@ const FloatingShapesSettings = () => {
                       icon: s.icon,
                       badgeText: s.badge,
                       subText: s.subText,
-                      borderColor: '#c9aa58',
+                      borderColor: '#8dc63f',
                     });
                   }}
                   className="p-2 rounded-lg text-[9.5px] font-bold bg-[#14261b] hover:bg-brand-gold hover:text-black border border-brand-gold/50 text-brand-goldLight transition flex flex-col items-center justify-center gap-1 shadow-sm active:scale-95 text-center group"
@@ -251,7 +254,7 @@ const FloatingShapesSettings = () => {
                     icon: s.icon,
                     badgeText: s.badge,
                     subText: s.subText || 'Alsafi Style',
-                    borderColor: '#c9aa58',
+                    borderColor: '#8dc63f',
                   });
                 }}
                 className="py-2 px-1.5 rounded-lg text-[10px] font-bold bg-[#122318] hover:bg-brand-gold hover:text-black border border-brand-gold/40 text-brand-goldLight transition flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 text-center"
@@ -280,7 +283,7 @@ const FloatingShapesSettings = () => {
                     icon: s.icon,
                     badgeText: s.badge,
                     subText: s.subText,
-                    borderColor: '#c9aa58',
+                    borderColor: '#8dc63f',
                   });
                 }}
                 className="p-1.5 rounded-lg text-[9.5px] font-bold bg-[#102016] hover:bg-brand-gold hover:text-black border border-brand-gold/30 text-slate-200 hover:text-black transition flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 text-center group"
@@ -330,7 +333,7 @@ const FloatingShapesSettings = () => {
                       icon: emoji,
                       badgeText: '',
                       subText: '',
-                      borderColor: '#c9aa58',
+                      borderColor: '#8dc63f',
                     });
                   }}
                   className="p-1.5 rounded-lg text-lg hover:bg-brand-gold/30 hover:scale-110 active:scale-95 transition flex items-center justify-center cursor-pointer"
@@ -364,7 +367,7 @@ const FloatingShapesSettings = () => {
                       icon: customEmojiInput.trim(),
                       badgeText: '',
                       subText: '',
-                      borderColor: '#c9aa58',
+                      borderColor: '#8dc63f',
                     });
                     setCustomEmojiInput('');
                   }
@@ -674,53 +677,179 @@ const FloatingShapesSettings = () => {
                     </div>
 
                     {/* Image upload inside shape */}
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="text-[9.5px] text-gray-300">صورة داخل الشكل:</span>
-                      <div className="flex items-center gap-1">
-                        {shape.image && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateFloatingShape(selectedShapePageIdx, shape.id, {
-                                image: '',
-                                contentType: 'icon',
-                              })
-                            }
-                            className="px-2 py-0.5 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white rounded text-[9px] transition"
-                          >
-                            إزالة
-                          </button>
-                        )}
-                        <label className="px-2.5 py-1 bg-brand-gold hover:bg-brand-goldLight text-black rounded text-[9.5px] font-bold cursor-pointer transition shadow-sm flex items-center gap-1">
-                          <Camera className="w-3 h-3" />
-                          <span>{shape.image ? 'تغيير صورة' : '📷 رفع صورة طبق'}</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={async (e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                try {
-                                  const opt = await optimizeImageFile(file, 800, 800, 0.95);
-                                  updateFloatingShape(selectedShapePageIdx, shape.id, {
-                                    image: opt,
-                                    contentType: 'image',
-                                  });
-                                } catch {
-                                  const r = new FileReader();
-                                  r.onload = (ev) =>
+                    <div className="space-y-2 pt-1 border-t border-white/10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9.5px] text-gray-300 font-semibold">صورة داخل الشكل:</span>
+                        <div className="flex items-center gap-1">
+                          {shape.image && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateFloatingShape(selectedShapePageIdx, shape.id, {
+                                  image: '',
+                                  contentType: 'icon',
+                                })
+                              }
+                              className="px-2 py-0.5 bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white rounded text-[9px] transition"
+                            >
+                              إزالة
+                            </button>
+                          )}
+                          <label className="px-2.5 py-1 bg-brand-gold hover:bg-brand-goldLight text-black rounded text-[9.5px] font-bold cursor-pointer transition shadow-sm flex items-center gap-1">
+                            <Camera className="w-3 h-3" />
+                            <span>{shape.image ? 'تغيير صورة' : '📷 رفع صورة طبق'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  try {
+                                    const opt = await optimizeImageFile(file, 800, 800, 0.95);
                                     updateFloatingShape(selectedShapePageIdx, shape.id, {
-                                      image: ev.target.result,
+                                      image: opt,
                                       contentType: 'image',
                                     });
-                                  r.readAsDataURL(file);
+                                  } catch {
+                                    const r = new FileReader();
+                                    r.onload = (ev) =>
+                                      updateFloatingShape(selectedShapePageIdx, shape.id, {
+                                        image: ev.target.result,
+                                        contentType: 'image',
+                                      });
+                                    r.readAsDataURL(file);
+                                  }
                                 }
-                              }
-                            }}
-                          />
-                        </label>
+                              }}
+                            />
+                          </label>
+                        </div>
                       </div>
+
+                      {/* Image Specific Transformations & Crop Controls */}
+                      {shape.image && (
+                        <div className="bg-black/60 p-2.5 rounded-lg border border-brand-gold/30 space-y-2">
+                          {/* Fit & Crop Mode Switcher */}
+                          <div className="flex items-center justify-between text-[9.5px]">
+                            <span className="text-gray-300">طريقة العرض والقص:</span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateFloatingShape(selectedShapePageIdx, shape.id, {
+                                    imageFit: 'cover',
+                                    noClip: false,
+                                  })
+                                }
+                                className={`px-2 py-0.5 rounded text-[9px] font-bold transition ${
+                                  !shape.noClip && (shape.imageFit || 'cover') === 'cover'
+                                    ? 'bg-brand-gold text-black'
+                                    : 'bg-white/5 text-gray-300 hover:text-white'
+                                }`}
+                              >
+                                قص بالشكل
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateFloatingShape(selectedShapePageIdx, shape.id, {
+                                    imageFit: 'contain',
+                                    noClip: false,
+                                  })
+                                }
+                                className={`px-2 py-0.5 rounded text-[9px] font-bold transition ${
+                                  shape.imageFit === 'contain' && !shape.noClip
+                                    ? 'bg-brand-gold text-black'
+                                    : 'bg-white/5 text-gray-300 hover:text-white'
+                                }`}
+                              >
+                                احتواء كامل (بدون قص)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateFloatingShape(selectedShapePageIdx, shape.id, {
+                                    noClip: !shape.noClip,
+                                  })
+                                }
+                                className={`px-2 py-0.5 rounded text-[9px] font-bold transition ${
+                                  shape.noClip
+                                    ? 'bg-emerald-500 text-black font-black'
+                                    : 'bg-white/5 text-gray-300 hover:text-white'
+                                }`}
+                              >
+                                🖼️ صورة حرة
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Image Scale / Zoom Slider */}
+                          <div>
+                            <div className="flex justify-between items-center text-[9.5px] mb-1">
+                              <span className="text-gray-300 font-semibold">🔍 مقياس/تكبير الصورة داخل الإطار:</span>
+                              <span className="font-mono text-brand-gold font-bold">
+                                {Math.round((shape.imageScale !== undefined ? shape.imageScale : 1.0) * 100)}%
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0.3"
+                              max="3.0"
+                              step="0.05"
+                              className="control-slider"
+                              value={shape.imageScale !== undefined ? shape.imageScale : 1.0}
+                              onChange={(e) =>
+                                updateFloatingShape(selectedShapePageIdx, shape.id, {
+                                  imageScale: parseFloat(e.target.value),
+                                })
+                              }
+                            />
+                          </div>
+
+                          {/* Image Position X and Y */}
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <div className="flex justify-between items-center text-[9px] text-gray-300 mb-0.5">
+                                <span>↔️ موضع الصورة X:</span>
+                                <span className="font-mono text-brand-gold">{shape.imagePosX || 50}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                step="1"
+                                className="control-slider"
+                                value={shape.imagePosX !== undefined ? shape.imagePosX : 50}
+                                onChange={(e) =>
+                                  updateFloatingShape(selectedShapePageIdx, shape.id, {
+                                    imagePosX: Number(e.target.value),
+                                  })
+                                }
+                              />
+                            </div>
+                            <div>
+                              <div className="flex justify-between items-center text-[9px] text-gray-300 mb-0.5">
+                                <span>↕️ موضع الصورة Y:</span>
+                                <span className="font-mono text-brand-gold">{shape.imagePosY || 50}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                step="1"
+                                className="control-slider"
+                                value={shape.imagePosY !== undefined ? shape.imagePosY : 50}
+                                onChange={(e) =>
+                                  updateFloatingShape(selectedShapePageIdx, shape.id, {
+                                    imagePosY: Number(e.target.value),
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
