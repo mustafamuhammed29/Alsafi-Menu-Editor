@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Type, Globe, Move, Shield, Frame, LayoutTemplate, Utensils, Footprints, QrCode, Upload, Trash2, Camera, Sparkles, Sliders, RotateCcw } from 'lucide-react';
+import { Type, Globe, Move, Shield, Frame, LayoutTemplate, Utensils, Footprints, QrCode, Upload, Trash2, Camera, Sparkles, Sliders, RotateCcw, Palette, Check } from 'lucide-react';
 import { useMenu } from '../../../context/MenuContext';
 import { optimizeImageFile } from '../../../utils/imageOptimizer';
+import { BORDER_COLOR_PRESETS } from '../../common/PageDecorativeBorder';
 
 const DEFAULT_SETTINGS = {
   itemTitleSize: 14,
@@ -585,6 +586,109 @@ const TypographySettings = ({
                 onChange={(e) => updateSetting(targetScope, 'descSize', parseFloat(e.target.value))}
               />
             </div>
+
+            {/* 3.1 Dish Allergen & Additives (Zusatzstoffe) Font Size & Design */}
+            <div className="bg-black/50 border border-brand-gold/40 rounded-xl p-3 space-y-2.5 shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="text-[11px] text-brand-gold font-bold block">
+                    حجم خط الحساسية والمواد المضافة (Zusatzstoffe):
+                  </span>
+                  <span className="text-[9.5px] text-gray-300 font-mono">
+                    مثل: (Zusatzstoffe: 1, 3) أو (Allergene: A, G)
+                  </span>
+                </div>
+                <span className="text-[11.5px] text-yellow-300 font-mono font-bold bg-black/80 px-2 py-0.5 rounded border border-yellow-400/50 shadow-inner">
+                  {currentSettings.allergenSize !== undefined ? currentSettings.allergenSize : 8.5}px
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min="6"
+                max="20"
+                step="0.5"
+                className="control-slider"
+                value={currentSettings.allergenSize !== undefined ? currentSettings.allergenSize : 8.5}
+                onChange={(e) => updateSetting(targetScope, 'allergenSize', parseFloat(e.target.value))}
+              />
+
+              {/* Quick Presets */}
+              <div className="flex items-center justify-between pt-1 gap-1">
+                <span className="text-[9px] text-gray-400">مقاسات سريعة:</span>
+                <div className="flex gap-1 flex-wrap">
+                  {[
+                    { label: 'دقيق 7.5px', size: 7.5 },
+                    { label: 'افتراضي 8.5px', size: 8.5 },
+                    { label: 'واضح 10px', size: 10 },
+                    { label: 'بارز 11.5px', size: 11.5 },
+                    { label: 'كبير 13px', size: 13 },
+                  ].map((preset) => (
+                    <button
+                      key={preset.size}
+                      type="button"
+                      onClick={() => updateSetting(targetScope, 'allergenSize', preset.size)}
+                      className={`px-1.5 py-0.5 rounded text-[8.5px] border transition ${
+                        (currentSettings.allergenSize !== undefined ? currentSettings.allergenSize : 8.5) === preset.size
+                          ? 'bg-brand-gold text-black font-bold border-brand-gold shadow-sm'
+                          : 'bg-black/60 text-gray-300 hover:text-white border-white/10'
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Color Control for Zusatzstoffe */}
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                <span className="text-[9.5px] text-gray-300 font-semibold">لون خط Zusatzstoffe والحساسية:</span>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="color"
+                    value={currentSettings.allergenColor || '#334235'}
+                    onChange={(e) => updateSetting(targetScope, 'allergenColor', e.target.value)}
+                    className="w-5 h-5 rounded border border-white/30 cursor-pointer bg-transparent"
+                  />
+                  <span className="text-[9px] font-mono text-gray-300">{currentSettings.allergenColor || '#334235'}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 flex-wrap">
+                {[
+                  { label: 'أخضر داكن ناصع (مقروء)', color: '#162a1c' },
+                  { label: 'كريمي داكن', color: '#334235' },
+                  { label: 'ذهبي معتدل', color: '#8A6A1A' },
+                  { label: 'أخضر الصافي', color: '#8dc63f' },
+                  { label: 'أسود كحلي', color: '#0a0a0a' },
+                  { label: 'أبيض ناصع', color: '#ffffff' },
+                ].map((c) => (
+                  <button
+                    key={c.color}
+                    type="button"
+                    onClick={() => updateSetting(targetScope, 'allergenColor', c.color)}
+                    className="px-1.5 py-0.5 rounded text-[8px] border bg-black/60 text-gray-300 hover:text-white flex items-center gap-1"
+                    style={{ borderColor: (currentSettings.allergenColor || '#334235') === c.color ? '#8dc63f' : 'rgba(255,255,255,0.15)' }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c.color }} />
+                    <span>{c.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Show / Hide Toggle */}
+              <div className="pt-1.5 border-t border-white/10">
+                <label className="flex items-center gap-2 text-[10px] text-gray-200 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={currentSettings.showDishAllergens !== false}
+                    onChange={(e) => updateSetting(targetScope, 'showDishAllergens', e.target.checked)}
+                    className="rounded"
+                  />
+                  <span>إظهار رموز وملاحظات الحساسية بجانب الأطباق والمشروبات</span>
+                </label>
+              </div>
+            </div>
           </>
         )}
 
@@ -768,25 +872,6 @@ const TypographySettings = ({
             className="control-slider"
             value={currentSettings.titleSize !== undefined ? currentSettings.titleSize : 28}
             onChange={(e) => updateSetting(targetScope, 'titleSize', parseFloat(e.target.value))}
-          />
-        </div>
-
-        {/* 6. Dish Allergen Tags Font Size */}
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[11px] text-gray-300 font-semibold">حجم رموز الحساسية:</span>
-            <span className="text-[11px] text-brand-accent font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-accent/30">
-              {currentSettings.allergenSize !== undefined ? currentSettings.allergenSize : 8}px
-            </span>
-          </div>
-          <input
-            type="range"
-            min="6"
-            max="16"
-            step="0.5"
-            className="control-slider"
-            value={currentSettings.allergenSize !== undefined ? currentSettings.allergenSize : 8}
-            onChange={(e) => updateSetting(targetScope, 'allergenSize', parseFloat(e.target.value))}
           />
         </div>
 
@@ -1606,46 +1691,58 @@ const TypographySettings = ({
             <button
               type="button"
               onClick={() => updateSetting(targetScope, 'borderTop', currentSettings.borderTop === false ? true : false)}
-              className={`py-1.5 px-2 rounded-lg text-xs font-bold transition flex items-center justify-between ${
+              className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-between ${
                 currentSettings.borderTop !== false
-                  ? 'bg-brand-gold/20 text-brand-goldLight border border-brand-gold/60 shadow-sm'
+                  ? 'bg-gradient-to-r from-emerald-950/60 to-brand-green/70 text-brand-goldLight border border-brand-accent/60 shadow-sm'
                   : 'bg-black/60 text-slate-500 border border-white/5 line-through'
               }`}
             >
               <span>⬆️ الإطار العلوي</span>
+              <span className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono font-bold ${currentSettings.borderTop !== false ? 'bg-brand-accent/20 text-brand-accent' : 'text-slate-500'}`}>
+                {currentSettings.borderTop !== false ? '✓ ظاهر' : 'مخفي'}
+              </span>
             </button>
             <button
               type="button"
               onClick={() => updateSetting(targetScope, 'borderBottom', currentSettings.borderBottom === false ? true : false)}
-              className={`py-1.5 px-2 rounded-lg text-xs font-bold transition flex items-center justify-between ${
+              className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-between ${
                 currentSettings.borderBottom !== false
-                  ? 'bg-brand-gold/20 text-brand-goldLight border border-brand-gold/60 shadow-sm'
+                  ? 'bg-gradient-to-r from-emerald-950/60 to-brand-green/70 text-brand-goldLight border border-brand-accent/60 shadow-sm'
                   : 'bg-black/60 text-slate-500 border border-white/5 line-through'
               }`}
             >
               <span>⬇️ الإطار السفلي</span>
+              <span className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono font-bold ${currentSettings.borderBottom !== false ? 'bg-brand-accent/20 text-brand-accent' : 'text-slate-500'}`}>
+                {currentSettings.borderBottom !== false ? '✓ ظاهر' : 'مخفي'}
+              </span>
             </button>
             <button
               type="button"
               onClick={() => updateSetting(targetScope, 'borderLeft', currentSettings.borderLeft === false ? true : false)}
-              className={`py-1.5 px-2 rounded-lg text-xs font-bold transition flex items-center justify-between ${
+              className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-between ${
                 currentSettings.borderLeft !== false
-                  ? 'bg-brand-gold/20 text-brand-goldLight border border-brand-gold/60 shadow-sm'
+                  ? 'bg-gradient-to-r from-emerald-950/60 to-brand-green/70 text-brand-goldLight border border-brand-accent/60 shadow-sm'
                   : 'bg-black/60 text-slate-500 border border-white/5 line-through'
               }`}
             >
               <span>⬅️ الإطار الأيسر</span>
+              <span className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono font-bold ${currentSettings.borderLeft !== false ? 'bg-brand-accent/20 text-brand-accent' : 'text-slate-500'}`}>
+                {currentSettings.borderLeft !== false ? '✓ ظاهر' : 'مخفي'}
+              </span>
             </button>
             <button
               type="button"
               onClick={() => updateSetting(targetScope, 'borderRight', currentSettings.borderRight === false ? true : false)}
-              className={`py-1.5 px-2 rounded-lg text-xs font-bold transition flex items-center justify-between ${
+              className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-between ${
                 currentSettings.borderRight !== false
-                  ? 'bg-brand-gold/20 text-brand-goldLight border border-brand-gold/60 shadow-sm'
+                  ? 'bg-gradient-to-r from-emerald-950/60 to-brand-green/70 text-brand-goldLight border border-brand-accent/60 shadow-sm'
                   : 'bg-black/60 text-slate-500 border border-white/5 line-through'
               }`}
             >
               <span>➡️ الإطار الأيمن</span>
+              <span className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono font-bold ${currentSettings.borderRight !== false ? 'bg-brand-accent/20 text-brand-accent' : 'text-slate-500'}`}>
+                {currentSettings.borderRight !== false ? '✓ ظاهر' : 'مخفي'}
+              </span>
             </button>
           </div>
         </div>
@@ -1667,13 +1764,142 @@ const TypographySettings = ({
                 onClick={() => updateSetting(targetScope, 'borderCornerStyle', st.id)}
                 className={`py-1.5 px-1 rounded-lg text-[10.5px] font-bold transition flex items-center justify-center text-center ${
                   (currentSettings.borderCornerStyle || 'royal') === st.id
-                    ? 'bg-brand-gold text-black shadow-md'
-                    : 'bg-black/60 text-slate-400 border border-white/10 hover:text-white'
+                    ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-black shadow-md font-black scale-[1.02]'
+                    : 'bg-black/60 text-slate-400 border border-white/10 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {st.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* 🎨 Border Color Presets & Custom Color Controls */}
+        <div className="pt-2 border-t border-white/10 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] text-gray-200 font-semibold flex items-center gap-1.5">
+              <Palette className="w-3.5 h-3.5 text-amber-400" />
+              <span>ألوان الإطار والزخارف (Border Colors):</span>
+            </label>
+            <div className="flex items-center gap-1.5">
+              {((currentSettings.borderColor && currentSettings.borderColor !== '#8dc63f') ||
+                (currentSettings.borderColorScheme && currentSettings.borderColorScheme !== 'emerald')) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateSetting(targetScope, 'borderColorScheme', 'emerald');
+                    updateSetting(targetScope, 'borderColor', '#8dc63f');
+                    updateSetting(targetScope, 'borderSecondaryColor', '#a6e247');
+                  }}
+                  className="text-[9.5px] text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-black/40 hover:bg-white/10 border border-white/10 transition flex items-center gap-1 cursor-pointer"
+                  title="استعادة اللون الافتراضي (أخضر الصافي)"
+                >
+                  <RotateCcw className="w-2.5 h-2.5" />
+                  <span>استعادة</span>
+                </button>
+              )}
+              <span className="text-[10px] text-amber-300 font-bold font-mono bg-black/60 px-2 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
+                <span
+                  className="w-2 h-2 rounded-full inline-block shadow-sm"
+                  style={{ backgroundColor: currentSettings.borderColor || '#8dc63f' }}
+                />
+                <span>
+                  {BORDER_COLOR_PRESETS.find(p => p.id === (currentSettings.borderColorScheme || 'emerald'))?.label || 'مخصص'}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          {/* 8 Curated Luxury Color Presets Grid */}
+          <div className="grid grid-cols-4 gap-1.5">
+            {BORDER_COLOR_PRESETS.map((preset) => {
+              const isSelected = (currentSettings.borderColorScheme || 'emerald') === preset.id;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => {
+                    updateSetting(targetScope, 'borderColorScheme', preset.id);
+                    if (preset.id !== 'custom') {
+                      updateSetting(targetScope, 'borderColor', preset.primary);
+                      updateSetting(targetScope, 'borderSecondaryColor', preset.secondary);
+                    }
+                  }}
+                  className={`p-1.5 rounded-lg border text-center transition flex flex-col items-center justify-center gap-1 relative overflow-hidden group cursor-pointer ${
+                    isSelected
+                      ? 'bg-black/90 border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.25)] scale-[1.02]'
+                      : 'bg-black/60 border-white/10 hover:border-white/30 hover:bg-white/5'
+                  }`}
+                  title={preset.label}
+                >
+                  {/* Swatch circle with gradient preview */}
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center shadow-md bg-gradient-to-tr ${preset.accentBg} relative border border-white/20`}
+                  >
+                    {isSelected ? (
+                      <Check className="w-3 h-3 text-black font-black drop-shadow-sm" />
+                    ) : (
+                      <span className="text-[10px] drop-shadow">{preset.icon}</span>
+                    )}
+                  </div>
+                  <span className={`text-[10px] font-bold truncate max-w-full ${isSelected ? 'text-amber-300' : 'text-slate-300'}`}>
+                    {preset.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Custom Color Pickers Box (Primary & Secondary / Accents) */}
+          <div className="bg-black/70 p-2.5 rounded-xl border border-white/10 space-y-2">
+            <div className="text-[10px] text-slate-400 font-medium">
+              تعديل يدوي دقيق للون الأساسي والثانوي للخطوط والزخارف:
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {/* Primary Color Picker */}
+              <div className="bg-black/80 p-2 rounded-lg border border-white/10 flex items-center justify-between">
+                <div>
+                  <label className="text-[10px] text-gray-300 font-semibold block">اللون الأساسي:</label>
+                  <span className="text-[10px] text-amber-300 font-mono uppercase font-bold">
+                    {currentSettings.borderColor || '#8dc63f'}
+                  </span>
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    type="color"
+                    value={currentSettings.borderColor || '#8dc63f'}
+                    onChange={(e) => {
+                      updateSetting(targetScope, 'borderColor', e.target.value);
+                      updateSetting(targetScope, 'borderColorScheme', 'custom');
+                    }}
+                    className="w-8 h-8 cursor-pointer rounded-lg border-2 border-white/20 bg-transparent p-0 hover:scale-105 transition-transform"
+                    title="اختر اللون الأساسي للإطار"
+                  />
+                </div>
+              </div>
+
+              {/* Secondary Accent Color Picker */}
+              <div className="bg-black/80 p-2 rounded-lg border border-white/10 flex items-center justify-between">
+                <div>
+                  <label className="text-[10px] text-gray-300 font-semibold block">اللون الثانوي (الزخارف):</label>
+                  <span className="text-[10px] text-amber-300 font-mono uppercase font-bold">
+                    {currentSettings.borderSecondaryColor || '#a6e247'}
+                  </span>
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    type="color"
+                    value={currentSettings.borderSecondaryColor || '#a6e247'}
+                    onChange={(e) => {
+                      updateSetting(targetScope, 'borderSecondaryColor', e.target.value);
+                      updateSetting(targetScope, 'borderColorScheme', 'custom');
+                    }}
+                    className="w-8 h-8 cursor-pointer rounded-lg border-2 border-white/20 bg-transparent p-0 hover:scale-105 transition-transform"
+                    title="اختر اللون الثانوي لخط الحلية الداخلي والزوايا"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -1751,32 +1977,65 @@ const TypographySettings = ({
         <div className="space-y-2.5 pt-1">
           {/* Custom QR Code Size and Color Settings */}
           {targetScope === 'global' && (
-            <div className="grid grid-cols-2 gap-3 mb-3 p-2 bg-black/60 rounded-lg border border-brand-gold/20">
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[11px] text-gray-300 font-semibold">حجم الباركود:</span>
-                  <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
-                    {currentSettings.qrCodeSize || 68}px
-                  </span>
-                </div>
-                <input
-                  type="range" min="40" max="150" step="1" className="control-slider"
-                  value={currentSettings.qrCodeSize || 68}
-                  onChange={(e) => updateSetting('global', 'qrCodeSize', Number(e.target.value))}
-                />
-              </div>
-              <div>
-                <label className="text-[11px] text-gray-300 font-semibold block mb-1">لون الباركود:</label>
-                <div className="flex items-center gap-2">
+            <div className="space-y-2 mb-3 p-2.5 bg-black/60 rounded-lg border border-brand-gold/20">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[11px] text-gray-300 font-semibold">حجم الباركود:</span>
+                    <span className="text-[11px] text-brand-gold font-mono font-bold bg-black/60 px-1.5 py-0.5 rounded border border-brand-gold/30">
+                      {currentSettings.qrCodeSize || 68}px
+                    </span>
+                  </div>
                   <input
-                    type="color"
-                    value={currentSettings.qrCodeColor || '#050a07'}
-                    onChange={(e) => updateSetting('global', 'qrCodeColor', e.target.value)}
-                    className="w-8 h-8 cursor-pointer rounded border-0 bg-transparent p-0"
+                    type="range" min="40" max="150" step="1" className="control-slider"
+                    value={currentSettings.qrCodeSize || 68}
+                    onChange={(e) => updateSetting('global', 'qrCodeSize', Number(e.target.value))}
                   />
-                  <span className="text-[10px] text-brand-goldLight font-mono uppercase">
-                    {currentSettings.qrCodeColor || '#050a07'}
-                  </span>
+                </div>
+                <div>
+                  <label className="text-[11px] text-gray-300 font-semibold block mb-1">لون الباركود:</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={currentSettings.qrCodeColor || '#050a07'}
+                      onChange={(e) => updateSetting('global', 'qrCodeColor', e.target.value)}
+                      className="w-8 h-8 cursor-pointer rounded border-0 bg-transparent p-0"
+                    />
+                    <span className="text-[10px] text-brand-goldLight font-mono uppercase">
+                      {currentSettings.qrCodeColor || '#050a07'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Subtitle Size & Color Controls */}
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10">
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[10.5px] text-gray-200 font-semibold">حجم الكتابة السفلية:</span>
+                    <span className="text-[10.5px] text-brand-gold font-mono font-bold">
+                      {currentSettings.qrSubtitleSize || 11.5}px
+                    </span>
+                  </div>
+                  <input
+                    type="range" min="8" max="22" step="0.5" className="control-slider"
+                    value={currentSettings.qrSubtitleSize || 11.5}
+                    onChange={(e) => updateSetting('global', 'qrSubtitleSize', parseFloat(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10.5px] text-gray-200 font-semibold block mb-1">لون الكتابة السفلية:</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={currentSettings.qrSubtitleColor || '#162a1c'}
+                      onChange={(e) => updateSetting('global', 'qrSubtitleColor', e.target.value)}
+                      className="w-7 h-7 cursor-pointer rounded border border-white/30 bg-transparent"
+                    />
+                    <span className="text-[10px] text-brand-gold font-mono">
+                      {currentSettings.qrSubtitleColor || '#162a1c'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1795,7 +2054,21 @@ const TypographySettings = ({
                   </span>
                 </div>
                 <div>
-                  <label className="text-[10px] text-gray-400 font-semibold block mb-0.5">العنوان:</label>
+                  <label className="text-[10px] text-brand-goldLight font-bold block mb-0.5">✍️ الكتابة التوضيحية أسفل الرمز (Subtitle):</label>
+                  <input
+                    type="text"
+                    value={qr.subtitle !== undefined ? qr.subtitle : ''}
+                    onChange={(e) => {
+                      const updated = [...(currentSettings.qrCodes || DEFAULT_SETTINGS.qrCodes)];
+                      updated[idx] = { ...updated[idx], subtitle: e.target.value };
+                      updateSetting('global', 'qrCodes', updated);
+                    }}
+                    placeholder="مثال: Online Speisekarte"
+                    className="cms-input text-[11px] py-1 m-0 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-400 font-semibold block mb-0.5">العنوان الرئيسي:</label>
                   <input
                     type="text"
                     value={qr.title || ''}

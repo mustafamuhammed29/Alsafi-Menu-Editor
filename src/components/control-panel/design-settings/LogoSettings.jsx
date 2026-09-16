@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
-import { Sparkles, Trash2, Upload } from 'lucide-react';
+import { Sparkles, Trash2, Upload, RotateCcw } from 'lucide-react';
 import { useMenu } from '../../../context/MenuContext';
 import { optimizeImageFile } from '../../../utils/imageOptimizer';
+import { DEFAULT_ALSAFI_LOGO } from '../../../data/defaultLogo';
 
 const LogoSettings = ({ targetScope }) => {
   const { pages, globalSettings, pageOverrides, updateSetting } = useMenu();
@@ -12,11 +13,23 @@ const LogoSettings = ({ targetScope }) => {
       ? globalSettings
       : { ...globalSettings, ...(pageOverrides[targetScope] || {}) };
 
+  const handleResetToDefaultLogo = () => {
+    updateSetting(targetScope, 'logoImage', DEFAULT_ALSAFI_LOGO);
+    if (targetScope === 'global') {
+      pages.forEach((_, i) => {
+        const pageKey = `page${i + 1}`;
+        if (pageOverrides[pageKey] && pageOverrides[pageKey].logoImage !== undefined) {
+          updateSetting(pageKey, 'logoImage', DEFAULT_ALSAFI_LOGO);
+        }
+      });
+    }
+  };
+
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       try {
-        const optimized = await optimizeImageFile(file, 800, 800, 0.95);
+        const optimized = await optimizeImageFile(file, 1200, 1200, 0.95);
         updateSetting(targetScope, 'logoImage', optimized);
         if (targetScope === 'global') {
           pages.forEach((_, i) => {
@@ -108,14 +121,25 @@ const LogoSettings = ({ targetScope }) => {
           />
           <div className="flex-1">
             <span className="text-xs font-bold text-white block">شعار المطعم مفعّل</span>
-            <button
-              type="button"
-              onClick={handleRemoveLogo}
-              className="text-[10.5px] text-red-400 hover:text-red-200 transition flex items-center gap-1 mt-0.5"
-            >
-              <Trash2 className="w-3 h-3" />
-              <span>حذف الشعار واسترجاع الحرف A</span>
-            </button>
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <button
+                type="button"
+                onClick={handleResetToDefaultLogo}
+                className="text-[10px] text-brand-gold hover:text-yellow-300 transition flex items-center gap-1 font-bold bg-brand-gold/10 px-1.5 py-0.5 rounded border border-brand-gold/30"
+                title="استعادة شعار الصافي الشفاف الأصلي عالي الدقة"
+              >
+                <RotateCcw className="w-2.5 h-2.5 text-brand-gold" />
+                <span>استعادة شعار الصافي الأصلي</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleRemoveLogo}
+                className="text-[10px] text-red-400 hover:text-red-200 transition flex items-center gap-0.5"
+              >
+                <Trash2 className="w-2.5 h-2.5" />
+                <span>الحرف A</span>
+              </button>
+            </div>
           </div>
           <button
             type="button"

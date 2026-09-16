@@ -173,6 +173,8 @@
   cursor: text;
   transition: background-color 0.2s;
   min-width: 10px;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 [contenteditable="true"]:hover {
   background-color: rgba(255, 255, 255, 0.08);
@@ -263,6 +265,36 @@
   border-radius: 9999px;
   background: rgba(0, 0, 0, 0.7);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ✦ CREME LUXURY THEME (#0F3B2E, #8DBB3E, #F2EBD8, #B88A2A, #44443E) ✦ */
+.theme-creme-luxury .category-num-circle {
+  background: #8DBB3E !important;
+  color: #0F3B2E !important;
+  font-weight: 900;
+  box-shadow: 0 1px 3px rgba(15, 59, 46, 0.2);
+}
+
+.theme-creme-luxury .item-number-badge {
+  background: #0F3B2E !important;
+  color: #FFFFFF !important;
+  border: 1px solid #0F3B2E !important;
+  box-shadow: 0 1px 3px rgba(15, 59, 46, 0.2);
+}
+
+.theme-creme-luxury .price-badge-pill {
+  color: #0F3B2E !important;
+}
+
+.theme-creme-luxury .leader-dots {
+  border-bottom: 2px dotted rgba(68, 68, 62, 0.25) !important;
+}
+
+.theme-creme-luxury .dietary-bar {
+  border: 1px solid rgba(184, 138, 42, 0.4) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #44443E !important;
+  box-shadow: 0 2px 8px rgba(15, 59, 46, 0.08) !important;
 }
 
 .upload-btn {

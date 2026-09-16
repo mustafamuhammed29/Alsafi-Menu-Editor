@@ -42,24 +42,35 @@ export const CategorySection = ({
   const textColor = p.categoryTextColor || 'gold-light'; // 'gold-light' | 'gold-gradient' | 'white'
   const align = p.categoryAlign || 'center'; // 'center' | 'left' | 'right'
 
+  const isCreme = p.bgStyle === 'creme-luxury';
+
   // Text Typography Classes & Style
-  let titleColorClass = 'text-brand-goldLight';
-  if (textColor === 'gold-gradient') {
-    titleColorClass = 'bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] via-[#E2F7C7] to-[#8DC63F]';
-  } else if (textColor === 'white') {
-    titleColorClass = 'text-white';
+  let titleColorClass = isCreme ? 'text-[#FFFFFF]' : 'text-brand-goldLight';
+  if (!isCreme) {
+    if (textColor === 'gold-gradient') {
+      titleColorClass = 'bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] via-[#E2F7C7] to-[#8DC63F]';
+    } else if (textColor === 'white') {
+      titleColorClass = 'text-white';
+    }
   }
 
   // Background and Border logic for pill styles
-  let badgeBg = `linear-gradient(135deg, rgba(22, 42, 28, ${pillBgOpacity}) 0%, rgba(10, 22, 14, ${pillBgOpacity}) 100%)`;
-  let badgeBorder = `${pillBorderWidth}px solid rgba(141, 198, 63, 0.7)`;
-  if (badgeStyle === 'outline') {
-    badgeBg = `rgba(0, 0, 0, ${pillBgOpacity * 0.45})`;
-    badgeBorder = `${pillBorderWidth}px solid #8dc63f`;
-  } else if (badgeStyle === 'gold') {
-    badgeBg = `linear-gradient(135deg, #8dc63f 0%, #6ea822 100%)`;
-    badgeBorder = `${pillBorderWidth}px solid #d4f4a2`;
-    titleColorClass = 'text-[#0b1c11] font-black';
+  let badgeBg = isCreme 
+    ? '#0F3B2E' 
+    : `linear-gradient(135deg, rgba(22, 42, 28, ${pillBgOpacity}) 0%, rgba(10, 22, 14, ${pillBgOpacity}) 100%)`;
+  let badgeBorder = isCreme 
+    ? `${pillBorderWidth}px solid #0F3B2E` 
+    : `${pillBorderWidth}px solid rgba(141, 198, 63, 0.7)`;
+
+  if (!isCreme) {
+    if (badgeStyle === 'outline') {
+      badgeBg = `rgba(0, 0, 0, ${pillBgOpacity * 0.45})`;
+      badgeBorder = `${pillBorderWidth}px solid #8dc63f`;
+    } else if (badgeStyle === 'gold') {
+      badgeBg = `linear-gradient(135deg, #8dc63f 0%, #6ea822 100%)`;
+      badgeBorder = `${pillBorderWidth}px solid #d4f4a2`;
+      titleColorClass = 'text-[#0b1c11] font-black';
+    }
   }
 
   const justifyClass = align === 'left' ? 'justify-start' : align === 'right' ? 'justify-end' : 'justify-center';
@@ -187,7 +198,7 @@ export const CategorySection = ({
           className={`font-serif italic text-center block ${smartCatGap <= 10 ? 'mb-0.5' : 'mb-2'} px-4`}
           style={{
             fontSize: `${Math.max(10.5, catSubtitleSize)}px`,
-            color: '#e6cd85',        /* bright gold — clearly readable on dark green */
+            color: isCreme ? '#44443E' : '#e6cd85',        /* dark text on creme, bright gold on dark green */
             letterSpacing: '0.02em',
             opacity: 0.92,
           }}

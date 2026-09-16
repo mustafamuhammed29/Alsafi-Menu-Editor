@@ -120,7 +120,7 @@ export const verifyCharacterIntegrity = (element, pageIdentifier = '') => {
 /**
  * Capture a page element as a JPEG at EXACTLY A4 @ 300 DPI (2480×3508px).
  */
-const capturePage = async (element, pixelRatio = 3.15, quality = 0.85, pageIdentifier = '') => {
+const capturePage = async (element, pixelRatio = 3.125, quality = 0.88, pageIdentifier = '') => {
   // 1. Perform QA integrity check on DOM characters & ensure images are loaded
   verifyCharacterIntegrity(element, pageIdentifier);
   await ensureAllImagesLoaded(element);
@@ -167,9 +167,13 @@ const capturePage = async (element, pixelRatio = 3.15, quality = 0.85, pageIdent
     },
     width: w,
     height: h,
-    canvasWidth: w,
-    canvasHeight: h,
+    canvasWidth: targetCanvasW,
+    canvasHeight: targetCanvasH,
   };
+
+  // Temporarily disable contentEditable on all editable elements to prevent browser editor styling/word-break quirks
+  const editables = Array.from(element.querySelectorAll('[contenteditable="true"]'));
+  editables.forEach((el) => el.setAttribute('contenteditable', 'false'));
 
   try {
     return await toJpeg(element, opts);
@@ -179,7 +183,11 @@ const capturePage = async (element, pixelRatio = 3.15, quality = 0.85, pageIdent
       ...opts,
       quality: 0.70,
       pixelRatio: 2.5,
+      canvasWidth: Math.round(w * 2.5),
+      canvasHeight: Math.round(h * 2.5),
     });
+  } finally {
+    editables.forEach((el) => el.setAttribute('contenteditable', 'true'));
   }
 };
 
@@ -196,19 +204,25 @@ const buildPDF = async (pages, onProgress, pixelRatio = 3.15, quality = 0.85) =>
   }
   await ensureAllFontsLoaded();
 
+  // Reset any visual zoom transform on <main> container during capture
+  const mainEl = document.querySelector('main');
+  const originalTransform = mainEl ? mainEl.style.transform : '';
+  if (mainEl) mainEl.style.transform = 'none';
+
   let pdf = null;
   let addedCount = 0;
 
-  for (let i = 0; i < total; i++) {
-    const page = pages[i];
-    const pageNum = page.pageNumber || `${i + 1}`;
-    
-    if (onProgress) {
-      onProgress(i + 1, total, `معالجة الصفحة ${pageNum} / ${total} وتطبيق التصغير التلقائي لتناسب A4 (Auto-Fit)...`);
-    }
+  try {
+    for (let i = 0; i < total; i++) {
+      const page = pages[i];
+      const pageNum = page.pageNumber || `${i + 1}`;
+      
+      if (onProgress) {
+        onProgress(i + 1, total, `معالجة الصفحة ${pageNum} / ${total} وتطبيق التصغير التلقائي لتناسب A4 (Auto-Fit)...`);
+      }
 
-    const wrapper = document.getElementById(page.id);
-    if (!wrapper) continue;
+      const wrapper = document.getElementById(page.id);
+      if (!wrapper) continue;
 
     // Support both portrait (.a4-page) and landscape (.a4-landscape-page) elements
     const element = wrapper.querySelector('.a4-page, .a4-landscape-page') || wrapper;
@@ -297,10 +311,15 @@ const buildPDF = async (pages, onProgress, pixelRatio = 3.15, quality = 0.85) =>
     );
 
     addedCount++;
-  }
+    }
 
-  if (addedCount === 0 || !pdf) throw new Error('لم يتم العثور على صفحات للمعالجة.');
-  return pdf;
+    if (addedCount === 0 || !pdf) throw new Error('لم يتم العثور على صفحات للمعالجة.');
+    return pdf;
+  } finally {
+    if (mainEl && originalTransform !== undefined) {
+      mainEl.style.transform = originalTransform;
+    }
+  }
 };
 
 // ─── PUBLIC API ────────────────────────────────────────────────────────────────
@@ -312,10 +331,10 @@ const buildPDF = async (pages, onProgress, pixelRatio = 3.15, quality = 0.85) =>
 export const exportMenuAsPDF = async (
   pages,
   onProgress,
-  options = { dpi: 300, quality: 0.95, pixelRatio: 3.8 }
+  options = { dpi: 300, quality: 0.76, pixelRatio: 3.125 }
 ) => {
-  const pixelRatio = options.dpi === 150 ? 1.75 : (options.pixelRatio || 3.8);
-  const quality    = options.quality !== undefined ? options.quality : 0.95;
+  const pixelRatio = options.dpi === 150 ? 1.75 : (options.pixelRatio || 3.125);
+  const quality    = options.quality !== undefined ? options.quality : (options.dpi === 150 ? 0.70 : 0.76);
 
   if (onProgress) onProgress(0, pages.length, 'جاري تهيئة ملف الـ PDF بأعلى دقة مطبعية (Ultra-HD)...');
 
@@ -336,10 +355,10 @@ export const exportMenuAsPDF = async (
 export const printMenuDirectly = async (
   pages,
   onProgress,
-  options = { dpi: 300, quality: 0.95, pixelRatio: 3.8 }
+  options = { dpi: 300, quality: 0.76, pixelRatio: 3.125 }
 ) => {
-  const pixelRatio = options.dpi === 150 ? 1.75 : (options.pixelRatio || 3.8);
-  const quality    = options.quality !== undefined ? options.quality : 0.95;
+  const pixelRatio = options.dpi === 150 ? 1.75 : (options.pixelRatio || 3.125);
+  const quality    = options.quality !== undefined ? options.quality : (options.dpi === 150 ? 0.70 : 0.76);
 
   if (onProgress) onProgress(0, pages.length, 'جاري تحضير أحدث نسخة من المنيو للطباعة المباشرة بدقة 300 DPI...');
 

@@ -19,6 +19,11 @@ export const InfoPageLayout = ({
 }) => {
   const p = pageSettings;
   const { updateSetting, updateFloatingShape, deleteFloatingShape, showPrintGuides, showLayoutGrid } = useMenu();
+  const pageScope = pageIndex !== undefined ? `page${pageIndex + 1}` : 'page13';
+
+  const handleUpdateSetting = (key, val) => {
+    updateSetting(pageScope, key, val);
+  };
 
   const qrList = p.qrCodes || DEFAULT_SETTINGS.qrCodes;
 
@@ -28,13 +33,15 @@ export const InfoPageLayout = ({
     updateSetting('global', 'qrCodes', updated);
   };
 
+  const isCreme = !p.bgStyle || p.bgStyle === 'creme-luxury';
+
   let bgColor = '#0a1610';
   let bgImage = '';
 
   if (p.bgStyle === 'gradient') {
     bgColor = '#0a1610';
     bgImage = 'radial-gradient(ellipse at top center, #163322 0%, #0a1610 70%, #040d08 100%)';
-  } else if (p.bgStyle === 'solid-green' || !p.bgStyle) {
+  } else if (p.bgStyle === 'solid-green') {
     bgColor = '#0a1610';
     bgImage = 'none';
   } else if (p.bgStyle === 'emerald-deep') {
@@ -46,14 +53,18 @@ export const InfoPageLayout = ({
   } else if (p.bgStyle === 'damascus-dark') {
     bgColor = '#07130b';
     bgImage = 'linear-gradient(180deg, #0e2416 0%, #07130b 60%, #030805 100%)';
+  } else if (!p.bgStyle || p.bgStyle === 'creme-luxury') {
+    bgColor = '#F2EBD8';
+    bgImage = 'radial-gradient(ellipse at 50% 20%, #FAF6EE 0%, #F2EBD8 65%, #E8DFCA 100%)';
   } else if (p.bgStyle === 'true-black') {
     bgColor = '#000000';
     bgImage = 'radial-gradient(ellipse at top center, #0a0a0a 0%, #000000 80%)';
   }
 
-  const patternOpacity = p.bgPatternOpacity !== undefined ? (p.bgPatternOpacity / 100).toFixed(3) : 0.025;
+  const defaultPatternColor = isCreme ? '#B88A2A' : '#8dc63f';
+  const patternOpacity = p.bgPatternOpacity !== undefined ? (p.bgPatternOpacity / 100).toFixed(3) : (isCreme ? '0.04' : '0.025');
   const patternScale = p.bgPatternScale !== undefined ? p.bgPatternScale / 100 : 1;
-  const patternColor = p.bgPatternColor || '#8dc63f';
+  const patternColor = p.bgPatternColor && p.bgPatternColor !== '#8dc63f' ? p.bgPatternColor : defaultPatternColor;
   let patternSvg = '';
   
   if (p.bgPatternType === 'none') {
@@ -94,7 +105,7 @@ export const InfoPageLayout = ({
   return (
     <div className="a4-page-wrapper" id={pageData.id}>
       <div
-        className="a4-page"
+        className={`a4-page ${isCreme ? 'theme-creme-luxury' : ''}`}
         style={{ 
           backgroundColor: bgColor, 
           backgroundImage: bgImage || 'none',
@@ -132,6 +143,10 @@ export const InfoPageLayout = ({
           borderInset={p.borderInset !== undefined ? p.borderInset : 24}
           borderWidth={p.borderWidth !== undefined ? p.borderWidth : 1.5}
           borderOpacity={p.borderOpacity !== undefined ? p.borderOpacity : 85}
+          borderColorScheme={p.borderColorScheme}
+          borderColor={p.borderColor}
+          borderSecondaryColor={p.borderSecondaryColor}
+          theme={isCreme ? 'creme' : 'default'}
         />
 
         {/* Interactive Floating Geometric Food & Ornament Shapes */}
@@ -158,7 +173,7 @@ export const InfoPageLayout = ({
           <EditableText
             value={pageData.header.subtitle}
             onChange={(v) => onUpdateHeader(pageIndex, 'subtitle', v)}
-            className="text-[11px] tracking-[0.25em] text-brand-goldLight uppercase font-cinzel font-semibold mb-1 block"
+            className={`text-[11px] tracking-[0.25em] uppercase font-cinzel font-semibold mb-1 block ${isCreme ? 'text-[#B88A2A]' : 'text-brand-goldLight'}`}
           />
 
           <RestaurantLogo
@@ -167,118 +182,327 @@ export const InfoPageLayout = ({
             className="mb-1"
             multiplier={1}
             showSubtext={true}
+            theme={isCreme ? 'creme' : 'default'}
+            isCreme={isCreme}
           />
 
           <EditableText
             value={pageData.header.title}
             onChange={(v) => onUpdateHeader(pageIndex, 'title', v)}
             tagName="h2"
-            className="font-playfair text-[26px] font-bold text-white leading-tight mb-0.5 whitespace-pre-wrap text-center block"
+            className={`font-playfair text-[26px] font-bold leading-tight mb-0.5 whitespace-pre-wrap text-center block ${isCreme ? 'text-[#0F3B2E]' : 'text-white'}`}
           />
 
-          <div className="flex items-center gap-2 text-brand-goldLight opacity-90 mb-0.5">
-            <span className="text-[11px]">❧</span>
+          <div className={`flex items-center gap-2 mb-0.5 ${isCreme ? 'text-[#44443E] opacity-90' : 'text-brand-goldLight opacity-90'}`}>
+            <span className={`text-[11px] ${isCreme ? 'text-[#8DBB3E]' : ''}`}>❧</span>
             <EditableText
               value={pageData.header.tagline}
               onChange={(v) => onUpdateHeader(pageIndex, 'tagline', v)}
               className="font-serif italic text-[12.5px] block"
             />
-            <span className="text-[11px]">☙</span>
+            <span className={`text-[11px] ${isCreme ? 'text-[#8DBB3E]' : ''}`}>☙</span>
           </div>
         </header>
 
         {/* Central Catering & Contact Card Block */}
         <div className="flex-1 flex flex-col justify-between w-full my-auto">
           {/* 1. Central Catering & Contact Card */}
-          <div className="w-full px-3 relative z-20 flex flex-col gap-2 my-auto">
-            <div
-              className="bg-[#03140a]/95 rounded-xl p-3.5 flex flex-col gap-2 text-slate-200 w-full mx-auto shadow-2xl transition-all"
-              style={{
-                border: p.showPage13CardBorders !== false ? `${p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px solid rgba(201, 170, 88, ${p.page13BorderOpacity !== undefined ? p.page13BorderOpacity / 100 : 0.5})` : 'none',
-              }}
-            >
-              <div className="flex items-center gap-3 justify-center">
-                <div className="category-pill bg-brand-green border-brand-gold scale-100">
-                  <span
-                    className="category-num-circle bg-brand-accent/20 text-brand-goldLight"
-                    style={{ textAlign: 'center', lineHeight: '1' }}
+          {p.showCateringCard !== false && (
+            <div className="w-full px-3 relative z-20 flex flex-col gap-2 my-auto">
+              <div
+                className={`${isCreme ? 'text-[#44443E]' : 'bg-[#03140a]/95 text-slate-200'} rounded-xl p-3.5 flex flex-col gap-2 w-full mx-auto shadow-md transition-all`}
+                style={{
+                  backgroundColor: isCreme ? 'rgba(242, 235, 216, 0.6)' : undefined,
+                  border: p.showPage13CardBorders !== false ? `${p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px solid rgba(${isCreme ? '184, 138, 42' : '201, 170, 88'}, ${p.page13BorderOpacity !== undefined ? p.page13BorderOpacity / 100 : 0.5})` : 'none',
+                }}
+              >
+                <div className="flex items-center gap-3 justify-center">
+                  <div className="category-pill bg-brand-green border-brand-gold scale-100">
+                    <span
+                      className="category-num-circle bg-brand-accent/20 text-brand-goldLight"
+                      style={{
+                        textAlign: 'center',
+                        lineHeight: '1',
+                        fontSize: p.cateringBadgeNumSize ? `${p.cateringBadgeNumSize}px` : undefined,
+                      }}
+                    >
+                      <EditableText
+                        value={p.cateringBadgeNum || '18'}
+                        onChange={(v) => handleUpdateSetting('cateringBadgeNum', v)}
+                      />
+                    </span>
+                    <span
+                      className="font-cinzel font-bold text-white tracking-widest uppercase pr-3 pl-1 block"
+                      style={{
+                        fontSize: p.cateringBadgeTitleSize ? `${p.cateringBadgeTitleSize}px` : '13.5px',
+                      }}
+                    >
+                      <EditableText
+                        value={p.cateringBadgeTitle || '18. CATERING · LIEFERUNG · ABHOLUNG'}
+                        onChange={(v) => handleUpdateSetting('cateringBadgeTitle', v)}
+                      />
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <p
+                    className="font-serif italic mb-0.5"
+                    style={{
+                      fontSize: `${p.cateringQuoteSize !== undefined ? p.cateringQuoteSize : 13}px`,
+                      color: p.cateringQuoteColor || (isCreme ? '#8A6A1A' : 'rgba(255, 235, 180, 0.95)'),
+                    }}
                   >
-                    18
-                  </span>
-                  <span className="font-cinzel text-[13.5px] font-bold text-white tracking-widest uppercase pr-3 pl-1 block">
-                    18. CATERING · LIEFERUNG · ABHOLUNG
-                  </span>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <p className="font-serif italic text-[13px] text-brand-goldLight/90 mb-0.5">
-                  „Du feierst. Wir kümmern uns um den Rest.“
-                </p>
-                <p className="text-[11px] text-slate-300 leading-relaxed max-w-xl mx-auto">
-                  Ob Geburtstag, Hochzeit, Firmenfeier oder Familienfest - wir bringen Alsafi auf euren Tisch. Frisch zubereitet, individuell abgestimmt und mit Liebe gemacht.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-[11px] max-w-2xl mx-auto border-t border-white/10 pt-2">
-                <div className="flex gap-2">
-                  <span className="text-brand-gold text-sm">📞</span>
-                  <div>
-                    <span className="text-brand-accent font-bold">Telefon & WhatsApp:</span>
-                    <br />
-                    {RESTAURANT_INFO.phone}
-                  </div>
+                    <EditableText
+                      value={p.cateringQuote !== undefined ? p.cateringQuote : '„Du feierst. Wir kümmern uns um den Rest.“'}
+                      onChange={(v) => handleUpdateSetting('cateringQuote', v)}
+                      tagName="span"
+                    />
+                  </p>
+                  <p
+                    className="leading-relaxed max-w-xl mx-auto"
+                    style={{
+                      fontSize: `${p.cateringDescSize !== undefined ? p.cateringDescSize : 11}px`,
+                      color: p.cateringDescColor || (isCreme ? '#44443E' : '#cbd5e1'),
+                    }}
+                  >
+                    <EditableText
+                      value={p.cateringDesc !== undefined ? p.cateringDesc : 'Ob Geburtstag, Hochzeit, Firmenfeier oder Familienfest - wir bringen Alsafi auf euren Tisch. Frisch zubereitet, individuell abgestimmt und mit Liebe gemacht.'}
+                      onChange={(v) => handleUpdateSetting('cateringDesc', v)}
+                      tagName="span"
+                    />
+                  </p>
                 </div>
 
-                <div className="flex gap-2">
-                  <span className="text-brand-gold text-sm">@</span>
-                  <div>
-                    <span className="text-brand-accent font-bold">Catering & Anfragen:</span>
-                    <br />
-                    {RESTAURANT_INFO.email}
-                  </div>
-                </div>
+                <div className={`grid grid-cols-2 gap-x-6 gap-y-2 max-w-2xl mx-auto border-t pt-2 w-full ${isCreme ? 'border-[#B88A2A]/30 text-[#44443E]' : 'border-white/10 text-slate-200'}`}>
+                  {/* Item 1: Phone */}
+                  {p.showCateringPhone !== false && (
+                    <div className="flex gap-2">
+                      <span className="text-brand-gold text-sm select-none">
+                        <EditableText
+                          value={p.cateringPhoneIcon || '📞'}
+                          onChange={(v) => handleUpdateSetting('cateringPhoneIcon', v)}
+                        />
+                      </span>
+                      <div>
+                        <span
+                          className="font-bold block"
+                          style={{
+                            fontSize: `${p.cateringItemLabelSize !== undefined ? p.cateringItemLabelSize : 11}px`,
+                            color: p.cateringItemLabelColor || (isCreme ? '#2e6b22' : '#8dc63f'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringPhoneLabel || 'Telefon & WhatsApp:'}
+                            onChange={(v) => handleUpdateSetting('cateringPhoneLabel', v)}
+                          />
+                        </span>
+                        <span
+                          style={{
+                            fontSize: `${p.cateringItemValSize !== undefined ? p.cateringItemValSize : 11}px`,
+                            color: p.cateringItemValColor || (isCreme ? '#333330' : '#e2e8f0'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringPhoneVal !== undefined ? p.cateringPhoneVal : RESTAURANT_INFO.phone}
+                            onChange={(v) => handleUpdateSetting('cateringPhoneVal', v)}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
-                <div className="flex gap-2">
-                  <span className="text-brand-gold text-sm">📍</span>
-                  <div>
-                    <span className="text-brand-accent font-bold">Adresse:</span>
-                    <br />
-                    {RESTAURANT_INFO.address}
-                  </div>
-                </div>
+                  {/* Item 2: Email */}
+                  {p.showCateringEmail !== false && (
+                    <div className="flex gap-2">
+                      <span className="text-brand-gold text-sm select-none">
+                        <EditableText
+                          value={p.cateringEmailIcon || '@'}
+                          onChange={(v) => handleUpdateSetting('cateringEmailIcon', v)}
+                        />
+                      </span>
+                      <div>
+                        <span
+                          className="font-bold block"
+                          style={{
+                            fontSize: `${p.cateringItemLabelSize !== undefined ? p.cateringItemLabelSize : 11}px`,
+                            color: p.cateringItemLabelColor || (isCreme ? '#2e6b22' : '#8dc63f'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringEmailLabel || 'Catering & Anfragen:'}
+                            onChange={(v) => handleUpdateSetting('cateringEmailLabel', v)}
+                          />
+                        </span>
+                        <span
+                          style={{
+                            fontSize: `${p.cateringItemValSize !== undefined ? p.cateringItemValSize : 11}px`,
+                            color: p.cateringItemValColor || (isCreme ? '#333330' : '#e2e8f0'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringEmailVal !== undefined ? p.cateringEmailVal : RESTAURANT_INFO.email}
+                            onChange={(v) => handleUpdateSetting('cateringEmailVal', v)}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
-                <div className="flex gap-2">
-                  <span className="text-brand-gold text-sm">📱</span>
-                  <div>
-                    <span className="text-brand-accent font-bold">Bestellung auch über:</span>
-                    <br />
-                    {RESTAURANT_INFO.deliveryServices}
-                  </div>
-                </div>
+                  {/* Item 3: Address */}
+                  {p.showCateringAddress !== false && (
+                    <div className="flex gap-2">
+                      <span className="text-brand-gold text-sm select-none">
+                        <EditableText
+                          value={p.cateringAddressIcon || '📍'}
+                          onChange={(v) => handleUpdateSetting('cateringAddressIcon', v)}
+                        />
+                      </span>
+                      <div>
+                        <span
+                          className="font-bold block"
+                          style={{
+                            fontSize: `${p.cateringItemLabelSize !== undefined ? p.cateringItemLabelSize : 11}px`,
+                            color: p.cateringItemLabelColor || (isCreme ? '#2e6b22' : '#8dc63f'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringAddressLabel || 'Adresse:'}
+                            onChange={(v) => handleUpdateSetting('cateringAddressLabel', v)}
+                          />
+                        </span>
+                        <span
+                          style={{
+                            fontSize: `${p.cateringItemValSize !== undefined ? p.cateringItemValSize : 11}px`,
+                            color: p.cateringItemValColor || (isCreme ? '#333330' : '#e2e8f0'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringAddressVal !== undefined ? p.cateringAddressVal : RESTAURANT_INFO.address}
+                            onChange={(v) => handleUpdateSetting('cateringAddressVal', v)}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
-                <div className="flex gap-2">
-                  <span className="text-brand-gold text-sm">🕒</span>
-                  <div>
-                    <span className="text-brand-accent font-bold">Öffnungszeiten:</span>
-                    <br />
-                    Montag–Samstag 11:00–22:00 Uhr | Sonntag & Feiertage 12:00–22:00 Uhr
-                  </div>
-                </div>
+                  {/* Item 4: Delivery Services */}
+                  {p.showCateringDeliveryServices !== false && (
+                    <div className="flex gap-2">
+                      <span className="text-brand-gold text-sm select-none">
+                        <EditableText
+                          value={p.cateringDeliveryServicesIcon || '📱'}
+                          onChange={(v) => handleUpdateSetting('cateringDeliveryServicesIcon', v)}
+                        />
+                      </span>
+                      <div>
+                        <span
+                          className="font-bold block"
+                          style={{
+                            fontSize: `${p.cateringItemLabelSize !== undefined ? p.cateringItemLabelSize : 11}px`,
+                            color: p.cateringItemLabelColor || (isCreme ? '#2e6b22' : '#8dc63f'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringDeliveryServicesLabel || 'Bestellung auch über:'}
+                            onChange={(v) => handleUpdateSetting('cateringDeliveryServicesLabel', v)}
+                          />
+                        </span>
+                        <span
+                          style={{
+                            fontSize: `${p.cateringItemValSize !== undefined ? p.cateringItemValSize : 11}px`,
+                            color: p.cateringItemValColor || (isCreme ? '#333330' : '#e2e8f0'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringDeliveryServicesVal !== undefined ? p.cateringDeliveryServicesVal : RESTAURANT_INFO.deliveryServices}
+                            onChange={(v) => handleUpdateSetting('cateringDeliveryServicesVal', v)}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
-                <div className="flex gap-2">
-                  <span className="text-brand-gold text-sm">🚚</span>
-                  <div>
-                    <span className="text-brand-accent font-bold">Lieferzeiten:</span>
-                    <br />
-                    Montag–Samstag 14:00–21:00 Uhr | Sonntag & Feiertage 12:00–21:00 Uhr
-                  </div>
+                  {/* Item 5: Opening Hours */}
+                  {p.showCateringHours !== false && (
+                    <div className="flex gap-2">
+                      <span className="text-brand-gold text-sm select-none">
+                        <EditableText
+                          value={p.cateringHoursIcon || '🕒'}
+                          onChange={(v) => handleUpdateSetting('cateringHoursIcon', v)}
+                        />
+                      </span>
+                      <div>
+                        <span
+                          className="font-bold block"
+                          style={{
+                            fontSize: `${p.cateringItemLabelSize !== undefined ? p.cateringItemLabelSize : 11}px`,
+                            color: p.cateringItemLabelColor || (isCreme ? '#2e6b22' : '#8dc63f'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringHoursLabel || 'Öffnungszeiten:'}
+                            onChange={(v) => handleUpdateSetting('cateringHoursLabel', v)}
+                          />
+                        </span>
+                        <span
+                          style={{
+                            fontSize: `${p.cateringItemValSize !== undefined ? p.cateringItemValSize : 11}px`,
+                            color: p.cateringItemValColor || (isCreme ? '#333330' : '#e2e8f0'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringHoursVal !== undefined ? p.cateringHoursVal : 'Montag–Samstag 11:00–22:00 Uhr | Sonntag & Feiertage 12:00–22:00 Uhr'}
+                            onChange={(v) => handleUpdateSetting('cateringHoursVal', v)}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Item 6: Delivery Times */}
+                  {p.showCateringDeliveryTimes !== false && (
+                    <div className="flex gap-2">
+                      <span className="text-brand-gold text-sm select-none">
+                        <EditableText
+                          value={p.cateringDeliveryTimesIcon || '🚚'}
+                          onChange={(v) => handleUpdateSetting('cateringDeliveryTimesIcon', v)}
+                        />
+                      </span>
+                      <div>
+                        <span
+                          className="font-bold block"
+                          style={{
+                            fontSize: `${p.cateringItemLabelSize !== undefined ? p.cateringItemLabelSize : 11}px`,
+                            color: p.cateringItemLabelColor || (isCreme ? '#2e6b22' : '#8dc63f'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringDeliveryTimesLabel || 'Lieferzeiten:'}
+                            onChange={(v) => handleUpdateSetting('cateringDeliveryTimesLabel', v)}
+                          />
+                        </span>
+                        <span
+                          style={{
+                            fontSize: `${p.cateringItemValSize !== undefined ? p.cateringItemValSize : 11}px`,
+                            color: p.cateringItemValColor || (isCreme ? '#333330' : '#e2e8f0'),
+                          }}
+                        >
+                          <EditableText
+                            value={p.cateringDeliveryTimesVal !== undefined ? p.cateringDeliveryTimesVal : 'Montag–Samstag 14:00–21:00 Uhr | Sonntag & Feiertage 12:00–21:00 Uhr'}
+                            onChange={(v) => handleUpdateSetting('cateringDeliveryTimesVal', v)}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
 
               {/* 3 Luxury QR Codes Showcase (Website, Google, WhatsApp) */}
               {p.showQrCodes !== false && (
-                <div className="mt-1 pt-2 border-t border-brand-gold/40 flex items-center justify-around gap-4 bg-black/40 rounded-lg p-2">
+                <div className={`mt-1 pt-2 border-t ${isCreme ? 'border-[#B88A2A]/40' : 'border-brand-gold/40 bg-black/40'} flex items-center justify-around gap-4 rounded-lg p-2`}
+                  style={{ backgroundColor: isCreme ? 'rgba(242, 235, 216, 0.4)' : undefined }}
+                >
                   {qrList.map((qr, qIdx) => (
                     <QRCodeDisplay
                       key={qr.id || qIdx}
@@ -286,6 +510,11 @@ export const InfoPageLayout = ({
                       index={qIdx}
                       size={p.qrCodeSize || 60}
                       color={p.qrCodeColor || '#050a07'}
+                      titleSize={p.qrTitleSize}
+                      titleColor={p.qrTitleColor}
+                      subtitleSize={p.qrSubtitleSize}
+                      subtitleColor={p.qrSubtitleColor}
+                      isCreme={isCreme}
                       onUpdateTitle={(idx, val) => handleUpdateQrField(idx, 'title', val)}
                       onUpdateSubtitle={(idx, val) => handleUpdateQrField(idx, 'subtitle', val)}
                       onUpdateUrl={(idx, val) => handleUpdateQrField(idx, 'url', val)}
@@ -297,6 +526,7 @@ export const InfoPageLayout = ({
               )}
             </div>
           </div>
+          )}
 
           {/* Bottom Legends, Hinweise & Allergen Tables */}
           <div
@@ -310,20 +540,21 @@ export const InfoPageLayout = ({
             {/* 2. Full Official HINWEISE & SYMBOLE Card */}
             {p.showHinweiseCard !== false && (
               <div
-                className="rounded-lg p-2 bg-black/60 shadow-md text-slate-200 transition-all"
+                className={`rounded-lg p-2 ${isCreme ? 'text-[#44443E]' : 'bg-black/60 text-slate-200'} shadow-md transition-all`}
                 style={{
-                  border: p.showPage13CardBorders !== false ? `${p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px solid rgba(201, 170, 88, ${p.page13BorderOpacity !== undefined ? p.page13BorderOpacity / 100 : 0.4})` : 'none',
+                  backgroundColor: isCreme ? 'rgba(242, 235, 216, 0.6)' : undefined,
+                  border: p.showPage13CardBorders !== false ? `${p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px solid rgba(${isCreme ? '184, 138, 42' : '201, 170, 88'}, ${p.page13BorderOpacity !== undefined ? p.page13BorderOpacity / 100 : 0.4})` : 'none',
                 }}
               >
-                <div className="flex items-center justify-between border-b border-brand-gold/30 pb-0.5 mb-1">
+                <div className={`flex items-center justify-between border-b ${isCreme ? 'border-[#B88A2A]/40' : 'border-brand-gold/30'} pb-0.5 mb-1`}>
                   <h4
-                    className="text-brand-gold font-cinzel font-bold tracking-widest uppercase flex items-center gap-1"
+                    className={`${isCreme ? 'text-[#0F3B2E]' : 'text-brand-gold'} font-cinzel font-bold tracking-widest uppercase flex items-center gap-1`}
                     style={{ fontSize: `${p.legendTitleSize || 10}px` }}
                   >
                     <span>📋 HINWEISE & SYMBOLE</span>
                   </h4>
                   <span
-                    className="text-brand-goldLight font-bold tracking-wider"
+                    className={`${isCreme ? 'text-[#B88A2A]' : 'text-brand-goldLight'} font-bold tracking-wider`}
                     style={{ fontSize: `${Math.max(7, (p.legendTitleSize || 10) - 1.5)}px` }}
                   >
                     ALSAFI SPEISEKARTE
@@ -331,38 +562,38 @@ export const InfoPageLayout = ({
                 </div>
 
                 <div
-                  className="grid grid-cols-2 gap-x-3 gap-y-1 text-slate-300 mb-1"
+                  className={`grid grid-cols-2 gap-x-3 gap-y-1 mb-1 ${isCreme ? 'text-[#44443E]' : 'text-slate-300'}`}
                   style={{ fontSize: `${p.legendTextSize || 8}px` }}
                 >
-                  <div>• <strong className="text-white">Alle Fleischgerichte sind halal.</strong></div>
+                  <div>• <strong className={isCreme ? 'text-[#0F3B2E]' : 'text-white'}>Alle Fleischgerichte sind halal.</strong></div>
                   <div>• Unsere vegetarischen Gerichte können auf Wunsch auch vegan zubereitet werden. Sprich uns gerne an.</div>
                   <div>• Frisches arabisches Fladenbrot (A) ist zu jeder Speise inklusive und wird auf Wunsch gerne dazu gereicht.</div>
                   <div>• Bei Allergien, Unverträglichkeiten oder Fragen zu Allergenen und Zusatzstoffen wende dich bitte an unser Personal. Wir helfen dir gerne weiter.</div>
                 </div>
 
                 <div
-                  className="border-t border-white/10 pt-1 flex flex-wrap items-center justify-between gap-1"
+                  className={`border-t pt-1 flex flex-wrap items-center justify-between gap-1 ${isCreme ? 'border-[#B88A2A]/30' : 'border-white/10'}`}
                   style={{ fontSize: `${p.legendTextSize || 8}px` }}
                 >
                   <div className="flex items-center gap-2">
                     <span
-                      className="text-brand-gold font-bold font-cinzel"
+                      className={`${isCreme ? 'text-[#8A6A1A]' : 'text-brand-gold'} font-bold font-cinzel`}
                       style={{ fontSize: `${(p.legendTextSize || 8) + 0.5}px` }}
                     >
                       SYMBOLE:
                     </span>
-                    <span className="text-slate-300 flex items-center gap-1.5">
-                      <span>🌱 <strong className="text-white">vegan</strong></span>
+                    <span className={`${isCreme ? 'text-[#44443E]' : 'text-slate-300'} flex items-center gap-1.5`}>
+                      <span>🌱 <strong className={isCreme ? 'text-[#0F3B2E]' : 'text-white'}>vegan</strong></span>
                       <span>|</span>
-                      <span>🥬 <strong className="text-white">vegetarisch</strong></span>
+                      <span>🥬 <strong className={isCreme ? 'text-[#0F3B2E]' : 'text-white'}>vegetarisch</strong></span>
                       <span>|</span>
-                      <span>🌶️ <strong className="text-white">pikant</strong></span>
+                      <span>🌶️ <strong className={isCreme ? 'text-[#0F3B2E]' : 'text-white'}>pikant</strong></span>
                       <span>|</span>
-                      <span>🌶️🌶️ <strong className="text-white">extra scharf</strong></span>
+                      <span>🌶️🌶️ <strong className={isCreme ? 'text-[#0F3B2E]' : 'text-white'}>extra scharf</strong></span>
                     </span>
                   </div>
                   <span
-                    className="text-slate-300 italic block mt-0.5 leading-tight"
+                    className={`${isCreme ? 'text-[#44443E]/80' : 'text-slate-300'} italic block mt-0.5 leading-tight`}
                     style={{ fontSize: `${p.hinweiseNoticeSize !== undefined ? p.hinweiseNoticeSize : 8.5}px` }}
                   >
                     <EditableText
@@ -378,24 +609,25 @@ export const InfoPageLayout = ({
               <div className="flex gap-2">
                 {/* 3. Allergen Legend Card */}
                 <div
-                  className="w-[46%] rounded-lg p-2.5 bg-black/70 shadow-md transition-all flex flex-col justify-between"
+                  className={`w-[46%] rounded-lg p-2.5 ${isCreme ? 'text-[#44443E]' : 'bg-black/70 text-slate-200'} shadow-md transition-all flex flex-col justify-between`}
                   style={{
-                    border: p.showPage13CardBorders !== false ? `${p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px solid rgba(201, 170, 88, ${p.page13BorderOpacity !== undefined ? p.page13BorderOpacity / 100 : 0.4})` : 'none',
+                    backgroundColor: isCreme ? 'rgba(242, 235, 216, 0.6)' : undefined,
+                    border: p.showPage13CardBorders !== false ? `${p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px solid rgba(${isCreme ? '184, 138, 42' : '201, 170, 88'}, ${p.page13BorderOpacity !== undefined ? p.page13BorderOpacity / 100 : 0.4})` : 'none',
                   }}
                 >
                   <h4
-                    className="text-brand-goldLight font-cinzel text-center border-b border-brand-gold/30 pb-1 mb-1.5 tracking-widest font-bold shrink-0"
+                    className={`${isCreme ? 'text-[#0F3B2E]' : 'text-brand-goldLight'} font-cinzel text-center border-b ${isCreme ? 'border-[#B88A2A]/40' : 'border-brand-gold/30'} pb-1 mb-1.5 tracking-widest font-bold shrink-0`}
                     style={{ fontSize: `${p.legendTitleSize || 11}px` }}
                   >
                     ALLERGENLEGENDE
                   </h4>
                   <div
-                    className="grid grid-cols-2 gap-x-2 gap-y-1 text-slate-200"
+                    className="grid grid-cols-2 gap-x-2 gap-y-1"
                     style={{ fontSize: `${p.legendTextSize || 9.5}px` }}
                   >
                     {ALLERGENS.map((item) => (
-                      <span key={item.code} className="leading-tight break-words">
-                        <strong className="text-brand-gold font-bold">{item.code}</strong> {item.name}
+                      <span key={item.code} className={`leading-tight break-words ${isCreme ? 'text-[#44443E]' : 'text-slate-200'}`}>
+                        <strong className={`${isCreme ? 'text-[#0F3B2E]' : 'text-brand-gold'} font-bold`}>{item.code}</strong> {item.name}
                       </span>
                     ))}
                   </div>
@@ -403,24 +635,25 @@ export const InfoPageLayout = ({
 
                 {/* 4. Additives Legend Card */}
                 <div
-                  className="flex-1 rounded-lg p-2.5 bg-black/70 shadow-md transition-all flex flex-col justify-between"
+                  className={`flex-1 rounded-lg p-2.5 ${isCreme ? 'text-[#44443E]' : 'bg-black/70 text-slate-200'} shadow-md transition-all flex flex-col justify-between`}
                   style={{
-                    border: p.showPage13CardBorders !== false ? `${p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px solid rgba(201, 170, 88, ${p.page13BorderOpacity !== undefined ? p.page13BorderOpacity / 100 : 0.4})` : 'none',
+                    backgroundColor: isCreme ? 'rgba(242, 235, 216, 0.6)' : undefined,
+                    border: p.showPage13CardBorders !== false ? `${p.page13BorderWidth !== undefined ? p.page13BorderWidth : 1.5}px solid rgba(${isCreme ? '184, 138, 42' : '201, 170, 88'}, ${p.page13BorderOpacity !== undefined ? p.page13BorderOpacity / 100 : 0.4})` : 'none',
                   }}
                 >
                   <h4
-                    className="text-brand-goldLight font-cinzel text-center border-b border-brand-gold/30 pb-1 mb-1.5 tracking-widest font-bold shrink-0"
+                    className={`${isCreme ? 'text-[#0F3B2E]' : 'text-brand-goldLight'} font-cinzel text-center border-b ${isCreme ? 'border-[#B88A2A]/40' : 'border-brand-gold/30'} pb-1 mb-1.5 tracking-widest font-bold shrink-0`}
                     style={{ fontSize: `${p.legendTitleSize || 11}px` }}
                   >
                     ZUSATZSTOFFLEGENDE
                   </h4>
                   <div
-                    className="grid grid-cols-2 gap-x-2 gap-y-1 text-slate-200"
+                    className="grid grid-cols-2 gap-x-2 gap-y-1"
                     style={{ fontSize: `${p.legendTextSize || 9.5}px` }}
                   >
                     {ADDITIVES.map((item) => (
-                      <span key={item.code} className="leading-tight break-words">
-                        <strong className="text-brand-accent font-bold">{item.code}</strong> {item.name}
+                      <span key={item.code} className={`leading-tight break-words ${isCreme ? 'text-[#44443E]' : 'text-slate-200'}`}>
+                        <strong className={`${isCreme ? 'text-[#0F3B2E]' : 'text-brand-gold'} font-bold`}>{item.code}</strong> {item.name}
                       </span>
                     ))}
                   </div>

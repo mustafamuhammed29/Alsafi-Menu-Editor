@@ -360,7 +360,7 @@ export const TopControlBar = () => {
           {/* ★ HIGH-RES PRINT EXPORT BUTTON ★ */}
           <button
             type="button"
-            onClick={() => handleExportPDF({ dpi: 300, quality: 0.95, pixelRatio: 3.8 })}
+            onClick={() => handleExportPDF({ dpi: 300, quality: 0.76, pixelRatio: 3.125 })}
             disabled={isWorking}
             className={`relative px-5 py-2 font-bold text-xs rounded-lg shadow-[0_0_20px_rgba(201,170,88,0.4)] transition flex items-center gap-1.5 disabled:opacity-60 ${
               isPlainPaperMode

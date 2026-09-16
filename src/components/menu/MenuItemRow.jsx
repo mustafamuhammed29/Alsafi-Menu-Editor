@@ -22,7 +22,7 @@ export const MenuItemRow = ({
   const effectiveTitleSize = Math.max(12, smartItemTitleSize || p.itemTitleSize || 14);
   const effectivePriceSize = Math.max(12, smartPriceSize || p.priceSize || 13.5);
   const effectiveDescSize = Math.max(8.5, smartDescSize || p.descSize || 10);
-  const effectiveAllergenSize = smartAllergenSize || p.allergenSize || Math.max(7, effectiveDescSize - 1.5);
+  const effectiveAllergenSize = smartAllergenSize || (p.allergenSize !== undefined ? Number(p.allergenSize) : Math.max(7, effectiveDescSize - 1.5));
   const effectiveNumSize = p.itemNumSize || 15;
 
   const handleNameChange = (newName) => {
@@ -41,15 +41,22 @@ export const MenuItemRow = ({
     '🌱 100% Vegan',
   ];
 
+  const isCreme = !p.bgStyle || p.bgStyle === 'creme-luxury';
   const blockStyle = p.itemBlockStyle || 'minimal';
   
   let containerClass = "relative flex items-start gap-3 transition px-2 group/row ";
   if (blockStyle === 'minimal') {
-    containerClass += "border-b border-white/5 last:border-0 hover:bg-white/5";
+    containerClass += isCreme 
+      ? "border-b border-black/5 last:border-0 hover:bg-black/5" 
+      : "border-b border-white/5 last:border-0 hover:bg-white/5";
   } else if (blockStyle === 'card') {
-    containerClass += "bg-[#0e2719]/80 rounded-xl shadow-md border border-white/5 hover:bg-[#0e2719] mb-1.5 p-2";
+    containerClass += isCreme
+      ? "bg-[#F2EBD8]/70 rounded-xl shadow-sm border border-[#0F3B2E]/10 hover:bg-[#EDE5D0] mb-1.5 p-2"
+      : "bg-[#0e2719]/80 rounded-xl shadow-md border border-white/5 hover:bg-[#0e2719] mb-1.5 p-2";
   } else if (blockStyle === 'outline') {
-    containerClass += "bg-black/30 border border-brand-gold/30 rounded-xl hover:bg-black/50 mb-1.5 p-2";
+    containerClass += isCreme
+      ? "bg-[#F2EBD8]/50 border border-[#B88A2A]/40 rounded-xl hover:bg-[#EDE5D0]/70 mb-1.5 p-2"
+      : "bg-black/30 border border-brand-gold/30 rounded-xl hover:bg-black/50 mb-1.5 p-2";
   }
 
   return (
@@ -83,34 +90,46 @@ export const MenuItemRow = ({
         <div className={`flex items-center justify-between w-full ${hasDesc ? 'min-h-[22px]' : 'min-h-[19px]'}`}>
           
           {/* Title & Badges */}
-          <div className="flex items-center flex-wrap gap-1.5 shrink-0 max-w-[78%] py-0.2">
+          <div className="flex items-center flex-nowrap gap-1.5 shrink-0 max-w-[82%] py-0.2">
             <EditableText
               value={item.name.replace(/\s*(🌱|🥬|🌶️|🌶)+/g, '').trim()}
               onChange={handleNameChange}
-              className="font-bold text-white tracking-wide block drop-shadow-md"
-              style={{ fontSize: `${effectiveTitleSize}px`, lineHeight: 1.1, fontFamily: 'Outfit, sans-serif' }}
+              className={`font-bold tracking-wide block whitespace-nowrap ${isCreme ? 'text-[#0F3B2E] drop-shadow-none' : 'text-white drop-shadow-md'}`}
+              style={{ fontSize: `${effectiveTitleSize}px`, lineHeight: 1.1, fontFamily: 'Outfit, sans-serif', wordBreak: 'keep-all', whiteSpace: 'nowrap' }}
             />
 
             {/* Inline Allergen / Additive badge for compact rows without descriptions (e.g. Drinks, Beilagen) */}
             {!hasDesc && p.showDishAllergens !== false && item.allergens && item.allergens.trim() !== '' && (
-              <span className="text-brand-gold/70 text-[8px] font-medium tracking-tight translate-y-[0.5px]">
-                ({item.allergens})
+              <span
+                className={`${isCreme ? 'text-[#334235]' : 'text-brand-goldLight/90'} font-medium tracking-tight shrink-0 whitespace-nowrap translate-y-[0.5px]`}
+                style={{
+                  fontSize: `${effectiveAllergenSize}px`,
+                  color: p.allergenColor || undefined,
+                }}
+              >
+                (
+                <EditableText
+                  value={item.allergens}
+                  onChange={(v) => onUpdateItem(catIdx, itemIdx, 'allergens', v)}
+                />
+                )
               </span>
             )}
 
             {/* Featured Dish Badge */}
             {item.badge && item.badge.trim() !== '' && (
-              <span className="inline-flex items-center gap-0.5 bg-gradient-to-r from-brand-accent/30 via-green-600/30 to-brand-accent/30 border border-brand-accent/70 text-brand-goldLight text-[8.5px] font-bold px-1.5 py-0.2 rounded-full shadow-sm tracking-wider uppercase translate-y-[1px]">
+              <span className="inline-flex items-center gap-0.5 bg-gradient-to-r from-brand-accent/30 via-green-600/30 to-brand-accent/30 border border-brand-accent/70 text-brand-goldLight text-[8.5px] font-bold px-1.5 py-0.5 rounded-full shadow-sm tracking-wider uppercase shrink-0 whitespace-nowrap translate-y-[1px]">
                 <EditableText
                   value={item.badge}
                   onChange={(v) => onUpdateItem(catIdx, itemIdx, 'badge', v)}
-                  className="block"
+                  className="inline-block whitespace-nowrap"
+                  style={{ wordBreak: 'keep-all', whiteSpace: 'nowrap' }}
                 />
               </span>
             )}
 
             {/* Quick Badge Add Button */}
-            <div className="relative no-print opacity-0 group-hover/row:opacity-100 transition-opacity">
+            <div className="relative no-print opacity-0 group-hover/row:opacity-100 transition-opacity shrink-0">
               <button
                 type="button"
                 onClick={() => setShowBadgeMenu(!showBadgeMenu)}
@@ -154,17 +173,19 @@ export const MenuItemRow = ({
             </div>
 
             {/* Dietary Badges */}
-            {item.name.includes('🌱') && <span className="text-brand-accent text-[11px] ml-1">🌱</span>}
-            {item.name.includes('🥬') && <span className="text-green-500 text-[11px] ml-1">🥬</span>}
+            {item.name.includes('🌱') && <span className="text-[#8DBB3E] text-[11px] ml-1 shrink-0 whitespace-nowrap">🌱</span>}
+            {item.name.includes('🥬') && <span className="text-[#0F3B2E] text-[11px] ml-1 shrink-0 whitespace-nowrap">🥬</span>}
             {item.name.includes('🌶️🌶️') ? (
-              <span className="text-red-600 text-[11px] ml-1 font-bold">🌶️🌶️</span>
+              <span className="text-red-600 text-[11px] ml-1 font-bold shrink-0 whitespace-nowrap">🌶️🌶️</span>
             ) : (
-              item.name.includes('🌶️') && <span className="text-red-500 text-[11px] ml-1">🌶️</span>
+              item.name.includes('🌶️') && <span className="text-red-500 text-[11px] ml-1 shrink-0 whitespace-nowrap">🌶️</span>
             )}
           </div>
 
           {/* Elegant Leader Line */}
-          {item.price && <div className="flex-1 border-b border-dashed border-brand-gold/40 mx-4 translate-y-[4px]"></div>}
+          {item.price && (
+            <div className={`flex-1 min-w-[8px] border-b border-dashed ${isCreme ? 'border-[#44443E]/25' : 'border-brand-gold/40'} mx-2.5 translate-y-[4px]`}></div>
+          )}
 
           {/* Price */}
           {item.price && (
@@ -172,7 +193,7 @@ export const MenuItemRow = ({
               <EditableText
                 value={item.price}
                 onChange={(v) => onUpdateItem(catIdx, itemIdx, 'price', v)}
-                className="price-badge-pill block origin-right font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#C2F280] via-[#A6E247] to-[#8DC63F]"
+                className={`price-badge-pill block origin-right font-bold ${isCreme ? 'text-[#0F3B2E]' : 'text-transparent bg-clip-text bg-gradient-to-r from-[#C2F280] via-[#A6E247] to-[#8DC63F]'}`}
                 style={{ fontSize: `${effectivePriceSize}px` }}
               />
             </div>
@@ -186,14 +207,17 @@ export const MenuItemRow = ({
               <EditableText
                 value={item.allergens}
                 onChange={(v) => onUpdateItem(catIdx, itemIdx, 'allergens', v)}
-                className="block text-brand-gold/70 font-medium leading-none mb-0.5"
-                style={{ fontSize: `${effectiveAllergenSize}px` }}
+                className={`block ${isCreme ? 'text-[#334235]' : 'text-brand-goldLight/90'} font-medium leading-none mb-0.5`}
+                style={{
+                  fontSize: `${effectiveAllergenSize}px`,
+                  color: p.allergenColor || undefined,
+                }}
               />
             )}
             <EditableText
               value={item.desc}
               onChange={(v) => onUpdateItem(catIdx, itemIdx, 'desc', v)}
-              className="text-[#a8b5b0] font-light block pr-0.5 leading-[1.4] tracking-wide"
+              className={`${isCreme ? 'text-[#44443E]' : 'text-[#a8b5b0]'} font-normal block pr-0.5 leading-[1.4] tracking-wide`}
               style={{ fontSize: `${effectiveDescSize}px`, fontFamily: 'Inter, sans-serif' }}
             />
           </div>

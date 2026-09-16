@@ -19,6 +19,37 @@ export const CoverPageLayout = ({
 
   const heroImageInputRef = useRef(null);
   const [hoveredCover, setHoveredCover] = useState(false);
+  const [hoveredFooter, setHoveredFooter] = useState(false);
+
+  // Helper function to convert Hex to RGBA
+  const hexToRgba = (hex, opacityPercent) => {
+    if (!hex || typeof hex !== 'string') return hex;
+    if (hex.startsWith('rgba')) return hex;
+    let clean = hex.replace('#', '');
+    if (clean.length === 3) clean = clean.split('').map((c) => c + c).join('');
+    const r = parseInt(clean.substring(0, 2), 16) || 0;
+    const g = parseInt(clean.substring(2, 4), 16) || 0;
+    const b = parseInt(clean.substring(4, 6), 16) || 0;
+    const a = Math.max(0, Math.min(1, (opacityPercent !== undefined ? opacityPercent : 100) / 100));
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  };
+
+  // Helper for footer shadows
+  const getShadowCss = (shadowType) => {
+    switch (shadowType) {
+      case 'none':
+        return 'none';
+      case 'soft':
+        return '0 4px 15px rgba(0,0,0,0.5)';
+      case 'gold-glow':
+        return '0 0 25px rgba(212,175,55,0.45), 0 10px 30px rgba(0,0,0,0.95)';
+      case 'green-glow':
+        return '0 0 25px rgba(141,198,63,0.45), 0 10px 30px rgba(0,0,0,0.95)';
+      case 'strong':
+      default:
+        return '0 10px 30px rgba(0,0,0,0.95)';
+    }
+  };
 
   // Full-Bleed Background Image parameters
   const heroImage = pageData.coverHeroImage || pageData.coverBottomHeroImage || '/dishes/dish2-kebab.jpg';
@@ -38,9 +69,46 @@ export const CoverPageLayout = ({
   const coverLogoSize = pageData.coverLogoSize !== undefined ? pageData.coverLogoSize : (p.coverLogoSize !== undefined ? p.coverLogoSize : 68);
   const coverBadgeSize = pageData.coverBadgeSize !== undefined ? pageData.coverBadgeSize : (p.coverBadgeSize !== undefined ? p.coverBadgeSize : 9.5);
   const coverTaglineSize = pageData.coverTaglineSize !== undefined ? pageData.coverTaglineSize : (p.coverTaglineSize !== undefined ? p.coverTaglineSize : 9);
+
+  // ─── Cover Footer Complete Master Parameters ───
+  const showCoverFooter = pageData.showCoverFooter !== false;
+  const showPhone = pageData.coverFooterPhoneVisible !== false;
+  const showAddress = pageData.coverFooterAddressVisible !== false;
+  const showHours = pageData.coverFooterHoursVisible !== false;
+  const showDelivery = pageData.coverFooterDeliveryVisible !== false;
+
+  const coverFooterColumns = pageData.coverFooterColumns || '4';
+  const coverFooterGap = pageData.coverFooterGap !== undefined ? pageData.coverFooterGap : 12;
+  const coverFooterPadding = pageData.coverFooterPadding !== undefined ? pageData.coverFooterPadding : 12;
+  const coverFooterMarginBottom = pageData.coverFooterMarginBottom !== undefined ? pageData.coverFooterMarginBottom : 20;
+  const coverFooterMarginSide = pageData.coverFooterMarginSide !== undefined ? pageData.coverFooterMarginSide : 28;
+  const coverFooterRadius = pageData.coverFooterBorderRadius !== undefined ? pageData.coverFooterBorderRadius : 16;
+  const coverFooterWrap = pageData.coverFooterWrap !== undefined ? pageData.coverFooterWrap : (p.coverFooterWrap !== undefined ? p.coverFooterWrap : true);
+
+  // Background & Glassmorphism
+  const coverFooterBgColor = pageData.coverFooterBgColor || '#0e1d14';
+  const coverFooterBgOpacity = pageData.coverFooterBgOpacity !== undefined ? pageData.coverFooterBgOpacity : 90;
+  const coverFooterBlur = pageData.coverFooterBlur !== undefined ? pageData.coverFooterBlur : 12;
+  const coverFooterBorderColor = pageData.coverFooterBorderColor || '#8dc63f';
+  const coverFooterBorderWidth = pageData.coverFooterBorderWidth !== undefined ? pageData.coverFooterBorderWidth : 2;
+  const coverFooterBorderOpacity = pageData.coverFooterBorderOpacity !== undefined ? pageData.coverFooterBorderOpacity : 60;
+  const coverFooterShadow = pageData.coverFooterShadow || 'strong';
+
+  // Icons
+  const coverFooterShowIcons = pageData.coverFooterShowIcons !== false;
+  const coverFooterIconSize = pageData.coverFooterIconSize !== undefined ? pageData.coverFooterIconSize : 14;
+  const coverFooterIconCircleSize = pageData.coverFooterIconCircleSize !== undefined ? pageData.coverFooterIconCircleSize : 28;
+  const coverFooterIconShape = pageData.coverFooterIconShape || 'circle';
+  const coverFooterIconColor = pageData.coverFooterIconColor || '#8dc63f';
+  const coverFooterIconBgColor = pageData.coverFooterIconBgColor || 'rgba(141, 198, 63, 0.25)';
+  const coverFooterIconBorderColor = pageData.coverFooterIconBorderColor || 'rgba(141, 198, 63, 0.60)';
+
+  // Typography & Colors
   const coverFooterTitleSize = pageData.coverFooterTitleSize !== undefined ? pageData.coverFooterTitleSize : (p.coverFooterTitleSize !== undefined ? p.coverFooterTitleSize : 8);
   const coverFooterValueSize = pageData.coverFooterValueSize !== undefined ? pageData.coverFooterValueSize : (p.coverFooterValueSize !== undefined ? p.coverFooterValueSize : 9.5);
-  const coverFooterWrap = pageData.coverFooterWrap !== undefined ? pageData.coverFooterWrap : (p.coverFooterWrap !== undefined ? p.coverFooterWrap : true);
+  const coverFooterTitleColor = pageData.coverFooterTitleColor || '#8dc63f';
+  const coverFooterValueColor = pageData.coverFooterValueColor || '#ffffff';
+  const coverFooterDeliveryColor = pageData.coverFooterDeliveryColor || '#a6e247';
 
   const contact = pageData.contactInfo || {
     phone: '06221 72 59 000',
@@ -48,6 +116,13 @@ export const CoverPageLayout = ({
     hours: 'Mo-Sa 11:00-22:00 | So & Feiertage 12:00-22:00',
     delivery: 'Lieferando · Uber Eats · Wolt',
     email: 'info@alsafi-heidelberg.de',
+  };
+
+  const contactLabels = pageData.contactLabels || {
+    phone: 'Telefon & WhatsApp',
+    address: 'Adresse',
+    hours: 'Öffnungszeiten',
+    delivery: 'Bestellung über',
   };
 
   const handleHeroImageUpload = async (e) => {
@@ -72,6 +147,47 @@ export const CoverPageLayout = ({
         [field]: val,
       },
     });
+  };
+
+  const handleUpdateContactLabel = (field, val) => {
+    updateCoverPage({
+      contactLabels: {
+        ...contactLabels,
+        [field]: val,
+      },
+    });
+  };
+
+  // Helper for icon container style
+  const getIconContainerStyle = () => {
+    if (coverFooterIconShape === 'none') {
+      return {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: `${coverFooterIconSize + 4}px`,
+        height: `${coverFooterIconSize + 4}px`,
+        background: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+      };
+    }
+    return {
+      width: `${coverFooterIconCircleSize}px`,
+      height: `${coverFooterIconCircleSize}px`,
+      borderRadius: coverFooterIconShape === 'circle' ? '9999px' : (coverFooterIconShape === 'rounded' ? '8px' : '0px'),
+      backgroundColor: coverFooterIconBgColor,
+      borderColor: coverFooterIconBorderColor,
+      borderWidth: '1px',
+      borderStyle: 'solid',
+    };
+  };
+
+  // Columns class
+  const getGridColsClass = () => {
+    if (coverFooterColumns === '2') return 'grid grid-cols-2';
+    if (coverFooterColumns === 'flex') return 'flex flex-wrap items-center justify-around';
+    return 'grid grid-cols-4';
   };
 
   const heroFit = pageData.coverHeroFit || 'cover';
@@ -138,6 +254,10 @@ export const CoverPageLayout = ({
           borderInset={p.borderInset !== undefined ? p.borderInset : 24}
           borderWidth={p.borderWidth !== undefined ? p.borderWidth : 2}
           borderOpacity={p.borderOpacity !== undefined ? p.borderOpacity : 95}
+          borderColorScheme={p.borderColorScheme}
+          borderColor={p.borderColor}
+          borderSecondaryColor={p.borderSecondaryColor}
+          theme={p.bgStyle === 'creme-luxury' ? 'creme' : 'default'}
         />
 
         {/* ─── LAYER 2: FLOATING SHAPES OVERLAY ──────────────────────────────────────── */}
@@ -245,73 +365,233 @@ export const CoverPageLayout = ({
         </div>
 
         {/* ─── LAYER 5: BOTTOM LUXURY GLASS RESTAURANT INFO (المعلومات في الأسفل) ─────── */}
-        <footer className="relative z-20 mx-7 mb-5 p-3 rounded-2xl bg-[#0e1d14]/90 border-2 border-brand-gold/60 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.95)] shrink-0">
-          <div className="grid grid-cols-4 gap-3 text-slate-200">
-            {/* Phone & WhatsApp */}
-            <div className="flex items-start gap-2">
-              <div className="w-7 h-7 rounded-full bg-brand-gold/25 border border-brand-gold/60 flex items-center justify-center shrink-0 shadow mt-0.5">
-                <Phone className="w-3.5 h-3.5 text-brand-gold" />
+        {showCoverFooter && (
+          <footer
+            className="relative z-20 shrink-0 transition-all duration-200"
+            style={{
+              marginLeft: `${coverFooterMarginSide}px`,
+              marginRight: `${coverFooterMarginSide}px`,
+              marginBottom: `${coverFooterMarginBottom}px`,
+              padding: `${coverFooterPadding}px`,
+              borderRadius: `${coverFooterRadius}px`,
+              backgroundColor: hexToRgba(coverFooterBgColor, coverFooterBgOpacity),
+              backdropFilter: coverFooterBlur > 0 ? `blur(${coverFooterBlur}px)` : 'none',
+              WebkitBackdropFilter: coverFooterBlur > 0 ? `blur(${coverFooterBlur}px)` : 'none',
+              borderColor: hexToRgba(coverFooterBorderColor, coverFooterBorderOpacity),
+              borderWidth: `${coverFooterBorderWidth}px`,
+              borderStyle: coverFooterBorderWidth > 0 ? 'solid' : 'none',
+              boxShadow: getShadowCss(coverFooterShadow),
+            }}
+            onMouseEnter={() => setHoveredFooter(true)}
+            onMouseLeave={() => setHoveredFooter(false)}
+          >
+            {/* Quick controller indicator on hover (no-print) */}
+            {hoveredFooter && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 no-print pointer-events-none z-30 animate-fade-in">
+                <span className="px-2.5 py-0.5 rounded-full bg-black/90 text-brand-gold border border-brand-gold/60 text-[9px] font-bold shadow-lg flex items-center gap-1 backdrop-blur-md">
+                  <span>⚙️ شريط معلومات التواصل والفوتر</span>
+                </span>
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-brand-accent font-bold uppercase tracking-wider leading-tight" style={{ fontSize: `${coverFooterTitleSize}px` }}>Telefon & WhatsApp</div>
-                <div className={`font-semibold text-white leading-tight ${coverFooterWrap ? 'break-words whitespace-normal' : 'truncate'}`} style={{ fontSize: `${coverFooterValueSize}px` }}>
-                  <EditableText
-                    value={contact.phone}
-                    onChange={(v) => handleUpdateContact('phone', v)}
-                  />
-                </div>
-              </div>
-            </div>
+            )}
 
-            {/* Address */}
-            <div className="flex items-start gap-2">
-              <div className="w-7 h-7 rounded-full bg-brand-gold/25 border border-brand-gold/60 flex items-center justify-center shrink-0 shadow mt-0.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-gold" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-brand-accent font-bold uppercase tracking-wider leading-tight" style={{ fontSize: `${coverFooterTitleSize}px` }}>Adresse</div>
-                <div className={`font-semibold text-white leading-tight ${coverFooterWrap ? 'break-words whitespace-normal' : 'truncate'}`} style={{ fontSize: `${coverFooterValueSize}px` }}>
-                  <EditableText
-                    value={contact.address}
-                    onChange={(v) => handleUpdateContact('address', v)}
-                  />
+            <div
+              className={`${getGridColsClass()} text-slate-200`}
+              style={{ gap: `${coverFooterGap}px` }}
+            >
+              {/* Phone & WhatsApp */}
+              {showPhone && (
+                <div className="flex items-start gap-2 min-w-0">
+                  {coverFooterShowIcons && (
+                    <div
+                      className="shrink-0 flex items-center justify-center shadow mt-0.5 transition-all"
+                      style={getIconContainerStyle()}
+                    >
+                      <Phone
+                        style={{
+                          width: `${coverFooterIconSize}px`,
+                          height: `${coverFooterIconSize}px`,
+                          color: coverFooterIconColor,
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1 text-left">
+                    <div
+                      className="font-bold uppercase tracking-wider leading-tight"
+                      style={{
+                        fontSize: `${coverFooterTitleSize}px`,
+                        color: coverFooterTitleColor,
+                      }}
+                    >
+                      <EditableText
+                        value={contactLabels.phone || 'Telefon & WhatsApp'}
+                        onChange={(v) => handleUpdateContactLabel('phone', v)}
+                      />
+                    </div>
+                    <div
+                      className={`font-semibold leading-tight ${
+                        coverFooterWrap ? 'break-words whitespace-normal' : 'truncate'
+                      }`}
+                      style={{
+                        fontSize: `${coverFooterValueSize}px`,
+                        color: coverFooterValueColor,
+                      }}
+                    >
+                      <EditableText
+                        value={contact.phone}
+                        onChange={(v) => handleUpdateContact('phone', v)}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
 
-            {/* Opening Hours */}
-            <div className="flex items-start gap-2">
-              <div className="w-7 h-7 rounded-full bg-brand-gold/25 border border-brand-gold/60 flex items-center justify-center shrink-0 shadow mt-0.5">
-                <Clock className="w-3.5 h-3.5 text-brand-gold" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-brand-accent font-bold uppercase tracking-wider leading-tight" style={{ fontSize: `${coverFooterTitleSize}px` }}>Öffnungszeiten</div>
-                <div className={`font-semibold text-white leading-tight ${coverFooterWrap ? 'break-words whitespace-normal' : 'truncate'}`} style={{ fontSize: `${coverFooterValueSize}px` }}>
-                  <EditableText
-                    value={contact.hours}
-                    onChange={(v) => handleUpdateContact('hours', v)}
-                  />
+              {/* Address */}
+              {showAddress && (
+                <div className="flex items-start gap-2 min-w-0">
+                  {coverFooterShowIcons && (
+                    <div
+                      className="shrink-0 flex items-center justify-center shadow mt-0.5 transition-all"
+                      style={getIconContainerStyle()}
+                    >
+                      <MapPin
+                        style={{
+                          width: `${coverFooterIconSize}px`,
+                          height: `${coverFooterIconSize}px`,
+                          color: coverFooterIconColor,
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1 text-left">
+                    <div
+                      className="font-bold uppercase tracking-wider leading-tight"
+                      style={{
+                        fontSize: `${coverFooterTitleSize}px`,
+                        color: coverFooterTitleColor,
+                      }}
+                    >
+                      <EditableText
+                        value={contactLabels.address || 'Adresse'}
+                        onChange={(v) => handleUpdateContactLabel('address', v)}
+                      />
+                    </div>
+                    <div
+                      className={`font-semibold leading-tight ${
+                        coverFooterWrap ? 'break-words whitespace-normal' : 'truncate'
+                      }`}
+                      style={{
+                        fontSize: `${coverFooterValueSize}px`,
+                        color: coverFooterValueColor,
+                      }}
+                    >
+                      <EditableText
+                        value={contact.address}
+                        onChange={(v) => handleUpdateContact('address', v)}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
 
-            {/* Delivery Services */}
-            <div className="flex items-start gap-2">
-              <div className="w-7 h-7 rounded-full bg-brand-gold/25 border border-brand-gold/60 flex items-center justify-center shrink-0 shadow mt-0.5">
-                <Truck className="w-3.5 h-3.5 text-brand-gold" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-brand-accent font-bold uppercase tracking-wider leading-tight" style={{ fontSize: `${coverFooterTitleSize}px` }}>Bestellung über</div>
-                <div className={`font-semibold text-brand-goldLight leading-tight ${coverFooterWrap ? 'break-words whitespace-normal' : 'truncate'}`} style={{ fontSize: `${coverFooterValueSize}px` }}>
-                  <EditableText
-                    value={contact.delivery}
-                    onChange={(v) => handleUpdateContact('delivery', v)}
-                  />
+              {/* Opening Hours */}
+              {showHours && (
+                <div className="flex items-start gap-2 min-w-0">
+                  {coverFooterShowIcons && (
+                    <div
+                      className="shrink-0 flex items-center justify-center shadow mt-0.5 transition-all"
+                      style={getIconContainerStyle()}
+                    >
+                      <Clock
+                        style={{
+                          width: `${coverFooterIconSize}px`,
+                          height: `${coverFooterIconSize}px`,
+                          color: coverFooterIconColor,
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1 text-left">
+                    <div
+                      className="font-bold uppercase tracking-wider leading-tight"
+                      style={{
+                        fontSize: `${coverFooterTitleSize}px`,
+                        color: coverFooterTitleColor,
+                      }}
+                    >
+                      <EditableText
+                        value={contactLabels.hours || 'Öffnungszeiten'}
+                        onChange={(v) => handleUpdateContactLabel('hours', v)}
+                      />
+                    </div>
+                    <div
+                      className={`font-semibold leading-tight ${
+                        coverFooterWrap ? 'break-words whitespace-normal' : 'truncate'
+                      }`}
+                      style={{
+                        fontSize: `${coverFooterValueSize}px`,
+                        color: coverFooterValueColor,
+                      }}
+                    >
+                      <EditableText
+                        value={contact.hours}
+                        onChange={(v) => handleUpdateContact('hours', v)}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Delivery Services */}
+              {showDelivery && (
+                <div className="flex items-start gap-2 min-w-0">
+                  {coverFooterShowIcons && (
+                    <div
+                      className="shrink-0 flex items-center justify-center shadow mt-0.5 transition-all"
+                      style={getIconContainerStyle()}
+                    >
+                      <Truck
+                        style={{
+                          width: `${coverFooterIconSize}px`,
+                          height: `${coverFooterIconSize}px`,
+                          color: coverFooterIconColor,
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1 text-left">
+                    <div
+                      className="font-bold uppercase tracking-wider leading-tight"
+                      style={{
+                        fontSize: `${coverFooterTitleSize}px`,
+                        color: coverFooterTitleColor,
+                      }}
+                    >
+                      <EditableText
+                        value={contactLabels.delivery || 'Bestellung über'}
+                        onChange={(v) => handleUpdateContactLabel('delivery', v)}
+                      />
+                    </div>
+                    <div
+                      className={`font-semibold leading-tight ${
+                        coverFooterWrap ? 'break-words whitespace-normal' : 'truncate'
+                      }`}
+                      style={{
+                        fontSize: `${coverFooterValueSize}px`,
+                        color: coverFooterDeliveryColor,
+                      }}
+                    >
+                      <EditableText
+                        value={contact.delivery}
+                        onChange={(v) => handleUpdateContact('delivery', v)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </footer>
+          </footer>
+        )}
       </div>
     </div>
   );

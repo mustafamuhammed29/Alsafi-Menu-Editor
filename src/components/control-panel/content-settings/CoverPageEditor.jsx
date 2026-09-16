@@ -3,6 +3,7 @@ import { Upload, RefreshCw, Type, Sparkles, Image, Sliders, Eye, EyeOff, Move, M
 import { useMenu } from '../../../context/MenuContext';
 import { DEFAULT_COVER_PAGE } from '../../../data/initialPages';
 import { optimizeImageFile } from '../../../utils/imageOptimizer';
+import CoverFooterEditor from './CoverFooterEditor';
 
 export const CoverPageEditor = ({ page }) => {
   const {
@@ -588,156 +589,8 @@ export const CoverPageEditor = ({ page }) => {
         </div>
       </div>
 
-      {/* ─── 3. BOTTOM CONTACT & RESTAURANT INFO (معلومات وبيانات التواصل بالأسفل) ─── */}
-      <div className="bg-black/40 border border-brand-gold/35 rounded-xl p-3 space-y-3 shadow-lg">
-        <span className="text-xs font-bold text-brand-gold flex items-center gap-1.5 border-b border-white/10 pb-1.5">
-          <Phone className="w-3.5 h-3.5 text-brand-gold" />
-          <span>معلومات وبيانات التواصل في أسفل الغلاف:</span>
-        </span>
-
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="text-[10px] text-gray-300 block mb-1 font-semibold">رقم الهاتف والواتساب:</label>
-            <input
-              type="text"
-              className="cms-input text-xs font-mono text-white"
-              value={contact.phone}
-              onChange={(e) => handleUpdateContact('phone', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="text-[10px] text-gray-300 block mb-1 font-semibold">أوقات العمل (Öffnungszeiten):</label>
-            <input
-              type="text"
-              className="cms-input text-xs text-white"
-              value={contact.hours}
-              onChange={(e) => handleUpdateContact('hours', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="text-[10px] text-gray-300 block mb-1 font-semibold">عنوان الفرع (Adresse):</label>
-            <input
-              type="text"
-              className="cms-input text-xs text-white"
-              value={contact.address}
-              onChange={(e) => handleUpdateContact('address', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="text-[10px] text-gray-300 block mb-1 font-semibold">خدمات التوصيل (Lieferung):</label>
-            <input
-              type="text"
-              className="cms-input text-xs text-brand-goldLight"
-              value={contact.delivery}
-              onChange={(e) => handleUpdateContact('delivery', e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Footer Bar Font Size & Text Wrap Controls */}
-        <div className="pt-2 border-t border-white/10 space-y-2">
-          {/* Text Wrap Toggle Button */}
-          <div className="flex items-center justify-between bg-black/50 p-2 rounded-lg border border-white/10">
-            <div>
-              <span className="text-[10px] text-gray-200 font-semibold block">التفاف النص التلقائي (Text Wrap):</span>
-              <span className="text-[8.5px] text-gray-400 block">نزول النص للسطر الثاني عند التكبير بدلاً من قصه بالنواقص (...)</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                const currentWrap = currentCover.coverFooterWrap !== undefined ? currentCover.coverFooterWrap : true;
-                updateCoverPage({ coverFooterWrap: !currentWrap });
-              }}
-              className={`px-2.5 py-1 rounded text-[10px] font-bold border transition ${
-                (currentCover.coverFooterWrap !== undefined ? currentCover.coverFooterWrap : true)
-                  ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/50'
-                  : 'bg-yellow-950/90 text-yellow-300 border-yellow-500/50'
-              }`}
-            >
-              {(currentCover.coverFooterWrap !== undefined ? currentCover.coverFooterWrap : true)
-                ? '✓ ملتف (مكتمل)'
-                : '✂ مقصوص (...)'}
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {/* Footer Label Size */}
-            <div className="bg-black/50 p-2 rounded-lg border border-white/10">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[9.5px] text-gray-300 font-semibold">حجم عناوين الفوتر (Labels):</span>
-                <div className="flex items-center gap-1">
-                  <input
-                    type="number"
-                    min="5"
-                    max="18"
-                    step="0.5"
-                    className="w-14 bg-black border border-brand-gold/60 text-brand-gold text-center text-[10px] font-mono font-bold rounded py-0.5"
-                    value={currentCover.coverFooterTitleSize !== undefined ? currentCover.coverFooterTitleSize : 8}
-                    onChange={(e) => {
-                      const val = parseFloat(e.target.value);
-                      updateCoverPage({ coverFooterTitleSize: val });
-                      updateSetting('page1', 'coverFooterTitleSize', val);
-                    }}
-                  />
-                  <span className="text-[9px] text-gray-400">px</span>
-                </div>
-              </div>
-              <input
-                type="range"
-                min="5"
-                max="18"
-                step="0.5"
-                className="control-slider"
-                value={currentCover.coverFooterTitleSize !== undefined ? currentCover.coverFooterTitleSize : 8}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value);
-                  updateCoverPage({ coverFooterTitleSize: val });
-                  updateSetting('page1', 'coverFooterTitleSize', val);
-                }}
-              />
-            </div>
-
-            {/* Footer Value Size */}
-            <div className="bg-black/50 p-2 rounded-lg border border-white/10">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[9.5px] text-gray-300 font-semibold">حجم نصوص الفوتر (Content):</span>
-                <div className="flex items-center gap-1">
-                  <input
-                    type="number"
-                    min="5"
-                    max="20"
-                    step="0.5"
-                    className="w-14 bg-black border border-brand-gold/60 text-brand-gold text-center text-[10px] font-mono font-bold rounded py-0.5"
-                    value={currentCover.coverFooterValueSize !== undefined ? currentCover.coverFooterValueSize : 9.5}
-                    onChange={(e) => {
-                      const val = parseFloat(e.target.value);
-                      updateCoverPage({ coverFooterValueSize: val });
-                      updateSetting('page1', 'coverFooterValueSize', val);
-                    }}
-                  />
-                  <span className="text-[9px] text-gray-400">px</span>
-                </div>
-              </div>
-              <input
-                type="range"
-                min="5"
-                max="20"
-                step="0.5"
-                className="control-slider"
-                value={currentCover.coverFooterValueSize !== undefined ? currentCover.coverFooterValueSize : 9.5}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value);
-                  updateCoverPage({ coverFooterValueSize: val });
-                  updateSetting('page1', 'coverFooterValueSize', val);
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* ─── 3. BOTTOM CONTACT & RESTAURANT INFO CONTROLLER (متحكم شريط الفوتر ومعلومات التواصل الشامل) ─── */}
+      <CoverFooterEditor page={currentCover} />
     </div>
   );
 };

@@ -9,6 +9,7 @@ import BackgroundSettings from './design-settings/BackgroundSettings';
 import ArchSettings from './design-settings/ArchSettings';
 import TypographySettings from './design-settings/TypographySettings';
 import FloatingShapesSettings from './design-settings/FloatingShapesSettings';
+import CoverFooterEditor from './content-settings/CoverFooterEditor';
 
 export const DesignTab = () => {
   const { resetScope } = useMenu();
@@ -57,6 +58,9 @@ export const DesignTab = () => {
       />
       
       <FloatingShapesSettings />
+      
+      {/* 7. Cover Page Footer Bar Controller */}
+      <CoverFooterEditor />
 
       {/* Reset Action */}
       <div className="pt-2">

@@ -1,166 +1,285 @@
-import { DEFAULT_ALSAFI_BG } from './defaultBgImage';
+import { DEFAULT_ALSAFI_BG } from './defaultBgImage.js';
+import { DEFAULT_ALSAFI_LOGO } from './defaultLogo.js';
 
 export const DEFAULT_SETTINGS = {
-  // Geometry, Arch & Dividing Line
-  archWidth: 280,             // 120px to 420px (Width of the photo arch)
-  archCurveDepth: 110,        // 0px (completely straight) to 200px (deep waist curve)
-  archWaistY: 560,            // 200px to 900px (vertical height/position of curve center)
-  archBottomOffset: 10,       // -100px to +100px (bottom spread / angle)
-  archStyle: 'classic',       // 'classic' | 'subtle' | 'straight' | 'wave'
-  archBorderWidth: 1.5,       // 0px to 6px
-  archInnerBorderWidth: 3,    // 0px to 8px
-  archBorderColor: '#8dc63f', // Brand Lime Green outer line
-  archInnerColor: '#162a1c',  // Deep Forest Green inner line
-  showArchBorder: true,       // Toggle dividing line
-  logoImage: 'logo.jpg',
-  logoSize: 36,
-  page13LogoSize: 54, // Separate & independent logo size for Page 13 (Info & Legend)
-
-  // Custom Page Background Image & Watermark (Alsafi Neon Sign Wall)
-  bgStyle: 'solid-green',     // 'true-black' | 'solid-green' | 'gradient'
-  bgPatternType: 'logoLetter',// 'stars' | 'cutlery' | 'diamonds' | 'dots' | 'logoLetter'
-  bgPatternOpacity: 3,        // 0 to 100 (opacity of the background ornament pattern)
-  bgPatternScale: 100,        // 50 to 300 (scale percentage of the pattern)
-  bgPatternColor: '#8dc63f',  // default AlsaFi brand lime green for the pattern
-  customBgImage: DEFAULT_ALSAFI_BG,
-  bgOpacity: 45,              // 0% to 100%
-  bgBlur: 0,                  // 0px to 20px
-  bgDarkness: 15,             // 0% to 90%
-  bgFit: 'cover',             // 'cover' | 'contain' | 'center'
-  bgScale: 100,               // 20% to 300%
-  bgPosX: 68,                 // 68% = perfectly centered in menu text column
-  bgPosY: 50,                 // 50% = perfectly centered Y
-
-  // QR Codes Configuration (Page 13 & Contact)
-  showQrCodes: true,
-  qrCodeSize: 68,
-  qrCodes: [
+  "archWidth": 280,
+  "archCurveDepth": 100,
+  "archWaistY": 580,
+  "archBottomOffset": -5,
+  "archStyle": "classic",
+  "archBorderWidth": 1.5,
+  "archInnerBorderWidth": 3,
+  "archBorderColor": "#c9aa58",
+  "archInnerColor": "#0f3d23",
+  "showArchBorder": true,
+  "logoImage": DEFAULT_ALSAFI_LOGO,
+  "logoSize": 86,
+  "page13LogoSize": 54,
+  "bgStyle": "creme-luxury",
+  "bgPatternType": "dots",
+  "bgPatternOpacity": 13,
+  "bgPatternScale": 120,
+  "bgPatternColor": "#c9aa58",
+  "customBgImage": "",
+  "bgOpacity": 20,
+  "bgBlur": 0,
+  "bgDarkness": 30,
+  "bgFit": "cover",
+  "bgScale": 100,
+  "bgPosX": 68,
+  "bgPosY": 50,
+  "showQrCodes": true,
+  "qrCodeSize": 110,
+  "qrCodes": [
     {
-      id: 'website',
-      title: 'WEBSITE & SPEISEKARTE',
-      url: 'https://alsafi-restaurant.de',
-      customImage: '',
-      subtitle: 'Online Speisekarte',
+      "id": "website",
+      "title": "WEBSITE & SPEISEKARTE",
+      "url": "https://alsafi-heidelberg.de/",
+      "customImage": "",
+      "subtitle": "Online Speisekarte"
     },
     {
-      id: 'google',
-      title: 'GOOGLE BEWERTUNG',
-      url: 'https://g.page/r/alsafi-restaurant/review',
-      customImage: '',
-      subtitle: 'Bewerten Sie uns',
+      "id": "google",
+      "title": "GOOGLE BEWERTUNG",
+      "url": "https://share.google/ccyEK2lp5ycbbXURu",
+      "customImage": "",
+      "subtitle": "Bewerten Sie uns"
     },
     {
-      id: 'whatsapp',
-      title: 'WHATSAPP BESTELLUNG',
-      url: 'https://wa.me/4962217259000',
-      customImage: '',
-      subtitle: 'Reservierung & Chat',
-    },
+      "id": "whatsapp",
+      "title": "WHATSAPP BESTELLUNG",
+      "url": "https://wa.me/4962217259000",
+      "customImage": "",
+      "subtitle": "Reservierung & Chat"
+    }
   ],
+  "contentOffsetX": 0,
+  "contentOffsetY": 0,
+  "contentScale": 110,
+  "contentPaddingRight": 14,
+  "contentPaddingLeft": 8,
+  "printBleedScale": 100,
+  "legendOffsetX": 0,
+  "legendOffsetY": 0,
+  "legendScale": 100,
+  "legendPaddingBottom": 4,
+  "legendTextSize": 10.5,
+  "legendTitleSize": 14,
+  "hinweiseNoticeSize": 9.5,
+  "hinweiseNoticeText": "Die Symbole beziehen sich auf die Standardzubereitung. Gerichte mit 🌶️ sind pikant bzw. scharf; 🌶️🌶️ kennzeichnet die extra scharfe Variante.",
+  "showHinweiseCard": true,
+  "showAllergenLegend": true,
+  "page13OffsetY": 0,
+  "page13OffsetX": 0,
+  "page13ContentScale": 100,
+  "page13CardGap": 8,
+  "page13BorderWidth": 1.5,
+  "page13BorderOpacity": 50,
+  "showPage13CardBorders": true,
+  "showDishAllergens": true,
+  "allergenSize": 8.5,
+  "showBorder": true,
+  "borderTop": true,
+  "borderBottom": true,
+  "borderLeft": true,
+  "borderRight": true,
+  "borderCornerStyle": "royal",
+  "borderInset": 20,
+  "borderWidth": 1.5,
+  "borderOpacity": 85,
+  "borderColorScheme": "emerald",
+  "borderColor": "#8dc63f",
+  "borderSecondaryColor": "#a6e247",
+  "photoBlend": "smooth",
+  "photoFeather": 60,
+  "autoFitPageSpacing": true,
+  "bottomOrnamentStyle": "royal",
+  "showCalloutCards": false,
+  "itemGap": 8,
+  "categoryGap": 18,
+  "titleSize": 28,
+  "subtitleSize": 11.5,
+  "taglineSize": 13.5,
+  "dietaryBarSize": 8.5,
+  "catTitleSize": 16,
+  "catSubtitleSize": 11,
+  "itemTitleSize": 14.5,
+  "priceSize": 14,
+  "descSize": 10,
+  "itemNumSize": 12,
+  "footerText": "ALSAFI RESTAURANT · HEIDELBERG",
+  "footerTextSize": 11,
+  "footerTextLetterSpacing": 0.23,
+  "footerTextColor": "muted",
+  "footerTextOffsetX": 251,
+  "footerTextOffsetY": 0,
+  "pageNumberSize": 17.5,
+  "pageNumberWeight": "bold",
+  "pageNumberColor": "gold",
+  "pageNumberOffsetX": -8,
+  "pageNumberOffsetY": 4,
+  "footerBottomOffset": 25,
+  "footerPaddingRight": 28,
+  "footerPaddingLeft": 28,
+  "footerDividerWidth": 1,
+  "footerDividerOpacity": 90,
+  "showFooterDivider": true,
+  "showFooterText": true,
+  "showPageNumber": true,
+  "qrCodeColor": "#092a16",
+  "itemBlockStyle": "card",
+  "categoryPillPaddingX": 12,
+  "categoryPillPaddingY": 4,
+  "categoryPillRadius": 6,
+  "categoryPillNoWrap": true,
+  "categoryBadgeStyle": "pill",
+  "categoryLetterSpacing": 0.12,
+  "twoColumnImageWidth": 100,
+  "twoColumnImageHeight": 225,
+  "pageBrightness": 110,
+  "pageContrast": 105,
+  "imageBrightness": 115,
+  "imageContrast": 105
+};
 
-  // Content Block Positioning (Nudge / Offset & Edge Margins)
-  contentOffsetX: 0,
-  contentOffsetY: 0,
-  contentScale: 100,            // 50% to 120% — scale entire content block as one unit
-  contentPaddingRight: 34,
-  contentPaddingLeft: 32,
-  printBleedScale: 100,       // 100% to 108% for full overscan bleed
-
-  // Page 13 Legend & Allergens Section Positioning & Typography
-  legendOffsetX: 0,
-  legendOffsetY: 0,
-  legendScale: 100,
-  legendPaddingBottom: 4,
-  legendTextSize: 9.5,        // Font size for Allergen & Additives list items (legible print size)
-  legendTitleSize: 11,        // Font size for Legend box titles
-  hinweiseNoticeSize: 8.5,    // Font size for standard preparation & spicy symbol notice
-  hinweiseNoticeText: 'Die Symbole beziehen sich auf die Standardzubereitung. Gerichte mit 🌶️ sind pikant; 🌶️🌶️ kennzeichnet die extra scharfe Variante.',
-  showHinweiseCard: true,     // Toggle for Hinweise & Symbole card
-  showAllergenLegend: true,   // Toggle for Allergen & Additives tables
-
-  // Page 13 Block Position & Card Border Controls (Whole Block & Card by Card)
-  page13OffsetY: 0,
-  page13OffsetX: 0,
-  page13ContentScale: 100,
-  page13CardGap: 8,
-  page13BorderWidth: 1.5,
-  page13BorderOpacity: 50,
-  showPage13CardBorders: true,
-
-  // Dish Allergens Display
-  showDishAllergens: true,    // Toggle for dish-level allergen tags
-  allergenSize: 8,            // 6px to 16px
-
-  // Decorative Page Frame & Borders
-  showBorder: true,
-  borderTop: true,
-  borderBottom: true,
-  borderLeft: true,
-  borderRight: true,
-  borderCornerStyle: 'royal', // 'royal' | 'geometric' | 'none'
-  borderInset: 32,             // 32px places frame & royal corners safely inside printable safe area
-  borderWidth: 1.5,           // 0.5px to 4px
-  borderOpacity: 85,          // 20% to 100%
-
-  // Photo Blend & Transition
-  photoBlend: 'smooth',       // 'smooth' | 'vignette' | 'sharp'
-  photoFeather: 60,
-
-  // Global Page & Photo Lighting (Print Brightness Optimization)
-  pageBrightness: 100,        // 80% to 160% (whole page brightness)
-  pageContrast: 100,          // 80% to 140% (whole page contrast)
-  imageBrightness: 100,       // 80% to 180% (food photos brightness boost)
-  imageContrast: 100,         // 80% to 140% (food photos contrast)
-  coverHeroBrightness: 100,   // 80% to 180% (cover photo brightness)
-  coverHeroVignette: 35,      // 0% to 100% (cover vignette shadow intensity)
-
-  // Whitespace Optimization & Luxury Ornaments
-  autoFitPageSpacing: true,   // Dynamically distributes item gaps based on page density
-  bottomOrnamentStyle: 'none', // Default is none to maximize food space
-  showCalloutCards: true,     // Shows Chef Recommendation callout cards on spare-space pages
-  twoColumnImageHeight: 245,  // Enlarged height for two-column decorative images (80px - 450px)
-  twoColumnImageWidth: 100,   // Width % for two-column decorative images (50% - 100%)
-  twoColumnImageBorder: 3,    // Border width in px
-
-  // Spacing
-  itemGap: 8,
-  categoryGap: 18,
-
-  // Header Typography
-  titleSize: 28,
-  subtitleSize: 11.5,
-  taglineSize: 13.5,
-  dietaryBarSize: 8.5,
-
-  // Category Typography
-  catTitleSize: 16,
-  catSubtitleSize: 11,
-
-  // Dish / Item Typography
-  itemTitleSize: 14,
-  priceSize: 13.5,
-  descSize: 10,
-  allergenSize: 8,
-  itemNumSize: 12,
-
-  // Footer & Page Numbers (100% Unified Across All Pages)
-  footerText: 'ALSAFI RESTAURANT · HEIDELBERG',
-  footerTextSize: 10,
-  footerTextLetterSpacing: 0.25,
-  footerTextColor: 'muted',
-  footerTextOffsetX: 0,
-  footerTextOffsetY: 0,
-  pageNumberSize: 15,
-  pageNumberWeight: 'bold',
-  pageNumberColor: 'gold',
-  pageNumberOffsetX: 0,
-  pageNumberOffsetY: 0,
-  footerBottomOffset: 36,
-  footerPaddingRight: 34,
-  footerPaddingLeft: 34,
-  footerDividerWidth: 1,
-  footerDividerOpacity: 30,
-  showFooterDivider: true,
-  showFooterText: true,
-  showPageNumber: true,
+export const DEFAULT_PAGE_OVERRIDES = {
+  "page2": {
+    "itemGap": 6,
+    "categoryGap": 10,
+    "showLogo": false,
+    "itemBlockStyle": "minimal",
+    "footerTextOffsetY": 0,
+    "footerTextOffsetX": 251,
+    "pageNumberOffsetY": 4
+  },
+  "page5": {
+    "itemGap": 6,
+    "categoryGap": 10,
+    "showLogo": false,
+    "itemBlockStyle": "minimal"
+  },
+  "page8": {
+    "itemGap": 6,
+    "categoryGap": 10,
+    "showLogo": false,
+    "itemBlockStyle": "minimal",
+    "contentScale": 100
+  },
+  "page1": {
+    "itemGap": 6,
+    "categoryGap": 12,
+    "itemBlockStyle": "card",
+    "footerTextOffsetX": 251,
+    "footerTextOffsetY": 0,
+    "pageNumberOffsetX": -8,
+    "pageNumberOffsetY": 4,
+    "contentScale": 110,
+    "coverLogoSize": 108,
+    "coverTitleSize": 35,
+    "coverBadgeSize": 12,
+    "coverSubtitleSize": 14.5,
+    "coverTaglineSize": 12.5,
+    "coverFooterTitleSize": 10.5,
+    "coverFooterValueSize": 9.5
+  },
+  "page3": {
+    "showLogo": false,
+    "footerTextOffsetX": 251,
+    "borderWidth": 1,
+    "dietaryBarSize": 10.5,
+    "footerTextOffsetY": 0,
+    "categoryPillOffsetX": 10,
+    "pageNumberOffsetX": -8,
+    "pageNumberOffsetY": 4
+  },
+  "page4": {
+    "showLogo": false,
+    "itemGap": 6,
+    "categoryGap": 12
+  },
+  "page6": {
+    "showLogo": false,
+    "itemGap": 6,
+    "categoryGap": 15,
+    "itemBlockStyle": "minimal",
+    "contentScale": 110
+  },
+  "page7": {
+    "showLogo": false,
+    "itemGap": 6,
+    "categoryGap": 12,
+    "contentScale": 110
+  },
+  "page9": {
+    "showLogo": false,
+    "itemGap": 6,
+    "categoryGap": 15,
+    "itemBlockStyle": "minimal",
+    "contentScale": 110
+  },
+  "page10": {
+    "showLogo": false,
+    "itemGap": 6,
+    "categoryGap": 10,
+    "contentScale": 100
+  },
+  "page11": {
+    "showLogo": false,
+    "contentScale": 110
+  },
+  "page12": {
+    "showLogo": false,
+    "itemGap": 29,
+    "contentOffsetX": 0,
+    "globalOffsetY": -14,
+    "contentOffsetY": 22,
+    "categoryGap": 28,
+    "contentPaddingLeft": 7,
+    "contentPaddingRight": 6,
+    "dietaryBarSize": 10.5,
+    "footerTextOffsetY": 0,
+    "footerTextOffsetX": 251,
+    "pageNumberOffsetY": 4,
+    "pageNumberOffsetX": -8,
+    "contentScale": 110,
+    "twoColumnImageWidth": 100,
+    "twoColumnImageHeight": 225
+  },
+  "page13": {
+    "pageNumberOffsetX": -8,
+    "contentOffsetX": -16,
+    "globalOffsetY": -128,
+    "headerOffsetY": -144,
+    "contentOffsetY": 64,
+    "categoryGap": 12,
+    "twoColumnImageHeight": 225,
+    "twoColumnImageWidth": 100,
+    "contentPaddingRight": 0,
+    "contentPaddingLeft": 0,
+    "itemGap": 7,
+    "qrCodeSize": 110,
+    "legendTitleSize": 14,
+    "legendOffsetX": 2,
+    "legendOffsetY": -30,
+    "legendTextSize": 10.5,
+    "footerTextOffsetX": 251,
+    "footerTextOffsetY": 0,
+    "pageNumberOffsetY": 4,
+    "printBleedScale": 100,
+    "contentScale": 117,
+    "page13LogoSize": 88,
+    "showHinweiseCard": true,
+    "showAllergenLegend": true,
+    "showQrCodes": true,
+    "catTitleSize": 16,
+    "categoryPillOffsetX": -268,
+    "categoryPillPaddingX": 9,
+    "categoryPillPaddingLeft": 9,
+    "categoryPillPaddingRight": 11,
+    "subtitleSize": 13.5,
+    "taglineSize": 11,
+    "dietaryBarSize": 11.5,
+    "footerDividerOpacity": 90,
+    "hinweiseNoticeSize": 9.5
+  }
 };

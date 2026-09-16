@@ -113,6 +113,12 @@ const BackgroundSettings = () => {
               color: 'linear-gradient(180deg, #0e2416, #07130b)',
             },
             {
+              id: 'creme-luxury',
+              label: 'كريمي ملكي فاخر (Creme-Hintergrund #F2EBD8)',
+              desc: 'خلفية عاجية كلاسيكية مع الأخضر الأساسي #0F3B2E والليموني #8DBB3E والذهبي #B88A2A ونصوص #44443E',
+              color: '#F2EBD8',
+            },
+            {
               id: 'true-black',
               label: 'أسود مطفي 100% للطباعة عالية التباين',
               desc: 'أسود نقي وأمان تام عند الطباعة مع توفير فائق في أحبار الطابعات',
@@ -124,7 +130,7 @@ const BackgroundSettings = () => {
               type="button"
               onClick={() => updateGlobalBackground('bgStyle', style.id)}
               className={`flex items-start gap-3 p-2.5 rounded-xl border transition text-right ${
-                (globalSettings.bgStyle || 'solid-green') === style.id
+                (globalSettings.bgStyle || 'creme-luxury') === style.id
                   ? 'bg-brand-gold/15 border-brand-gold text-white shadow-md'
                   : 'bg-black/60 border-white/10 text-gray-300 hover:border-white/30 hover:bg-black/80'
               }`}
@@ -136,7 +142,7 @@ const BackgroundSettings = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <span className="text-[11.5px] font-bold text-white leading-tight block">{style.label}</span>
-                  {(globalSettings.bgStyle || 'solid-green') === style.id && (
+                  {(globalSettings.bgStyle || 'creme-luxury') === style.id && (
                     <Check className="w-4 h-4 text-brand-gold shrink-0 ml-1.5" />
                   )}
                 </div>

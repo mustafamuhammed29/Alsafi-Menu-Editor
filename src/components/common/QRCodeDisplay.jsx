@@ -14,6 +14,11 @@ export const QRCodeDisplay = ({
   onUpdateUrl,
   onUpdateImage,
   onRemoveImage,
+  titleSize,
+  titleColor,
+  subtitleSize,
+  subtitleColor,
+  isCreme,
 }) => {
   const [generatedQr, setGeneratedQr] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -65,7 +70,11 @@ export const QRCodeDisplay = ({
       <EditableText
         value={qr.title}
         onChange={(v) => onUpdateTitle && onUpdateTitle(index, v)}
-        className="font-cinzel text-[10.5px] font-bold text-brand-gold tracking-wider uppercase mb-1 block"
+        className="font-cinzel font-bold tracking-wider uppercase mb-1 block transition-all"
+        style={{
+          fontSize: `${titleSize || 10.5}px`,
+          color: titleColor || (isCreme ? '#162a1c' : '#8dc63f'),
+        }}
       />
 
       {/* QR Code Container */}
@@ -73,7 +82,7 @@ export const QRCodeDisplay = ({
         className="relative bg-white p-1.5 rounded-lg border-[1.5px] border-brand-gold/70 shadow-lg cursor-pointer transition-transform group-hover:scale-105"
         style={{ width: `${size + 12}px`, height: `${size + 12}px` }}
         onClick={() => setIsEditing(!isEditing)}
-        title="انقر لتعديل الرابط أو رفع صورة باركود مخصصة"
+        title="انقر لتعديل الرابط أو النص أو رفع صورة باركود مخصصة"
       >
         {activeImageSrc ? (
           <img
@@ -101,7 +110,12 @@ export const QRCodeDisplay = ({
         <EditableText
           value={qr.subtitle}
           onChange={(v) => onUpdateSubtitle && onUpdateSubtitle(index, v)}
-          className="text-[9px] text-slate-300 font-serif italic mt-1 block"
+          className="font-serif italic mt-1 block font-bold leading-tight select-none transition-all"
+          style={{
+            fontSize: `${subtitleSize || 11.5}px`,
+            color: subtitleColor || (isCreme ? '#162a1c' : '#a6e247'),
+            textShadow: isCreme ? 'none' : '0 1px 4px rgba(0,0,0,0.9)',
+          }}
         />
       )}
 
@@ -122,10 +136,24 @@ export const QRCodeDisplay = ({
             </button>
           </div>
 
+          {/* Subtitle text input in popover */}
+          <div className="mb-2">
+            <label className="text-[10px] text-gray-300 font-semibold block mb-0.5">
+              النص التوضيحي أسفل الرمز:
+            </label>
+            <input
+              type="text"
+              value={qr.subtitle || ''}
+              onChange={(e) => onUpdateSubtitle && onUpdateSubtitle(index, e.target.value)}
+              placeholder="مثال: Online Speisekarte"
+              className="cms-input text-[11px] py-1 m-0 font-medium"
+            />
+          </div>
+
           {/* Option 1: URL Input */}
           <div className="mb-2.5">
             <label className="text-[10px] text-gray-300 font-semibold block mb-1">
-              1. رابط الباركود (يتم توليد الباركود تلقائياً):
+              رابط الباركود:
             </label>
             <div className="flex gap-1">
               <input

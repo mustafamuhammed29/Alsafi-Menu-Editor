@@ -9,8 +9,8 @@ export const optimizeImageFile = (file, maxWidth = 1800, maxHeight = 2400, quali
       return reject(new Error('No file provided'));
     }
 
-    // If SVG or tiny file (< 200KB), return as is
-    if (file.type === 'image/svg+xml' || file.size < 200 * 1024) {
+    // If SVG, return as is
+    if (file.type === 'image/svg+xml') {
       const reader = new FileReader();
       reader.onload = (e) => resolve(e.target.result);
       reader.onerror = reject;
@@ -24,6 +24,13 @@ export const optimizeImageFile = (file, maxWidth = 1800, maxHeight = 2400, quali
       img.onload = () => {
         let width = img.width;
         let height = img.height;
+
+        const isPng = file.type === 'image/png' || (!file.type && file.name && file.name.toLowerCase().endsWith('.png'));
+
+        // If file is reasonably sized and is PNG, keep original to guarantee 100% vector-crisp alpha
+        if (isPng && width <= maxWidth && height <= maxHeight && file.size < 500 * 1024) {
+          return resolve(e.target.result);
+        }
 
         // Calculate proportional scale
         if (width > maxWidth || height > maxHeight) {
@@ -41,9 +48,16 @@ export const optimizeImageFile = (file, maxWidth = 1800, maxHeight = 2400, quali
           return resolve(e.target.result);
         }
 
-        // Fill background with white to prevent black background on transparent images converted to JPEG
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, width, height);
+        const outputFormat = isPng ? 'image/png' : 'image/jpeg';
+
+        // Clear canvas to ensure complete alpha transparency for PNGs
+        ctx.clearRect(0, 0, width, height);
+
+        // Only fill background with white if converting to JPEG (since JPEG does not support alpha channel)
+        if (outputFormat === 'image/jpeg') {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+        }
 
         // High quality image smoothing
         ctx.imageSmoothingEnabled = true;
@@ -51,8 +65,7 @@ export const optimizeImageFile = (file, maxWidth = 1800, maxHeight = 2400, quali
         ctx.drawImage(img, 0, 0, width, height);
 
         // Preserve PNG transparency if PNG, otherwise use high-quality JPEG
-        const outputFormat = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-        const dataUrl = canvas.toDataURL(outputFormat, quality);
+        const dataUrl = canvas.toDataURL(outputFormat, isPng ? undefined : quality);
         resolve(dataUrl);
       };
       img.onerror = () => resolve(e.target.result);

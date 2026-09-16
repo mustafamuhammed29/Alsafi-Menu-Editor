@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_PAGES, DEFAULT_COVER_PAGE } from '../data/initialPages';
 import { DEFAULT_FLYER_DATA } from '../data/initialFlyer';
 import { DEFAULT_BIFOLD_FLYER } from '../data/initialBifoldFlyer';
-import { DEFAULT_SETTINGS } from '../data/defaultSettings';
+import { DEFAULT_SETTINGS, DEFAULT_PAGE_OVERRIDES } from '../data/defaultSettings';
 
 const MenuContext = createContext(null);
 
@@ -23,16 +23,14 @@ export const normalizeImage = (img, idx = 0) => {
   };
 };
 
-export const DATA_VERSION = '2026_09_03_BRAND_IDENTITY_ALSAFI_V32';
+export const DATA_VERSION = '2026_09_15_ALSAFI_PERFECTED_ORIGINALS_V34';
 
-// Global cache sync check before any state initialization
+// Global cache sync check: auto-heal settings and logo cache while preserving user-edited pages
 try {
   const currentVersion = localStorage.getItem('alsafi_menu_version');
   if (currentVersion !== DATA_VERSION) {
-    localStorage.removeItem('alsafi_menu_pages');
-    localStorage.removeItem('alsafi_cover_page');
-    localStorage.removeItem('alsafi_bifold_flyer_data');
     localStorage.removeItem('alsafi_menu_settings');
+    localStorage.removeItem('alsafi_menu_overrides');
     localStorage.setItem('alsafi_menu_version', DATA_VERSION);
   }
 } catch (e) {
@@ -218,10 +216,13 @@ export const MenuProvider = ({ children }) => {
   const resetToOfficialPdfData = () => {
     setPages(INITIAL_PAGES);
     setGlobalSettings(DEFAULT_SETTINGS);
+    setPageOverrides(DEFAULT_PAGE_OVERRIDES);
+    setCoverPageData(DEFAULT_COVER_PAGE);
     localStorage.setItem('alsafi_menu_version', DATA_VERSION);
     localStorage.setItem('alsafi_menu_pages', JSON.stringify(INITIAL_PAGES));
     localStorage.setItem('alsafi_menu_settings', JSON.stringify(DEFAULT_SETTINGS));
-    // Note: coverPageData is deliberately preserved and NOT erased!
+    localStorage.setItem('alsafi_menu_overrides', JSON.stringify(DEFAULT_PAGE_OVERRIDES));
+    localStorage.setItem('alsafi_cover_page', JSON.stringify(DEFAULT_COVER_PAGE));
   };
 
   const [globalSettings, setGlobalSettings] = useState(() => {
@@ -233,6 +234,9 @@ export const MenuProvider = ({ children }) => {
         if (parsed.qrCodes) {
           parsed.qrCodes = parsed.qrCodes.map(q => q.id === 'whatsapp' && (q.url?.includes('49176') || !q.url) ? { ...q, url: 'https://wa.me/4962217259000' } : q);
         }
+        if (!parsed.logoImage || parsed.logoImage === 'logo.jpg') {
+          parsed.logoImage = DEFAULT_SETTINGS.logoImage;
+        }
         return { ...DEFAULT_SETTINGS, ...parsed };
       }
       return DEFAULT_SETTINGS;
@@ -243,10 +247,15 @@ export const MenuProvider = ({ children }) => {
 
   const [pageOverrides, setPageOverrides] = useState(() => {
     try {
+      const savedVersion = localStorage.getItem('alsafi_menu_version');
       const saved = localStorage.getItem('alsafi_menu_overrides');
-      return saved ? JSON.parse(saved) : {};
+      if (savedVersion === DATA_VERSION && saved) {
+        return JSON.parse(saved);
+      }
+      localStorage.setItem('alsafi_menu_overrides', JSON.stringify(DEFAULT_PAGE_OVERRIDES));
+      return DEFAULT_PAGE_OVERRIDES;
     } catch {
-      return {};
+      return DEFAULT_PAGE_OVERRIDES;
     }
   });
 
@@ -662,7 +671,11 @@ export const MenuProvider = ({ children }) => {
   const updateSetting = (scope, key, value) => {
     let val = value;
     if (typeof value === 'string' && !isNaN(value) && value.trim() !== '') {
-      val = Number(value);
+      if (value.length > 1 && value.startsWith('0')) {
+        val = value;
+      } else {
+        val = Number(value);
+      }
     }
     if (scope === 'global') {
       setGlobalSettings((prev) => ({ ...prev, [key]: val }));
@@ -690,7 +703,11 @@ export const MenuProvider = ({ children }) => {
     if (scope !== 'global') {
       setPageOverrides((prev) => {
         const copy = { ...prev };
-        delete copy[scope];
+        if (DEFAULT_PAGE_OVERRIDES && DEFAULT_PAGE_OVERRIDES[scope]) {
+          copy[scope] = { ...DEFAULT_PAGE_OVERRIDES[scope] };
+        } else {
+          delete copy[scope];
+        }
         return copy;
       });
     } else {

@@ -35,25 +35,35 @@ export const PageFooter = ({
   const dividerOpacity = p.footerDividerOpacity !== undefined ? p.footerDividerOpacity / 100 : 0.3;
   const dividerWidth = p.footerDividerWidth !== undefined ? p.footerDividerWidth : 1;
 
+  const isCreme = p.bgStyle === 'creme-luxury';
+
   // Text Color Styling
-  let textColorClass = 'text-brand-textMuted';
-  if (footerTextColor === 'gold') {
-    textColorClass = 'text-brand-gold';
-  } else if (footerTextColor === 'gold-gradient') {
-    textColorClass = 'bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] via-[#A6E247] to-[#8DC63F]';
-  } else if (footerTextColor === 'white') {
-    textColorClass = 'text-white';
+  let textColorClass = isCreme ? 'text-[#44443E]' : 'text-brand-textMuted';
+  if (!isCreme) {
+    if (footerTextColor === 'gold') {
+      textColorClass = 'text-brand-gold';
+    } else if (footerTextColor === 'gold-gradient') {
+      textColorClass = 'bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] via-[#A6E247] to-[#8DC63F]';
+    } else if (footerTextColor === 'white') {
+      textColorClass = 'text-white';
+    }
   }
 
   // Page Number Color Styling
-  let numberColorClass = 'text-brand-gold';
-  if (pageNumberColor === 'gold-gradient') {
-    numberColorClass = 'bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] via-[#A6E247] to-[#8DC63F]';
-  } else if (pageNumberColor === 'white') {
-    numberColorClass = 'text-white';
-  } else if (pageNumberColor === 'muted') {
-    numberColorClass = 'text-brand-textMuted';
+  let numberColorClass = isCreme ? 'text-[#B88A2A]' : 'text-brand-gold';
+  if (!isCreme) {
+    if (pageNumberColor === 'gold-gradient') {
+      numberColorClass = 'bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] via-[#A6E247] to-[#8DC63F]';
+    } else if (pageNumberColor === 'white') {
+      numberColorClass = 'text-white';
+    } else if (pageNumberColor === 'muted') {
+      numberColorClass = 'text-brand-textMuted';
+    }
   }
+
+  const dividerBorderColor = isCreme
+    ? `rgba(184, 138, 42, ${dividerOpacity})`
+    : `rgba(201, 170, 88, ${dividerOpacity})`;
 
   return (
     <footer
@@ -64,7 +74,7 @@ export const PageFooter = ({
         right: `${footerPaddingRight}px`,
         paddingTop: showDivider ? '4px' : '0px',
         paddingBottom: '2px',
-        borderTop: showDivider ? `${dividerWidth}px solid rgba(201, 170, 88, ${dividerOpacity})` : 'none',
+        borderTop: showDivider ? `${dividerWidth}px solid ${dividerBorderColor}` : 'none',
         height: '28px',
         boxSizing: 'border-box',
       }}

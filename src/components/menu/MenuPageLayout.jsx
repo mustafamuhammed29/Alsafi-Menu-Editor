@@ -80,6 +80,8 @@ export const MenuPageLayout = ({
     return () => clearTimeout(timer);
   }, [pageData, pageSettings, smartItemTitleSize, smartDescSize, smartGap, smartCatGap]);
 
+  const isCreme = !p.bgStyle || p.bgStyle === 'creme-luxury';
+
   // Premium Background Styling
   let bgColor = '#0a1610'; 
   let bgImage = '';
@@ -87,7 +89,7 @@ export const MenuPageLayout = ({
   if (p.bgStyle === 'gradient') {
     bgColor = '#0a1610';
     bgImage = 'radial-gradient(ellipse at top center, #163322 0%, #0a1610 70%, #040d08 100%)';
-  } else if (p.bgStyle === 'solid-green' || !p.bgStyle) {
+  } else if (p.bgStyle === 'solid-green') {
     bgColor = '#0a1610';
     bgImage = 'none';
   } else if (p.bgStyle === 'emerald-deep') {
@@ -99,14 +101,18 @@ export const MenuPageLayout = ({
   } else if (p.bgStyle === 'damascus-dark') {
     bgColor = '#07130b';
     bgImage = 'linear-gradient(180deg, #0e2416 0%, #07130b 60%, #030805 100%)';
+  } else if (!p.bgStyle || p.bgStyle === 'creme-luxury') {
+    bgColor = '#F2EBD8';
+    bgImage = 'radial-gradient(ellipse at 50% 20%, #FAF6EE 0%, #F2EBD8 65%, #E8DFCA 100%)';
   } else if (p.bgStyle === 'true-black') {
     bgColor = '#000000';
     bgImage = 'radial-gradient(ellipse at top center, #0a0a0a 0%, #000000 80%)';
   }
 
-  const patternOpacity = p.bgPatternOpacity !== undefined ? (p.bgPatternOpacity / 100).toFixed(3) : 0.025;
+  const defaultPatternColor = isCreme ? '#B88A2A' : '#8dc63f';
+  const patternOpacity = p.bgPatternOpacity !== undefined ? (p.bgPatternOpacity / 100).toFixed(3) : (isCreme ? '0.04' : '0.025');
   const patternScale = p.bgPatternScale !== undefined ? p.bgPatternScale / 100 : 1;
-  const patternColor = p.bgPatternColor || '#8dc63f';
+  const patternColor = p.bgPatternColor && p.bgPatternColor !== '#8dc63f' ? p.bgPatternColor : defaultPatternColor;
   let patternSvg = '';
   
   if (p.bgPatternType === 'none') {
@@ -180,7 +186,7 @@ export const MenuPageLayout = ({
     <div className="a4-page-wrapper" id={pageData.id}>
       <div 
         ref={containerRef}
-        className={`a4-page ${isOverflowing ? 'a4-overflow-detected' : ''}`} 
+        className={`a4-page ${isOverflowing ? 'a4-overflow-detected' : ''} ${isCreme ? 'theme-creme-luxury' : ''}`} 
         style={{ 
           backgroundColor: bgColor, 
           backgroundImage: bgImage || 'none',
@@ -237,6 +243,10 @@ export const MenuPageLayout = ({
           borderInset={p.borderInset !== undefined ? p.borderInset : 32}
           borderWidth={p.borderWidth !== undefined ? p.borderWidth : 1.5}
           borderOpacity={p.borderOpacity !== undefined ? p.borderOpacity : 85}
+          borderColorScheme={p.borderColorScheme}
+          borderColor={p.borderColor}
+          borderSecondaryColor={p.borderSecondaryColor}
+          theme={isCreme ? 'creme' : 'default'}
         />
 
         {/* Interactive Floating Geometric Food & Ornament Shapes */}
@@ -260,8 +270,8 @@ export const MenuPageLayout = ({
           archStyle={p.archStyle || 'classic'}
           archBorderWidth={p.archBorderWidth !== undefined ? p.archBorderWidth : 1.5}
           archInnerBorderWidth={p.archInnerBorderWidth !== undefined ? p.archInnerBorderWidth : 3}
-          archBorderColor={p.archBorderColor || '#8dc63f'}
-          archInnerColor={p.archInnerColor || '#162a1c'}
+          archBorderColor={isCreme ? '#8DBB3E' : (p.archBorderColor || '#8dc63f')}
+          archInnerColor={isCreme ? '#0F3B2E' : (p.archInnerColor || '#162a1c')}
           showArchBorder={p.showArchBorder !== false}
           photoBlend={p.photoBlend || 'smooth'}
           photoFeather={p.photoFeather || 60}
@@ -294,7 +304,7 @@ export const MenuPageLayout = ({
               <EditableText
                 value={pageData.header.subtitle}
                 onChange={(v) => onUpdateHeader(pageIndex, 'subtitle', v)}
-                className="tracking-[0.25em] text-brand-goldLight uppercase font-cinzel font-semibold block mb-0.5"
+                className={`tracking-[0.25em] uppercase font-cinzel font-semibold block mb-0.5 ${isCreme ? 'text-[#B88A2A]' : 'text-brand-goldLight'}`}
                 style={{ fontSize: `${p.subtitleSize || (p.descSize + 1)}px` }}
               />
 
@@ -306,6 +316,8 @@ export const MenuPageLayout = ({
                   className="mb-0.5"
                   multiplier={1}
                   showSubtext={true}
+                  theme={isCreme ? 'creme' : 'default'}
+                  isCreme={isCreme}
                 />
               )}
 
@@ -313,32 +325,35 @@ export const MenuPageLayout = ({
                 value={pageData.header.title}
                 onChange={(v) => onUpdateHeader(pageIndex, 'title', v)}
                 tagName="h2"
-                className="font-playfair font-bold text-white leading-tight text-center block mb-0.5"
+                className={`font-playfair font-bold leading-tight text-center block mb-0.5 ${isCreme ? 'text-[#0F3B2E]' : 'text-white'}`}
                 style={{ fontSize: `${p.titleSize || 26}px` }}
               />
 
-              <div className="flex items-center gap-2 text-brand-goldLight opacity-90 mb-0.5">
-                <span className="text-[10px]">❧</span>
+              <div className={`flex items-center gap-2 mb-0.5 ${isCreme ? 'text-[#44443E] opacity-90' : 'text-brand-goldLight opacity-90'}`}>
+                <span className={`text-[10px] ${isCreme ? 'text-[#8DBB3E]' : ''}`}>❧</span>
                 <EditableText
                   value={pageData.header.tagline}
                   onChange={(v) => onUpdateHeader(pageIndex, 'tagline', v)}
                   className="font-serif italic block"
                   style={{ fontSize: `${p.taglineSize || (p.itemTitleSize - 1)}px` }}
                 />
-                <span className="text-[10px]">☙</span>
+                <span className={`text-[10px] ${isCreme ? 'text-[#8DBB3E]' : ''}`}>☙</span>
               </div>
 
               {/* Dietary Bar with clean flex-wrapping and safe bounds */}
               {pageData.header.showDietaryBar && (
                 <div
-                  className="dietary-bar font-bold text-brand-goldLight uppercase tracking-wider shadow-lg py-1 px-4 mt-1.5 max-w-full flex items-center justify-center gap-4"
-                  style={{ fontSize: `${p.dietaryBarSize || 8}px` }}
+                  className={`dietary-bar font-bold uppercase tracking-wider py-1 px-4 mt-1.5 max-w-full flex items-center justify-center gap-4 ${isCreme ? 'border-[#B88A2A]/40 text-[#44443E] shadow-sm' : 'text-brand-goldLight shadow-lg'}`}
+                  style={{
+                    fontSize: `${p.dietaryBarSize || 8}px`,
+                    ...(isCreme ? { backgroundColor: 'rgba(242, 235, 216, 0.7)' } : {}),
+                  }}
                 >
                   <span className="flex items-center gap-1">
-                    <span className="text-brand-accent text-[9.5px]">🌱</span> Vegan
+                    <span className="text-[#8DBB3E] text-[9.5px]">🌱</span> Vegan
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="text-green-500 text-[9.5px]">🥬</span> Vegetarisch
+                    <span className="text-[#0F3B2E] text-[9.5px]">🥬</span> Vegetarisch
                   </span>
                   <span className="flex items-center gap-1">
                     <span className="text-red-500 text-[9.5px]">🌶️</span> Pikant

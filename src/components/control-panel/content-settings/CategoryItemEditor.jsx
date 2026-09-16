@@ -3,7 +3,9 @@ import { Plus, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 import { useMenu } from '../../../context/MenuContext';
 
 const CategoryItemEditor = ({ editPageIdx, editCatIdx, currentCat }) => {
-  const { addItem, moveItem, deleteItem, updateItem, updateCategory } = useMenu();
+  const { addItem, moveItem, deleteItem, updateItem, updateCategory, updateSetting, getEffectiveSettingsForPage } = useMenu();
+  const pageScope = `page${editPageIdx + 1}`;
+  const pageSettings = getEffectiveSettingsForPage ? getEffectiveSettingsForPage(editPageIdx) : {};
 
   return (
     <div className="space-y-3">
@@ -131,14 +133,30 @@ const CategoryItemEditor = ({ editPageIdx, editCatIdx, currentCat }) => {
             </div>
 
             <div className="mt-2">
-              <label className="cms-label">الحساسية / Zusatzstoffe</label>
+              <div className="flex items-center justify-between mb-0.5">
+                <label className="cms-label m-0">الحساسية / Zusatzstoffe:</label>
+                <div className="flex items-center gap-1">
+                  <span className="text-[9px] text-gray-400">حجم الخط:</span>
+                  <input
+                    type="number"
+                    min="6"
+                    max="18"
+                    step="0.5"
+                    className="w-12 bg-black border border-brand-gold/40 text-yellow-300 text-center text-[9px] font-mono font-bold rounded py-0.2"
+                    value={pageSettings?.allergenSize !== undefined ? pageSettings.allergenSize : 8.5}
+                    onChange={(e) => updateSetting(pageScope, 'allergenSize', parseFloat(e.target.value) || 8.5)}
+                    title="تعديل حجم خط (Zusatzstoffe) في هذه الصفحة"
+                  />
+                  <span className="text-[8.5px] text-gray-400 font-mono">px</span>
+                </div>
+              </div>
               <input
                 type="text"
                 className="cms-input text-[11px]"
                 dir="ltr"
                 value={item.allergens || ''}
                 onChange={(e) => updateItem(editPageIdx, editCatIdx, iIdx, 'allergens', e.target.value)}
-                placeholder="Allergene: A, G, K"
+                placeholder="Zusatzstoffe: 1, 3 أو Allergene: A, G"
               />
             </div>
 

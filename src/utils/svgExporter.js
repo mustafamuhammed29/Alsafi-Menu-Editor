@@ -277,6 +277,10 @@ const capturePageAsSVG = async (element) => {
   document.head.appendChild(hideTextStyle);
   element.classList.add('temp-export-clean-bg');
 
+  // Temporarily disable contentEditable on all editable elements
+  const editables = Array.from(element.querySelectorAll('[contenteditable="true"]'));
+  editables.forEach((el) => el.setAttribute('contenteditable', 'false'));
+
   let bgImgDataUrl;
   try {
     const captureOpts = {
@@ -284,8 +288,8 @@ const capturePageAsSVG = async (element) => {
       backgroundColor: bgColor,
       quality: 0.85,
       pixelRatio: 3.15, // 300 DPI precision
-      canvasWidth: w,
-      canvasHeight: h,
+      canvasWidth: Math.round(w * 3.15),
+      canvasHeight: Math.round(h * 3.15),
       skipFonts: false,
       cacheBust: false,
       imagePlaceholder: fallbackPlaceholder,
@@ -316,6 +320,7 @@ const capturePageAsSVG = async (element) => {
     if (hideTextStyle.parentNode) {
       document.head.removeChild(hideTextStyle);
     }
+    editables.forEach((el) => el.setAttribute('contenteditable', 'true'));
   }
 
   // 4. Generate SVG vector layers
