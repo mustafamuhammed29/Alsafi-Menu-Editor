@@ -10,3 +10,4 @@ bin/
 *.json
 !package.json
 !package-lock.json
+!f.json

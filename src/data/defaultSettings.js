@@ -33,10 +33,10 @@ export const DEFAULT_SETTINGS = {
   "qrCodes": [
     {
       "id": "website",
-      "title": "WEBSITE & SPEISEKARTE",
+      "title": "WEBSITE & BESTELLUNG",
       "url": "https://alsafi-heidelberg.de/",
       "customImage": "",
-      "subtitle": "Online Speisekarte"
+      "subtitle": "Speisekarte & bestellen"
     },
     {
       "id": "google",
@@ -50,7 +50,7 @@ export const DEFAULT_SETTINGS = {
       "title": "WHATSAPP BESTELLUNG",
       "url": "https://wa.me/4962217259000",
       "customImage": "",
-      "subtitle": "Reservierung & Chat"
+      "subtitle": "Bestellung & Chat"
     }
   ],
   "contentOffsetX": 0,
@@ -195,7 +195,8 @@ export const DEFAULT_PAGE_OVERRIDES = {
   "page4": {
     "showLogo": false,
     "itemGap": 6,
-    "categoryGap": 12
+    "categoryGap": 12,
+    "contentScale": 100
   },
   "page6": {
     "showLogo": false,
@@ -280,6 +281,8 @@ export const DEFAULT_PAGE_OVERRIDES = {
     "taglineSize": 11,
     "dietaryBarSize": 11.5,
     "footerDividerOpacity": 90,
-    "hinweiseNoticeSize": 9.5
+    "hinweiseNoticeSize": 9.5,
+    "cateringDeliveryServicesVal": "Website · Lieferando · Uber Eats · Wolt",
+    "cateringBadgeTitle": "CATERING · LIEFERUNG · ABHOLUNG"
   }
 };

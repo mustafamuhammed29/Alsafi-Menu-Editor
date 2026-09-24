@@ -23,7 +23,7 @@ export const normalizeImage = (img, idx = 0) => {
   };
 };
 
-export const DATA_VERSION = '2026_09_15_ALSAFI_PERFECTED_ORIGINALS_V34';
+export const DATA_VERSION = '2026_09_24_ALSAFI_PERFECTED_V35';
 
 // Global cache sync check: auto-heal settings and logo cache while preserving user-edited pages
 try {
